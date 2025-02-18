@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="client-files/style.css">
+    <title>fosu</title>
+</head>
+
+<body>
+    <canvas></canvas>
+    <button id="play-skip-btn" class="ontop">
+        <img src="client-files/play-skip.png" alt="a">
+    </button>
+    <div id="songselect-container" class="ontop"></div>
+    <div id="songselect-metadata" class="ontop">
+        <p><span id="meta-artist"></span> - <span id="meta-title"></span>[<span id="meta-diffname"></span>]</p>
+        <p>Mapped by <span id="meta-creator">-</span></p>
+        <p><b>AR:</b><span id="meta-ar">-</span> <b>CS:</b><span id="meta-cs">-</span> <b>OD:</b><span
+                id="meta-od">-</span> <b>HP:</b><span id="meta-hp">-</span></p>
+    </div>
+
+    <div id="pause-overlay" class="ontop">
+        <div id="pause-buttons">
+            <button id="pause-continue">Continue</button>
+            <button id="pause-retry">Retry</button>
+            <button id="pause-back">Back</button>
+        </div>
+
+    </div>
+
+    <div id="result" class="ontop">
+        <table>
+            <tr>
+                <td><img src="./client-files/hit300.png" alt="perfect"></td>
+                <td><span id="result-300">0</span></td>
+            </tr>
+            <tr>
+                <td><img src="./client-files/hit100.png" alt="okay"></td>
+                <td><span id="result-100">0</span></td>
+            </tr>
+            <tr>
+                <td><img src="./client-files/hit50.png" alt="meh"></td>
+                <td><span id="result-50">0</span></td>
+            </tr>
+            <tr>
+                <td><img src="./client-files/hit0.png" alt="miss"></td>
+                <td><span id="result-0">0</span></td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td><span>Accuracy:</span></td>
+                <td><span id="result-acc">0%</span></td>
+            </tr>
+            <tr>
+                <td><span>Max combo:</span></td>
+                <td><span id="result-maxcombo">0x</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="result-metadata" class="ontop">
+        <p><span id="resultmeta-artist"></span> - <span id="resultmeta-title"></span>[<span id="resultmeta-diffname"></span>]</p>
+        <p>Mapped by <span id="resultmeta-creator"></span></p>
+        <p>Played by <span id="result-playername">you :)</span></p>
+    </div>
+
+    <audio src="" preload="auto"></audio>
+
+    <script defer type="module" src="client-js/main.js"></script>
+</body>
+
+</html>

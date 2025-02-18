@@ -1,0 +1,277 @@
+import { SongSelectionBuilder } from "./songSelectionBuilder.js";
+import { songSelectionManager } from "./songSelectionManager.js";
+import { Sprite, SpriteImage } from "./sprite.js";
+import { Animation, Timeline, EASING } from "./animationEngine.js";
+import { SongAudioHandler } from "./songAudioHandler.js";
+import { BackgrondImageManager } from "./backgroundImage.js";
+import { BeatmapLoader } from "./beatmapLoader.js";
+import { BeatmapPlayer } from "./beatmapPlayer.js";
+import { SkinResourceManager } from "./skinResourceManager.js";
+import { HitCircle } from "./hitObjectCircle.js";
+import { Slider } from "./hitObjectSlider.js";
+import { AccuracyJudgment } from "./accuracyJudgment.js";
+import { states, SongSelecting, Playing, Paused, Failed, Loading, Result } from "./gameStates.js";
+import { InputHandler } from "./InputHandler.js";
+import { Cursor } from "./cursor.js";
+import { AccuracyMeter } from "./accuracyMeter.js";
+import { ComboMeter } from "./comboMeter.js";
+import { AudioManager } from "./audioManager.js";
+import { InputOverlay } from "./inputOverlay.js";
+import { ResultScreenUpdater } from "./resultScreenUpdate.js";
+
+const config = {
+    sound: {
+        musicVolume: 0.07,
+        effectVolume: 0.1
+    },
+    visuals: {
+        skin: "OsuDefaultSkin",
+        cursorScale: 1.5
+    },
+    gameplay: {
+        mouseButtonsInGame: false,
+        hide300Points: true,
+        backgroundDim: 0.75
+    },
+    inputs: {
+        hitKeyA: "KeyX",
+        hitKeyB: "KeyC"
+    }
+}
+
+class Game {
+    constructor(cfg) {
+        this.canvas = document.querySelector("canvas");
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.ctx = this.canvas.getContext("2d");
+
+        this.CONFIG = cfg;
+
+        this.inputHandler = new InputHandler();
+
+        this.STATE_ENUM = states
+        this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result];
+
+        this.SPRITEIMG = SpriteImage;
+        this.SPRITE = Sprite;
+
+        this.EASINGS = EASING;
+        this.ANI = Animation;
+        this.TL = Timeline;
+
+        this.INPUTHANDLER = InputHandler;
+        this.CURSOR = Cursor;
+        this.HITCIRCLE = HitCircle;
+        this.SLIDER = Slider;
+        this.INPUTOVERLAY = InputOverlay;
+
+        this.auMgr = new AudioManager();
+        this.auMgr.setMasterVolume(this.CONFIG.sound.effectVolume);
+
+        this.songSelectContainer = document.querySelector("#songselect-container");
+        this.songSelectMetadata = {
+            container: document.querySelector("#songselect-metadata"),
+            title: document.querySelector("#meta-title"),
+            creator: document.querySelector("#meta-creator"),
+            artist: document.querySelector("#meta-artist"),
+            diffName: document.querySelector("#meta-diffname"),
+            AR: document.querySelector("#meta-ar"),
+            CS: document.querySelector("#meta-cs"),
+            OD: document.querySelector("#meta-od"),
+            HP: document.querySelector("#meta-hp")
+
+        }
+
+        this.pauseOverlay = document.querySelector("#pause-overlay");
+        this.pauseButtons = {
+            continue: document.querySelector("#pause-continue"),
+            retry: document.querySelector("#pause-retry"),
+            back: document.querySelector("#pause-back"),
+        }
+
+        this.resultScreen = {
+            container: document.querySelector("#result"),
+            perfectCount: document.querySelector("#result-300"),
+            okayCount: document.querySelector("#result-100"),
+            mehCount: document.querySelector("#result-50"),
+            missCount: document.querySelector("#result-0"),
+            accuracy: document.querySelector("#result-acc"),
+            maxComboCount: document.querySelector("#result-maxcombo"),
+        }
+
+        this.resultMetadata = {
+            container: document.querySelector("#result-metadata"),
+            title: document.querySelector("#resultmeta-title"),
+            creator: document.querySelector("#resultmeta-creator"),
+            artist: document.querySelector("#resultmeta-artist"),
+            diffName: document.querySelector("#resultmeta-diffname"),
+        }
+
+
+        this.introSkipButton = document.querySelector("#play-skip-btn");
+
+        this.skinResourceManager = new SkinResourceManager(this);
+        //this.skinResourceManager.loadSkin("OsuDefaultSkin");
+        this.skinResourceManager.loadSkin(this.CONFIG.visuals.skin);
+        //this.skinResourceManager.loadDefault();
+
+        this.loadingImg = new SpriteImage("client-files/loading.png");
+        this.loadingSprite = new Sprite(this.loadingImg);
+        this.loading = false;
+        this.loadingAnimation = new Animation(0, 1000, 0, 6.28, this.EASINGS.Linear, true);
+
+        this.ACCJUDGMENT = AccuracyJudgment;
+        this.accuracyMeter = new AccuracyMeter(this);
+        this.comboMeter = new ComboMeter(this);
+        this.songAudioHandler = new SongAudioHandler(this);
+        this.backgroundManager = new BackgrondImageManager(this);
+        this.beatmapPlayer = new BeatmapPlayer(this);
+        this.beatmapLoader = new BeatmapLoader(this);
+        new SongSelectionBuilder(this);
+        this.songSelectManager = new songSelectionManager(this);
+        this.cursor = new Cursor(this);
+        this.inputOverlay = new InputOverlay(this);
+
+        this.resultScreenUpdater = new ResultScreenUpdater(this);
+
+        window.addEventListener("resize", () => { this.resizeHandler() });
+        this.pauseButtons.continue.addEventListener("click", () => { this.pauseContinue() });
+        this.pauseButtons.retry.addEventListener("click", () => { this.pauseRetry() });
+        this.pauseButtons.back.addEventListener("click", () => { this.pauseBack() });
+        this.introSkipButton.addEventListener("click", () => { this.beatmapPlayer.skipIntro() });
+
+        this.clock = 0;
+        // Game starts in the song selection menu
+        this.currentState;
+        this.setState(0);
+    }
+
+    update(timestamp) {
+
+        this.clock = timestamp;
+
+        this.currentState.handleInput();
+        this.songAudioHandler.update();
+        this.backgroundManager.update();
+        this.beatmapPlayer.update();
+
+        if (this.loading) {
+            this.loadingAnimation.update(this.clock);
+            this.loadingSprite.rotation = this.loadingAnimation.currentValue;
+            this.loadingSprite.x = this.canvas.width * 0.5;
+            this.loadingSprite.y = this.canvas.height * 0.5;
+        }
+    }
+
+    render() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.backgroundManager.render();
+        this.beatmapPlayer.render();
+
+        if (this.loading) {
+            this.loadingSprite.render(this.ctx);
+        }
+
+        if (this.beatmapPlayer.playing) {
+            this.accuracyMeter.render();
+            this.comboMeter.render();
+            this.inputOverlay.render();
+            this.cursor.render();
+        }
+    }
+
+    setState(stateEnum) {
+        this.currentState = new this.STATES[stateEnum](this);
+        console.log(`game state changed to: ${this.currentState.stateName}`)
+
+        this.currentState.enter();
+    }
+
+    setLoadingCircle(state) {
+        this.loading = state;
+    }
+
+    resizeHandler() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        this.backgroundManager.resize();
+    }
+
+    pauseRetry() {
+        this.setState(states.PLAYING);
+        this.pauseOverlay.animate([
+            { filter: "opacity(100%)" },
+            { filter: "opacity(0%)" }
+        ],
+            {
+                duration: 250,
+                fill: "forwards"
+            }
+        );
+        this.comboMeter.reset();
+        this.accuracyMeter.reset();
+        this.songAudioHandler.reset();
+        this.beatmapPlayer.retry();
+        setTimeout(() => {
+            this.pauseOverlay.style.display = "none";
+            //this.songAudioHandler.play();
+        }, 500);
+    }
+
+    pauseContinue() {
+        // I am repeating myself here, i know!
+        // But there is only one difference
+        // I gave the player 1 second pause to adjust their aim when the continue button is used instead of the Escape key
+        this.setState(states.PLAYING);
+        this.pauseOverlay.animate([
+            { filter: "opacity(100%)" },
+            { filter: "opacity(0%)" }
+        ],
+            {
+                duration: 250,
+                fill: "forwards"
+            }
+        );
+
+        setTimeout(() => {
+            this.pauseOverlay.style.display = "none";
+            this.songAudioHandler.play();
+        }, 1000);
+    }
+
+    pauseBack() {
+        this.setState(states.SONGSELECT);
+        this.comboMeter.reset();
+        this.accuracyMeter.reset();
+        this.songAudioHandler.play();
+        this.pauseOverlay.animate([
+            { filter: "opacity(100%)" },
+            { filter: "opacity(0%)" }
+        ],
+            {
+                duration: 250,
+                fill: "forwards"
+            }
+        );
+
+        setTimeout(() => {
+            this.pauseOverlay.style.display = "none";
+        }, 500);
+    }
+}
+
+var game = null;
+
+function mainLoop(timestamp) {
+    game.update(timestamp);
+    game.render();
+    requestAnimationFrame(mainLoop);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    game = new Game(config);
+    requestAnimationFrame(mainLoop);
+});
+
