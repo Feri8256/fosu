@@ -2,19 +2,16 @@ export class songSelectionManager {
     constructor(game) {
         this.game = game;
 
-        this.prevSelect = {
-            au: "",
-            bg: "",
-            uid: "",
-            prev: 0,
-            scroll: 0
-        }
+        this.scroll = 0;
 
         window.addEventListener("click", (ev) => { this.select(ev.target); });
 
         this.listElements = document.querySelectorAll(".songselect-card");
         this.currentSelectionIndex = 0;
         this.lastSelectionTimestamp = 0;
+
+        this.previousSelect = { audioSrc: 0, id: -1, backgroundSrc: "", beatmapSrc: "", previewTime: 0 };
+        this.currentSelect = {};
     }
 
     select(element) {
@@ -22,26 +19,17 @@ export class songSelectionManager {
 
         element.scrollIntoView({ behavior: "smooth", block: "center" });
 
-        let selectedAu = element.dataset.ausrc;
-        let selectedUID = element.dataset.uid;
-        let selectedBG = element.dataset.bgsrc;
-        let selectedBM = element.dataset.bmsrc;
-        let selectedPre = parseFloat(element.dataset.pre);
+        this.currentSelect = this.game.songSelectBuilder.list[element.dataset.uid];
 
+        if (this.previousSelect.audioSrc !== this.currentSelect.audioSrc) this.changeAudioSource(this.currentSelect.audioSrc, this.currentSelect.previewTime);
+        if (this.previousSelect.backgroundSrc !== this.currentSelect.backgroundSrc) this.changeBackground(this.currentSelect.backgroundSrc);
+        if (this.previousSelect.id !== this.currentSelect.id) this.changeMetadata();
 
-        if (this.prevSelect.au !== selectedAu) this.changeAudioSource(selectedAu, selectedPre);
-        if (this.prevSelect.bg !== selectedBG) this.changeBackground(selectedBG);
-        if (this.prevSelect.uid !== selectedUID) this.changeMetadata(element.dataset);
+        if (this.previousSelect.id === this.currentSelect.id) this.startMapLoading(this.currentSelect.beatmapSrc);
 
-        if (this.prevSelect.uid === selectedUID) this.startMapLoading(selectedBM);
+        this.previousSelect = this.currentSelect;
 
-
-        this.prevSelect.au = selectedAu;
-        this.prevSelect.bg = selectedBG;
-        this.prevSelect.uid = selectedUID;
-        this.prevSelect.prev = selectedPre;
-
-        this.prevSelect.scroll = window.scrollY;
+        this.scroll = window.scrollY;
     }
 
     changeAudioSource(newURL, time) {
@@ -58,39 +46,24 @@ export class songSelectionManager {
         this.game.backgroundManager.setImage(newURL);
     }
 
-    changeMetadata(elementDataset) {
-        this.game.songSelectMetadata.title.textContent = elementDataset.title;
-        this.game.songSelectMetadata.creator.textContent = elementDataset.creator;
-        this.game.songSelectMetadata.artist.textContent = elementDataset.artist;
-        this.game.songSelectMetadata.diffName.textContent = elementDataset.diffname;
-        this.game.songSelectMetadata.AR.textContent = elementDataset.ar;
-        this.game.songSelectMetadata.CS.textContent = elementDataset.cs;
-        this.game.songSelectMetadata.OD.textContent = elementDataset.od;
-        this.game.songSelectMetadata.HP.textContent = elementDataset.hp;
+    changeMetadata() {
+        this.game.UI.songSelectMetadata.title.textContent = this.currentSelect.title;
+        this.game.UI.songSelectMetadata.creator.textContent = this.currentSelect.creator;
+        this.game.UI.songSelectMetadata.artist.textContent = this.currentSelect.artist;
+        this.game.UI.songSelectMetadata.diffName.textContent = this.currentSelect.difficultyName;
+        this.game.UI.songSelectMetadata.AR.textContent = this.currentSelect.AR;
+        this.game.UI.songSelectMetadata.CS.textContent = this.currentSelect.CS;
+        this.game.UI.songSelectMetadata.OD.textContent = this.currentSelect.OD;
+        this.game.UI.songSelectMetadata.HP.textContent = this.currentSelect.HP;
     }
 
     startMapLoading(url) {
-        if(!url) return;
+        if (!url) return;
         this.game.setState(this.game.STATE_ENUM.LOADING);
         this.game.beatmapLoader.load(url);
     }
 
-    keyArrowSelect(direction) {
-        if (this.lastSelectionTimestamp + 200 > this.game.clock) return;
-
-        // When i run this query selector in the constructor it returns undefined so it took place here
-        if (!this.listElements.length) this.listElements = document.querySelectorAll(".songselect-card");
-        if (direction === 0) return;
-
-        this.currentSelectionIndex += direction;
-        if (this.currentSelectionIndex > this.listElements.length - 1) this.currentSelectionIndex = 0;
-        if (this.currentSelectionIndex < 0) this.currentSelectionIndex = this.listElements.length - 1;
-
-        this.select(this.listElements[this.currentSelectionIndex]);
-        this.lastSelectionTimestamp = this.game.clock;
-    }
-
     scrollToLastPosition() {
-        window.scrollTo(0, this.prevSelect.scroll);
+        window.scrollTo(0, this.scroll);
     }
 }

@@ -32,35 +32,6 @@ export class BeatmapPlayer {
 
         this.parsedOSU = {};
 
-        this.hitsounds = {
-            0: {
-                0: 'normal-hitnormal',
-                1: 'normal-hitwhistle',
-                2: 'normal-hitfinish',
-                3: 'normal-hitclap',
-            },
-
-            1: {
-                0: 'normal-hitnormal',
-                1: 'normal-hitwhistle',
-                2: 'normal-hitfinish',
-                3: 'normal-hitclap',
-            },
-
-            2: {
-                0: 'soft-hitnormal',
-                1: 'soft-hitwhistle',
-                2: 'soft-hitfinish',
-                3: 'soft-hitclap',
-            },
-
-            3: {
-                0: 'drum-hitnormal',
-                1: 'drum-hitwhistle',
-                2: 'drum-hitfinish',
-                3: 'drum-hitclap',
-            }
-        }
     }
 
     /**
@@ -311,7 +282,7 @@ export class BeatmapPlayer {
         if (hitResult > 0) this.game.comboMeter.addHit(true);
 
         // Play a hitsound
-        this.playHitSound(obj.hitSample.normalSet, obj.hitSample.additionSet, obj.hitSound);
+        this.game.hitSoundPlayer.playHitSound(obj.hitSample.normalSet, obj.hitSample.additionSet, obj.hitSound);
 
         // Check if the configuration enables the 300s to be invisible
         // Add the accuracy judgment to their array
@@ -368,25 +339,6 @@ export class BeatmapPlayer {
     }
 
     /**
-     * https://osu.ppy.sh/wiki/hu/Client/File_formats/osu_%28file_format%29#hitsounds
-     * @param {Number} normal 
-     * @param {Number} addition
-     * @param {Number []} hitSound bit flags
-     */
-    playHitSound(normal = 0, addition = 0, hitSound) {
-        this.game.auMgr.playAudioClip(this.hitsounds[normal][0]);
-
-        for (let i = 0; i < hitSound.length; i++) {
-            const bit = hitSound[i];
-            if (bit === 1){ 
-                let bitIndex = ((hitSound.length-1)-i);
-                this.game.auMgr.playAudioClip(this.hitsounds[addition][bitIndex]);
-            };
-        }
-
-    }
-
-    /**
      * Clear the current map and load it again
      */
     retry() {
@@ -402,7 +354,7 @@ export class BeatmapPlayer {
     }
 
     setSkipButtonVisibility(state) {
-        this.game.introSkipButton.style.display = state ? "block" : "none";
+        this.game.UI.introSkipButton.style.display = state ? "block" : "none";
     }
 
     end() {

@@ -39,6 +39,7 @@ function buildMapList() {
             mapObj.CS = Difficulty.CircleSize;
             mapObj.OD = Difficulty.OverallDifficulty;
             mapObj.HP = Difficulty.HPDrainRate;
+            mapObj.id = mapCount;
 
             mapsetObj.difficulties.push(mapObj);
             mapCount++;

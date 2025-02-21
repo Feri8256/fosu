@@ -21,7 +21,7 @@ class SongSelecting extends GameState {
 
     enter() {
         this.game.beatmapPlayer.cleanup();
-        this.game.songSelectContainer.style.display = "block";
+        this.game.UI.songSelectContainer.style.display = "block";
         this.game.songSelectManager.scrollToLastPosition();
 
         this.game.accuracyMeter.reset();
@@ -33,7 +33,7 @@ class SongSelecting extends GameState {
         );
 
         this.game.backgroundManager.changeOpacity(1, 1000);
-        this.game.songSelectContainer.animate([
+        this.game.UI.songSelectContainer.animate([
             { transform: "translateX(690px)" },
             { transform: "translateX(0px)" }
         ],
@@ -44,7 +44,7 @@ class SongSelecting extends GameState {
             }
         )
 
-        this.game.songSelectMetadata.container.animate([
+        this.game.UI.songSelectMetadata.container.animate([
             { filter: "opacity(0%)" },
             { filter: "opacity(100%)" }
         ],
@@ -56,12 +56,7 @@ class SongSelecting extends GameState {
     }
 
     handleInput() {
-        let down = this.game.inputHandler.includesKey("ArrowDown");
-        let up = this.game.inputHandler.includesKey("ArrowUp");
-        let dir = (up ? -1 : 0) || (down ? 1 : 0);
-
-        this.game.songSelectManager.keyArrowSelect(dir);
-        //console.log(down, up)
+        
     }
 }
 
@@ -103,8 +98,8 @@ class Paused extends GameState {
 
     enter() {
         this.game.songAudioHandler.pause();
-        this.game.pauseOverlay.style.display = "block";
-        this.game.pauseOverlay.animate([
+        this.game.UI.pauseOverlay.style.display = "block";
+        this.game.UI.pauseOverlay.animate([
             { filter: "opacity(0%)" },
             { filter: "opacity(100%)" }
         ],
@@ -118,7 +113,7 @@ class Paused extends GameState {
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
             this.game.setState(states.PLAYING);
-            this.game.pauseOverlay.animate([
+            this.game.UI.pauseOverlay.animate([
                 { filter: "opacity(100%)" },
                 { filter: "opacity(0%)" }
             ],
@@ -129,7 +124,7 @@ class Paused extends GameState {
             );
 
             setTimeout(() => {
-                this.game.pauseOverlay.style.display = "none";
+                this.game.UI.pauseOverlay.style.display = "none";
                 this.game.songAudioHandler.play();
             }, 500);
         }
@@ -161,7 +156,7 @@ class Loading extends GameState {
     enter() {
         this.game.setLoadingCircle(true);
 
-        this.game.songSelectContainer.animate([
+        this.game.UI.songSelectContainer.animate([
             { transform: "translateX(0px)" },
             { transform: "translateX(690px)" }
         ],
@@ -171,10 +166,10 @@ class Loading extends GameState {
                 fill: "forwards"
             }
         ).onfinish = () => {
-            this.game.songSelectContainer.style.display = "none";
+            this.game.UI.songSelectContainer.style.display = "none";
         };
 
-        this.game.songSelectMetadata.container.animate([
+        this.game.UI.songSelectMetadata.container.animate([
             { filter: "opacity(100%)" },
             { filter: "opacity(0%)" }
         ],
@@ -205,9 +200,9 @@ class Result extends GameState {
         this.game.resultScreenUpdater.update();
 
         //this.game.backgroundManager.changeOpacity(1, 500);
-        this.game.resultScreen.container.style.filter = "opacity(0%)";
-        this.game.resultScreen.container.style.visibility = "visible";
-        this.game.resultScreen.container.animate(
+        this.game.UI.resultScreen.container.style.filter = "opacity(0%)";
+        this.game.UI.resultScreen.container.style.visibility = "visible";
+        this.game.UI.resultScreen.container.animate(
             [
                 { filter: "opacity(0%)" },
                 { filter: "opacity(100%)" }
@@ -219,9 +214,9 @@ class Result extends GameState {
             }
         );
 
-        this.game.resultMetadata.container.style.filter = "opacity(0%)";
-        this.game.resultMetadata.container.style.visibility = "visible";
-        this.game.resultMetadata.container.animate(
+        this.game.UI.resultMetadata.container.style.filter = "opacity(0%)";
+        this.game.UI.resultMetadata.container.style.visibility = "visible";
+        this.game.UI.resultMetadata.container.animate(
             [
                 { filter: "opacity(0%)" },
                 { filter: "opacity(100%)" }
@@ -242,7 +237,7 @@ class Result extends GameState {
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
 
-            this.game.resultScreen.container.animate(
+            this.game.UI.resultScreen.container.animate(
                 [
                     { filter: "opacity(100%)" },
                     { filter: "opacity(0%)" }
@@ -252,12 +247,12 @@ class Result extends GameState {
                     fill: "forwards"
                 }
             ).onfinish = () => {
-                this.game.resultScreen.container.style.visibility = "hidden";
+                this.game.UI.resultScreen.container.style.visibility = "hidden";
                 this.game.setState(states.SONGSELECT);
                 
             };
 
-            this.game.resultMetadata.container.animate(
+            this.game.UI.resultMetadata.container.animate(
                 [
                     { filter: "opacity(100%)" },
                     { filter: "opacity(0%)" }
@@ -267,7 +262,7 @@ class Result extends GameState {
                     fill: "forwards"
                 }
             ).onfinish = () => {
-                this.game.resultMetadata.container.style.visibility = "hidden";
+                this.game.UI.resultMetadata.container.style.visibility = "hidden";
             };
         } 
     }

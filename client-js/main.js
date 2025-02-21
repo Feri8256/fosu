@@ -18,6 +18,8 @@ import { ComboMeter } from "./comboMeter.js";
 import { AudioManager } from "./audioManager.js";
 import { InputOverlay } from "./inputOverlay.js";
 import { ResultScreenUpdater } from "./resultScreenUpdate.js";
+import { HitSoundPlayer } from "./hitSoundPlayer.js";
+import ui from "./UIelements.js";
 
 const config = {
     sound: {
@@ -25,7 +27,7 @@ const config = {
         effectVolume: 0.1
     },
     visuals: {
-        skin: "OsuDefaultSkin",
+        skin: "",
         cursorScale: 1.5
     },
     gameplay: {
@@ -50,6 +52,8 @@ class Game {
 
         this.inputHandler = new InputHandler();
 
+        this.UI = ui;
+
         this.STATE_ENUM = states
         this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result];
 
@@ -69,52 +73,8 @@ class Game {
         this.auMgr = new AudioManager();
         this.auMgr.setMasterVolume(this.CONFIG.sound.effectVolume);
 
-        this.songSelectContainer = document.querySelector("#songselect-container");
-        this.songSelectMetadata = {
-            container: document.querySelector("#songselect-metadata"),
-            title: document.querySelector("#meta-title"),
-            creator: document.querySelector("#meta-creator"),
-            artist: document.querySelector("#meta-artist"),
-            diffName: document.querySelector("#meta-diffname"),
-            AR: document.querySelector("#meta-ar"),
-            CS: document.querySelector("#meta-cs"),
-            OD: document.querySelector("#meta-od"),
-            HP: document.querySelector("#meta-hp")
-
-        }
-
-        this.pauseOverlay = document.querySelector("#pause-overlay");
-        this.pauseButtons = {
-            continue: document.querySelector("#pause-continue"),
-            retry: document.querySelector("#pause-retry"),
-            back: document.querySelector("#pause-back"),
-        }
-
-        this.resultScreen = {
-            container: document.querySelector("#result"),
-            perfectCount: document.querySelector("#result-300"),
-            okayCount: document.querySelector("#result-100"),
-            mehCount: document.querySelector("#result-50"),
-            missCount: document.querySelector("#result-0"),
-            accuracy: document.querySelector("#result-acc"),
-            maxComboCount: document.querySelector("#result-maxcombo"),
-        }
-
-        this.resultMetadata = {
-            container: document.querySelector("#result-metadata"),
-            title: document.querySelector("#resultmeta-title"),
-            creator: document.querySelector("#resultmeta-creator"),
-            artist: document.querySelector("#resultmeta-artist"),
-            diffName: document.querySelector("#resultmeta-diffname"),
-        }
-
-
-        this.introSkipButton = document.querySelector("#play-skip-btn");
-
         this.skinResourceManager = new SkinResourceManager(this);
-        //this.skinResourceManager.loadSkin("OsuDefaultSkin");
         this.skinResourceManager.loadSkin(this.CONFIG.visuals.skin);
-        //this.skinResourceManager.loadDefault();
 
         this.loadingImg = new SpriteImage("client-files/loading.png");
         this.loadingSprite = new Sprite(this.loadingImg);
@@ -128,18 +88,18 @@ class Game {
         this.backgroundManager = new BackgrondImageManager(this);
         this.beatmapPlayer = new BeatmapPlayer(this);
         this.beatmapLoader = new BeatmapLoader(this);
-        new SongSelectionBuilder(this);
+        this.songSelectBuilder = new SongSelectionBuilder(this);
         this.songSelectManager = new songSelectionManager(this);
         this.cursor = new Cursor(this);
         this.inputOverlay = new InputOverlay(this);
-
+        this.hitSoundPlayer = new HitSoundPlayer(this);
         this.resultScreenUpdater = new ResultScreenUpdater(this);
 
         window.addEventListener("resize", () => { this.resizeHandler() });
-        this.pauseButtons.continue.addEventListener("click", () => { this.pauseContinue() });
-        this.pauseButtons.retry.addEventListener("click", () => { this.pauseRetry() });
-        this.pauseButtons.back.addEventListener("click", () => { this.pauseBack() });
-        this.introSkipButton.addEventListener("click", () => { this.beatmapPlayer.skipIntro() });
+        this.UI.pauseButtons.continue.addEventListener("click", () => { this.pauseContinue() });
+        this.UI.pauseButtons.retry.addEventListener("click", () => { this.pauseRetry() });
+        this.UI.pauseButtons.back.addEventListener("click", () => { this.pauseBack() });
+        this.UI.introSkipButton.addEventListener("click", () => { this.beatmapPlayer.skipIntro() });
 
         this.clock = 0;
         // Game starts in the song selection menu
@@ -201,7 +161,7 @@ class Game {
 
     pauseRetry() {
         this.setState(states.PLAYING);
-        this.pauseOverlay.animate([
+        this.UI.pauseOverlay.animate([
             { filter: "opacity(100%)" },
             { filter: "opacity(0%)" }
         ],
@@ -215,7 +175,7 @@ class Game {
         this.songAudioHandler.reset();
         this.beatmapPlayer.retry();
         setTimeout(() => {
-            this.pauseOverlay.style.display = "none";
+            this.UI.pauseOverlay.style.display = "none";
             //this.songAudioHandler.play();
         }, 500);
     }
@@ -225,7 +185,7 @@ class Game {
         // But there is only one difference
         // I gave the player 1 second pause to adjust their aim when the continue button is used instead of the Escape key
         this.setState(states.PLAYING);
-        this.pauseOverlay.animate([
+        this.UI.pauseOverlay.animate([
             { filter: "opacity(100%)" },
             { filter: "opacity(0%)" }
         ],
@@ -236,7 +196,7 @@ class Game {
         );
 
         setTimeout(() => {
-            this.pauseOverlay.style.display = "none";
+            this.UI.pauseOverlay.style.display = "none";
             this.songAudioHandler.play();
         }, 1000);
     }
@@ -246,7 +206,7 @@ class Game {
         this.comboMeter.reset();
         this.accuracyMeter.reset();
         this.songAudioHandler.play();
-        this.pauseOverlay.animate([
+        this.UI.pauseOverlay.animate([
             { filter: "opacity(100%)" },
             { filter: "opacity(0%)" }
         ],
@@ -257,7 +217,7 @@ class Game {
         );
 
         setTimeout(() => {
-            this.pauseOverlay.style.display = "none";
+            this.UI.pauseOverlay.style.display = "none";
         }, 500);
     }
 }
