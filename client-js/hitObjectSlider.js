@@ -11,7 +11,7 @@ export class Slider {
         slides = 1,
         pixelLength = 0,
         multiplier = 1,
-        v = 1,
+        v = -100,
         beatLength
     ) {
         this.game = game;
@@ -58,12 +58,13 @@ export class Slider {
         //https://osu.ppy.sh/wiki/hu/Client/File_formats/osu_%28file_format%29
 
         this.velocity = 1;
-        if (v === 1 || v === -100) {
+        if (v === -100) {
             this.velocity = 1;
         } else if (v < -100) {
             this.velocity = (-1 * v / 100) / multiplier;
         } else if (v > -100) {
-            this.velocity = 1 - (multiplier * ((-1 * (100 + v) / 100)));
+            // ???
+            this.velocity = (multiplier / (1 - (v / 100))) * multiplier;
         }
 
         this.oneSlideTime = this.pixelLength / (this.multiplier * 100 * this.velocity) * this.beatLength;

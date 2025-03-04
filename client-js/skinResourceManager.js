@@ -1,8 +1,10 @@
 export class SkinResourceManager {
     constructor(game) {
         this.game = game;
-        this.skinsBaseUrl = "skins"
-        this.defaultPath = "client-files"
+        this.skinsBaseUrl = "skins";
+        this.defaultPath = "client-files";
+
+        this.scoreFontSet = new Map();
 
         this.filesNeeded = {
             sprites: [
@@ -26,12 +28,15 @@ export class SkinResourceManager {
                 "score-8.png",
                 "score-9.png",
                 "score-dot.png",
+                "score-percent.png",
                 "score-x.png",
                 "inputoverlay-background.png",
                 "inputoverlay-key.png",
                 "sliderb.png",
                 "sliderfollowcircle.png",
-                "reversearrow.png"
+                "reversearrow.png",
+                "spinner-circle.png",
+                "spinner-approachcircle.png"
             ],
             sounds: [
                 "combobreak.wav",
@@ -46,7 +51,10 @@ export class SkinResourceManager {
                 "drum-hitnormal.wav",
                 "drum-hitclap.wav",
                 "drum-hitfinish.wav",
-                "drum-hitwhistle.wav"
+                "drum-hitwhistle.wav",
+                "select-difficulty.wav",
+                "menuhit.wav",
+                "menuback.wav"
             ]
         }
 
@@ -58,10 +66,22 @@ export class SkinResourceManager {
         return this.spriteImages[name];
     }
 
+    setupScoreFont() {
+        for (let n = 0; n < 10; n++) {
+            this.scoreFontSet.set(String(n), new this.game.SPRITE(this.spriteImages[`score-${n}`],0,0,0,0,0,0));
+        }
+        this.scoreFontSet.set(".", new this.game.SPRITE(this.spriteImages["score-dot"],0,0,0,0,0,0));
+        this.scoreFontSet.set(",", new this.game.SPRITE(this.spriteImages["score-comma"],0,0,0,0,0,0));
+        this.scoreFontSet.set("%", new this.game.SPRITE(this.spriteImages["score-percent"],0,0,0,0,0,0));
+        this.scoreFontSet.set("x", new this.game.SPRITE(this.spriteImages["score-x"],0,0,0,0,0,0));
+    }
+
     loadDefault() {
         this.filesNeeded.sprites.forEach((fileName) => {
             this.spriteImages[fileName.split(".").at(0)] = new this.game.SPRITEIMG(`${this.defaultPath}/${fileName}`);
         });
+
+        this.setupScoreFont();
 
         this.filesNeeded.sounds.forEach((fileName) => {
             this.game.auMgr.loadFile(`${this.defaultPath}/${fileName}`, fileName.split(".").at(0));
@@ -91,6 +111,9 @@ export class SkinResourceManager {
                     }
                 });
 
+                this.setupScoreFont();
+
+
                 // Load sounds
                 this.filesNeeded.sounds.forEach((fileName) => {
                     if (d.includes(fileName)) {
@@ -99,6 +122,10 @@ export class SkinResourceManager {
                         this.game.auMgr.loadFile(`${this.defaultPath}/${fileName}`, fileName.split(".").at(0));
                     }
                 });
+            })
+            .catch((e) => {
+                this.loadDefault();
+                console.error(e);
             })
     }
 

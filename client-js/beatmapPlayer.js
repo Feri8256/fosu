@@ -13,6 +13,8 @@ export class BeatmapPlayer {
         this.hitCirclesToRender = [];
         this.sliders = [];
         this.slidersToRender = [];
+        this.spinners = [];
+        this.spinnersToRender = [];
 
         this.accJudgments = [];
 
@@ -67,6 +69,34 @@ export class BeatmapPlayer {
             element.hitSample.additionSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.additionSet
             element.hitSample.normalSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.normalSet
 
+            let objectType = element.type.reduce((a, b) => {return a + b});
+
+            // That is a spinner
+            if (objectType === 3) {
+                this.spinners.push(
+                    new this.game.SPINNER(
+                        this.game,
+                        element.time,
+                        parseInt(element.objectParams)
+                    )
+                )
+            } else { // That is a circle
+                this.hitCircles.push(
+                    new this.game.HITCIRCLE(
+                        this.game,
+                        this.mapToRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                        this.mapToRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
+                        this.globalScale,
+                        element.time,
+                        parsedOSU.Difficulty.CircleSize,
+                        this.timeWindow,
+                        element.hitSample,
+                        element.hitSound
+                    )
+                )
+            }
+
+            // That is a slider
             if (typeof element.curveType === "string") {
                 let scaledCurvePoints = [];
                 element.curvePoints.forEach((cp) => {
@@ -97,36 +127,21 @@ export class BeatmapPlayer {
                 )
             }
 
-            this.hitCircles.push(
-                new this.game.HITCIRCLE(
-                    this.game,
-                    this.mapToRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                    this.mapToRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
-                    this.globalScale,
-                    element.time,
-                    parsedOSU.Difficulty.CircleSize,
-                    this.timeWindow,
-                    element.hitSample,
-                    element.hitSound
-                )
-            )
-
-
         });
 
         // Needs fix for instances where a hit objects time is too close to 0 (the first hit object spawn immediately)
         // Possible solution is to start a timer, that can go negative if needed and then switching back to the audio playback time (stutter may occur when the swiching happens)
         let startDelay = Number(this.hitCircles.at(0)?.t) < 1000 ? 2000 : 1000;
-        let firsthitObjectTime = Math.min(this.hitCircles.at(0)?.t, this.sliders.at(0)?.t);
-        this.lastHitObjectTime = Math.max(this.hitCircles.at(-1)?.t, this.sliders.at(-1)?.endTime);
-        let relatedStartTimingPoint = this.getTimingPointAtTime(firsthitObjectTime);
+        this.firsthitObjectTime = Math.min(this.hitCircles.at(0)?.t, this.sliders.at(0)?.t, this.spinners.at(0)?.startTime);
+        this.lastHitObjectTime = Math.max(this.hitCircles.at(-1)?.t, this.sliders.at(-1)?.endTime, this.spinners.at(-1)?.endTime);
+        let relatedStartTimingPoint = this.getTimingPointAtTime(this.firsthitObjectTime);
 
-        if (firsthitObjectTime > 5000) {
+        if (this.firsthitObjectTime > 5000) {
             this.introSkipable = true;
 
             // No chance for this to ever become NaN!!! :)
-            this.skipToTime = firsthitObjectTime - (Number(relatedStartTimingPoint.uninherited?.beatLength || 500) * 5 ?? 2000);
-            console.log(`intro is skipable. First hit object is at ${firsthitObjectTime}. Skip to: ${this.skipToTime}`);
+            this.skipToTime = this.firsthitObjectTime - (Number(relatedStartTimingPoint.uninherited?.beatLength || 500) * 5 ?? 2000);
+            console.log(`intro is skipable. First hit object is at ${this.firsthitObjectTime}. Skip to: ${this.skipToTime}`);
         }
 
 
@@ -149,7 +164,10 @@ export class BeatmapPlayer {
 
     update() {
         this.currentTime = this.game.songAudioHandler.getCurrentTime();
-        this.progressBarCurrentWidth = this.mapToRange(this.currentTime, 0, this.lastHitObjectTime, 0, this.game.canvas.width);
+        this.progressBarCurrentWidth = this.mapToRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+
+        if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = this.mapToRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
+        else this.progressBarCurrentWidth = this.mapToRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
 
         // Select the hit objects that needs to be rendered and updated at currentTime
         this.slidersToRender = this.sliders.filter((s) => {
@@ -158,6 +176,10 @@ export class BeatmapPlayer {
 
         this.hitCirclesToRender = this.hitCircles.filter((o) => {
             return o.t < this.currentTime + this.timeWindow && o.t > this.currentTime - this.timeWindow && this.playing
+        });
+
+        this.spinnersToRender = this.spinners.filter((o) => {
+            return o.startTime < this.currentTime + 200 && o.endTime > this.currentTime - 200 && this.playing
         });
 
         // Loop through the hit objects that needs to be rendered and updated before rendering happens        
@@ -182,11 +204,11 @@ export class BeatmapPlayer {
             }
         });
 
-        this.slidersToRender.forEach((s) => {
-            s.update(this.currentTime);
-        });
+        this.slidersToRender.forEach((s) => { s.update(this.currentTime); });
 
-        this.accJudgments.forEach((a) => { a.update() });
+        this.spinnersToRender.forEach((s) => { s.update(this.currentTime); });
+
+        this.accJudgments.forEach((a) => { a.update(); });
 
         // Remove the accuracy judgments that has the `markedForDeletion` property set to true
         this.accJudgments = this.accJudgments.filter((a) => { return !a.markedForDeletion });
@@ -200,6 +222,7 @@ export class BeatmapPlayer {
 
     render() {
         // Rendering every type of hit object in order
+        this.spinnersToRender.forEach((o) => { o.render() });
         this.slidersToRender.forEach((s) => { s.render() });
         this.hitCirclesToRender.forEach((o) => { o.render() });
         this.accJudgments.forEach((a) => { a.render() });
@@ -208,7 +231,7 @@ export class BeatmapPlayer {
         if (!this.playing) return;
         this.game.ctx.fillStyle = "rgba(0,0,0,0.5)";
         this.game.ctx.fillRect(0, this.game.canvas.height - this.progressBarHeightPx, this.game.canvas.width, this.progressBarHeightPx);
-        this.game.ctx.fillStyle = "#64FFFF";
+        this.game.ctx.fillStyle = this.currentTime < this.skipToTime && this.introSkipable ? "#FFFF00" : "#64FFFF";
         this.game.ctx.fillRect(0, this.game.canvas.height - this.progressBarHeightPx, this.progressBarCurrentWidth, this.progressBarHeightPx);
     }
 
@@ -317,6 +340,8 @@ export class BeatmapPlayer {
         this.hitCirclesToRender.length = 0;
         this.sliders.length = 0;
         this.slidersToRender.length = 0;
+        this.spinners.length = 0;
+        this.spinnersToRender.length = 0;
 
         this.accJudgments.length = 0;
 
@@ -335,7 +360,8 @@ export class BeatmapPlayer {
         this.lastHitObjectTime = 0;
 
         this.setSkipButtonVisibility(false);
-
+        this.game.accuracyMeter.reset();
+        this.game.comboMeter.reset();
     }
 
     /**
@@ -351,6 +377,7 @@ export class BeatmapPlayer {
         this.game.songAudioHandler.setPlaybackTime(this.skipToTime);
         this.setSkipButtonVisibility(false);
         this.introSkipped = true;
+        this.game.auMgr.playAudioClip("menuhit");
     }
 
     setSkipButtonVisibility(state) {

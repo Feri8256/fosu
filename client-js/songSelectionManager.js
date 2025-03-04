@@ -23,9 +23,15 @@ export class songSelectionManager {
 
         if (this.previousSelect.audioSrc !== this.currentSelect.audioSrc) this.changeAudioSource(this.currentSelect.audioSrc, this.currentSelect.previewTime);
         if (this.previousSelect.backgroundSrc !== this.currentSelect.backgroundSrc) this.changeBackground(this.currentSelect.backgroundSrc);
-        if (this.previousSelect.id !== this.currentSelect.id) this.changeMetadata();
+        if (this.previousSelect.id !== this.currentSelect.id) {
+            this.changeMetadata();
+            this.game.auMgr.playAudioClip("select-difficulty");
+        }
 
-        if (this.previousSelect.id === this.currentSelect.id) this.startMapLoading(this.currentSelect.beatmapSrc);
+        if (this.previousSelect.id === this.currentSelect.id) {
+            this.startMapLoading(this.currentSelect.beatmapSrc);
+            this.game.auMgr.playAudioClip("menuhit");
+        }
 
         this.previousSelect = this.currentSelect;
 

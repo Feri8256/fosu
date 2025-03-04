@@ -56,7 +56,7 @@ class SongSelecting extends GameState {
     }
 
     handleInput() {
-        
+
     }
 }
 
@@ -72,7 +72,8 @@ class Playing extends GameState {
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
         this.game.cursor = new this.game.CURSOR(this.game);
         this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
-
+        //this.game.accuracyMeter.reset();
+        //this.game.comboMeter.reset();
     }
 
     handleInput() {
@@ -234,37 +235,62 @@ class Result extends GameState {
         );
     }
 
+    /**
+     * Animating the ui elements of the result screen
+     * @param {Boolean} r wanna retry?
+     */
+    animateElements(r) {
+        this.game.UI.resultScreen.container.animate(
+            [
+                { filter: "opacity(100%)" },
+                { filter: "opacity(0%)" }
+            ],
+            {
+                duration: 500,
+                fill: "forwards"
+            }
+        ).onfinish = () => {
+            this.game.UI.resultScreen.container.style.visibility = "hidden";
+           
+        };
+
+        this.game.UI.resultMetadata.container.animate(
+            [
+                { filter: "opacity(100%)" },
+                { filter: "opacity(0%)" }
+            ],
+            {
+                duration: 500,
+                fill: "forwards"
+            }
+        ).onfinish = () => {
+            this.afterUIAnimations(r);
+        };
+    }
+
+    /**
+     * 
+     * @param {Boolean} retry 
+     */
+    afterUIAnimations(retry) {
+        this.game.UI.resultMetadata.container.style.visibility = "hidden";
+        this.game.UI.resultScreen.container.style.visibility = "hidden";
+        this.game.setState(retry ? states.PLAYING : states.SONGSELECT);
+    }
+
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
 
-            this.game.UI.resultScreen.container.animate(
-                [
-                    { filter: "opacity(100%)" },
-                    { filter: "opacity(0%)" }
-                ],
-                {
-                    duration: 500,
-                    fill: "forwards"
-                }
-            ).onfinish = () => {
-                this.game.UI.resultScreen.container.style.visibility = "hidden";
-                this.game.setState(states.SONGSELECT);
-                
-            };
 
-            this.game.UI.resultMetadata.container.animate(
-                [
-                    { filter: "opacity(100%)" },
-                    { filter: "opacity(0%)" }
-                ],
-                {
-                    duration: 500,
-                    fill: "forwards"
-                }
-            ).onfinish = () => {
-                this.game.UI.resultMetadata.container.style.visibility = "hidden";
-            };
-        } 
+            this.animateElements(false);
+            this.game.auMgr.playAudioClip("menuback");
+        }
+
+        if (this.game.inputHandler.includesKey("KeyR", true)) {
+            this.game.beatmapPlayer.retry();
+            this.animateElements(true);
+
+        }
     }
 }
 

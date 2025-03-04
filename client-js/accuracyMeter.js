@@ -6,10 +6,22 @@ export class AccuracyMeter {
         this.totalHits = 0;
 
         this.results = [0,0,0,0,100];
+
+        this.fontRenderer = new this.game.SPRITEFONTRENDERER(
+            "100%",
+            this.game.skinResourceManager.scoreFontSet, 
+            0, 
+            this.game.canvas.width * 0.5, 
+            8, 
+            1,
+            1,
+            0.5,
+            0
+        );
     }
 
     update() {
-
+        this.fontRenderer.x = this.game.canvas.width * 0.5;
     }
 
     /**
@@ -44,14 +56,13 @@ export class AccuracyMeter {
         this.currentAcc = 100 - (100 * (1 - (this.correctHits / this.totalHits)));
         this.results[4] = this.currentAcc;
 
+        this.fontRenderer.updateText(`${String(this.currentAcc).slice(0,5)}%`);
+
         return hitResult;
     }
 
     render() {
-        this.game.ctx.fillStyle = "#fff";
-        this.game.ctx.font = "40px Arial";
-        this.game.ctx.textAlign = "center";
-        this.game.ctx.fillText(`${String(this.currentAcc).slice(0,5)}%`, this.game.canvas.width * 0.5, 50);
+        this.fontRenderer.render(this.game.ctx);
     }
 
     reset() {
@@ -59,6 +70,7 @@ export class AccuracyMeter {
         this.correctHits = 0;
         this.totalHits = 0;
         this.results = [0,0,0,0,100];
+        this.fontRenderer.updateText("100%");
     }
 
     getResults() {

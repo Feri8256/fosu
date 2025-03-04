@@ -9,6 +9,7 @@ import { BeatmapPlayer } from "./beatmapPlayer.js";
 import { SkinResourceManager } from "./skinResourceManager.js";
 import { HitCircle } from "./hitObjectCircle.js";
 import { Slider } from "./hitObjectSlider.js";
+import { Spinner } from "./hitObjectSpinner.js";
 import { AccuracyJudgment } from "./accuracyJudgment.js";
 import { states, SongSelecting, Playing, Paused, Failed, Loading, Result } from "./gameStates.js";
 import { InputHandler } from "./InputHandler.js";
@@ -19,11 +20,12 @@ import { AudioManager } from "./audioManager.js";
 import { InputOverlay } from "./inputOverlay.js";
 import { ResultScreenUpdater } from "./resultScreenUpdate.js";
 import { HitSoundPlayer } from "./hitSoundPlayer.js";
+import { SpriteFontRenderer } from "./fontRenderer.js";
 import ui from "./UIelements.js";
 
 const config = {
     sound: {
-        musicVolume: 0.07,
+        musicVolume: 0.1,
         effectVolume: 0.1
     },
     visuals: {
@@ -60,6 +62,8 @@ class Game {
         this.SPRITEIMG = SpriteImage;
         this.SPRITE = Sprite;
 
+        this.SPRITEFONTRENDERER = SpriteFontRenderer;
+
         this.EASINGS = EASING;
         this.ANI = Animation;
         this.TL = Timeline;
@@ -68,6 +72,7 @@ class Game {
         this.CURSOR = Cursor;
         this.HITCIRCLE = HitCircle;
         this.SLIDER = Slider;
+        this.SPINNER = Spinner;
         this.INPUTOVERLAY = InputOverlay;
 
         this.auMgr = new AudioManager();
@@ -115,6 +120,8 @@ class Game {
         this.songAudioHandler.update();
         this.backgroundManager.update();
         this.beatmapPlayer.update();
+        this.accuracyMeter.update();
+        this.comboMeter.update();
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);
