@@ -28,13 +28,31 @@ export class Slider {
         this.curvePoints = [[this.x, this.y], ...curvePoints];
         this.slides = slides;
 
-        //this.ballPath = [];
-        //for (let index = 0; index < this.slides; index++) {
-        //    let rev = index > 0 && index - 1 % 2 === 0;
+        this.currentSlide = 0;
+        this.currentSoundPlayed = 0;
 
-        //    if (rev) this.ballPath.push(...this.curvePoints.reverse())
-        //    else this.ballPath.push(...this.curvePoints)
-        //}
+        // This includes the points of the slider ball path with the repeats
+        this.ballPath = [];
+        for (let slide = 1; slide < this.slides + 1; slide++) {
+            let rev = slide % 2 === 0;
+            let prevP;
+
+            // Copy the curve points in normal or in reverse order
+            for (
+                let i = rev ? (this.curvePoints.length - 1) : 0; 
+                rev ? (i > 0) : (i < this.curvePoints.length);
+                rev ? (i--) : (i++)
+            ) {
+                const currentP = this.curvePoints.at(i);
+                if (prevP && currentP[0] === prevP[0] && currentP[1] === prevP[1]) continue;
+                this.ballPath.push(currentP);
+                prevP = currentP;
+            }
+
+            // If the last iteration is happened in reverse, put the first point at the end of the array
+            if (rev) this.ballPath.push(this.curvePoints.at(0));
+        }
+
         this.pixelLength = pixelLength;
         this.multiplier = multiplier;
         this.beatLength = beatLength;
@@ -62,13 +80,13 @@ export class Slider {
             this.velocity = 1;
         } else if (v < -100) {
             this.velocity = (-1 * v / 100) / multiplier;
-        } else if (v > -100) {
+        } else {
             // ???
-            this.velocity = (multiplier / (1 - (v / 100))) * multiplier;
+            this.velocity = multiplier / (multiplier * (v / -100));
         }
 
         this.oneSlideTime = this.pixelLength / (this.multiplier * 100 * this.velocity) * this.beatLength;
-        this.sliderTimeLengthTotal = this.oneSlideTime;
+        this.sliderTimeLengthTotal = this.oneSlideTime * slides;
         this.endTime = this.t + this.sliderTimeLengthTotal;
 
         this.ballSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("sliderb"));
@@ -77,26 +95,33 @@ export class Slider {
         this.followSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("sliderfollowcircle"));
         this.followSprite.scale = this.ballSize;
 
-        //this.reverseArrows = [
-        //    new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("reversearrow")),
-        //    new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("reversearrow"))
-        //];
+        this.reverseArrows = [
+            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("reversearrow")),
+            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("reversearrow"))
+        ];
 
         // Scaling all reverse arrows
-        //this.reverseArrows[0].scale = this.ballSize;
-        //this.reverseArrows[1].scale = this.ballSize;
+        this.reverseArrows[0].scale = this.ballSize;
+        this.reverseArrows[1].scale = this.ballSize;
 
         // Set position for the slider start reverse
-        //this.reverseArrows[0].x = this.x;
-        //this.reverseArrows[0].y = this.y;
+        this.reverseArrows[0].x = this.x;
+        this.reverseArrows[0].y = this.y;
 
         // Set position for the slider end reverse
-        //this.reverseArrows[1].x = this.sliderEndPos.x;
-        //this.reverseArrows[1].y = this.sliderEndPos.y;
+        this.reverseArrows[1].x = this.sliderEndPos.x;
+        this.reverseArrows[1].y = this.sliderEndPos.y;
 
         // Rotate the sprites according to the line angle of the slider segment they are sitting at
-        //this.reverseArrows[0].rotation = this.calculateLineAngle({ x: this.curvePoints.at(0)[0], y: this.curvePoints.at(0)[1] }, { x: this.curvePoints.at(1)[0], y: this.curvePoints.at(1)[1] }) - (Math.PI * 0.5);
-        //this.reverseArrows[1].rotation = this.calculateLineAngle({ x: this.curvePoints.at(-2)[0], y: this.curvePoints.at(-2)[1] }, this.sliderEndPos) + (Math.PI * 0.5);
+        this.reverseArrows[0].rotation = this.calculateLineAngle(
+            { x: this.curvePoints.at(0)[0], y: this.curvePoints.at(0)[1] }, 
+            { x: this.curvePoints.at(1)[0], y: this.curvePoints.at(1)[1] }
+        ) - (Math.PI * 0.5);
+
+        this.reverseArrows[1].rotation = this.calculateLineAngle(
+            { x: this.curvePoints.at(-2)[0], y: this.curvePoints.at(-2)[1] },
+            this.sliderEndPos
+        ) + (Math.PI * 0.5);
 
         // The ball movement is controlled by a series of animation in a timeline
         this.ballMovement = new this.game.TL();
@@ -113,21 +138,21 @@ export class Slider {
         // Creating the animations that controls the movement of the sliderball
         // The speed must be constant on every segment
         let currentSegmentTime = 0;
-        for (let i = 0; i < this.curvePoints.length; i++) {
-            const curvePoint = this.curvePoints[i];
-            if (!this.curvePoints[i + 1]) break; // Exit when we run out of range
+        for (let i = 0; i < this.ballPath.length; i++) {
+            const curvePoint = this.ballPath[i];
+            if (!this.ballPath[i + 1]) break; // Exit when we run out of range
             let segmentLengthPx = 0;
             let segmentLengthMs = 0;
 
             //if (i === 0) {
-            segmentLengthPx = this.calculateDistance({ x: curvePoint[0], y: curvePoint[1] }, { x: this.curvePoints[i + 1][0], y: this.curvePoints[i + 1][1] }) / this.scale;
+            segmentLengthPx = this.calculateDistance({ x: curvePoint[0], y: curvePoint[1] }, { x: this.ballPath[i + 1][0], y: this.ballPath[i + 1][1] }) / this.scale;
             segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal * this.pathTimeScale;
             this.ballMovement.appendAnimation(
                 new this.game.ANI(
                     currentSegmentTime,
                     currentSegmentTime + segmentLengthMs,
                     curvePoint[0],
-                    this.curvePoints[i + 1][0],
+                    this.ballPath[i + 1][0],
                     this.game.EASINGS.Linear,
                     false,
                     "X"
@@ -138,7 +163,7 @@ export class Slider {
                     currentSegmentTime,
                     currentSegmentTime + segmentLengthMs,
                     curvePoint[1],
-                    this.curvePoints[i + 1][1],
+                    this.ballPath[i + 1][1],
                     this.game.EASINGS.Linear,
                     false,
                     "Y"
@@ -155,17 +180,21 @@ export class Slider {
             this.game.EASINGS.Linear
         );
 
-        //this.reverseArrowPulse = new this.game.ANI(
-        //    0,
-        //    this.beatLength * 2,
-        //    this.ballSize,
-        //    this.ballSize * 0.8,
-        //    this.game.EASINGS.SineOut,
-        //    true
-        //)
+        this.reverseArrowPulse = new this.game.ANI(
+            0,
+            this.beatLength,
+            this.ballSize,
+            this.ballSize * 0.8,
+            this.game.EASINGS.SineOut,
+            true
+        );
 
 
-        this.endSoundPlayed = false;
+        this.reverseArrows[1].opacity = this.slides > 1 ? 1 : 0;
+        this.reverseArrows[0].opacity = this.slides > 2 ? 1 : 0;
+
+
+        this.endReached = false;
     }
 
     calculateDistance(pointA, pointB) {
@@ -201,7 +230,7 @@ export class Slider {
      */
     update(currentTime) {
         this.fading.update(currentTime);
-        //this.reverseArrowPulse.update(currentTime);
+        this.reverseArrowPulse.update(currentTime);
 
         // Start the movement of the ball when 
         if (!this.moving && currentTime >= this.t) {
@@ -211,9 +240,17 @@ export class Slider {
             //console.log(`beatLength: ${this.beatLength}\npixelLength: ${this.pixelLength}\nvelocity: ${this.velocity}\nmultiplier: ${this.multiplier}\none slide t: ${this.oneSlideTime}`)
         }
 
-        if (!this.endSoundPlayed & currentTime >= this.endTime) {
+        let edgeSoundIndex = Math.floor(this.ballMovement.timelineCurrentTime / this.oneSlideTime);
+        if (this.moving && edgeSoundIndex !== this.currentSoundPlayed) {
+
+            // Edge sounds will be expected
             this.game.auMgr.playAudioClip("normal-hitnormal");
-            this.endSoundPlayed = true;
+
+            this.currentSoundPlayed = edgeSoundIndex;
+        }
+
+        // Fade out when reached endTime
+        if (!this.endReached & currentTime >= this.endTime) {
 
             this.fading = new this.game.ANI(
                 this.endTime,
@@ -222,19 +259,21 @@ export class Slider {
                 0,
                 this.game.EASINGS.Linear
             );
+
+            this.endReached = true;
         }
 
         this.ballMovement.update(currentTime);
-        this.ballSprite.x = this.ballMovement.getValueOf("X") || this.sliderEndPos.x;
-        this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.sliderEndPos.y;
+        this.ballSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.x;
+        this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.ballSprite.y;
         this.ballSprite.opacity = this.fading.currentValue;
 
-        this.followSprite.x = this.ballMovement.getValueOf("X") || this.sliderEndPos.x;
-        this.followSprite.y = this.ballMovement.getValueOf("Y") || this.sliderEndPos.y;
+        this.followSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.y;
+        this.followSprite.y = this.ballMovement.getValueOf("Y") || this.ballSprite.y;
 
-        //this.reverseArrows.forEach((r) => {
-        //    r.scale = this.reverseArrowPulse.currentValue;
-        //});
+        this.reverseArrows.forEach((r) => {
+            r.scale = this.reverseArrowPulse.currentValue;
+        });
     }
 
     render() {
@@ -266,7 +305,7 @@ export class Slider {
         if (this.moving) this.ballSprite.render(this.game.ctx);
         if (this.following) this.followSprite.render(this.game.ctx);
 
-        //this.reverseArrows.forEach((r) => { r.render(this.game.ctx) });
+        this.reverseArrows.forEach((r) => { r.render(this.game.ctx) });
 
         this.game.ctx.restore();
     }

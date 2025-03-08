@@ -132,8 +132,16 @@ export class BeatmapPlayer {
         // Needs fix for instances where a hit objects time is too close to 0 (the first hit object spawn immediately)
         // Possible solution is to start a timer, that can go negative if needed and then switching back to the audio playback time (stutter may occur when the swiching happens)
         let startDelay = Number(this.hitCircles.at(0)?.t) < 1000 ? 2000 : 1000;
-        this.firsthitObjectTime = Math.min(this.hitCircles.at(0)?.t, this.sliders.at(0)?.t, this.spinners.at(0)?.startTime);
-        this.lastHitObjectTime = Math.max(this.hitCircles.at(-1)?.t, this.sliders.at(-1)?.endTime, this.spinners.at(-1)?.endTime);
+        this.firsthitObjectTime = Math.min(
+            this.hitCircles.at(0)?.t ?? Infinity, 
+            this.sliders.at(0)?.t ?? Infinity, 
+            this.spinners.at(0)?.startTime ?? Infinity
+        );
+        this.lastHitObjectTime = Math.max(
+            this.hitCircles.at(-1)?.t ?? -Infinity, 
+            this.sliders.at(-1)?.endTime ?? -Infinity, 
+            this.spinners.at(-1)?.endTime ?? -Infinity
+        );
         let relatedStartTimingPoint = this.getTimingPointAtTime(this.firsthitObjectTime);
 
         if (this.firsthitObjectTime > 5000) {
