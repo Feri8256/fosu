@@ -30,8 +30,6 @@ export class InputOverlay {
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
         });
 
-        this.overlayScale = 1;
-
         this.inputHandler = new this.game.INPUTHANDLER();
     }
 
@@ -46,9 +44,9 @@ export class InputOverlay {
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
         });
 
-        let keyA = this.inputHandler.includesKey(this.game.CONFIG.inputs.hitKeyA);
-        let keyB = this.inputHandler.includesKey(this.game.CONFIG.inputs.hitKeyB);
-        let mouseDown = this.game.CONFIG.gameplay.mouseButtonsInGame && this.inputHandler.getMouse().down;
+        let keyA = this.inputHandler.includesKey(this.game.CONFIG.hitKeyA);
+        let keyB = this.inputHandler.includesKey(this.game.CONFIG.hitKeyB);
+        let mouseDown = this.game.CONFIG.mouseButtonsInGame && this.inputHandler.getMouse().down;
 
         this.updateInputState([
             keyA,

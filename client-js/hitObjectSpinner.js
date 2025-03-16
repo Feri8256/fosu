@@ -1,12 +1,17 @@
 export class Spinner {
-    constructor(game, startTime, endTime) {
+    constructor(game, scale, startTime, endTime) {
         this.game = game;
+        this.scale = scale;
         this.circle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-circle"));
         this.approach = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-approachcircle"));
 
         this.startTime = startTime;
         this.endTime = endTime;
         this.duration = this.endTime - this.startTime;
+
+        // Use heights to scale
+        this.circle.scale = (384 / (this.circle.spriteImage.h ?? 666)) * this.scale;
+        this.approach.scale = (384 / (this.approach.spriteImage.h ?? 333)) * this.scale;
 
         // The spinner timeline is offseted by -200 ms!
         this.tl = new this.game.TL();
@@ -47,8 +52,8 @@ export class Spinner {
             new this.game.ANI(
                 0,
                 200,
-                1,
-                1,
+                this.approach.scale,
+                this.approach.scale,
                 this.game.EASINGS.Linear,
                 false,
                 "A"
@@ -58,8 +63,8 @@ export class Spinner {
             new this.game.ANI(
                 200,
                 this.duration + 200,
-                1,
-                0.05,
+                this.approach.scale,
+                0.1,
                 this.game.EASINGS.Linear,
                 false,
                 "A"
@@ -70,8 +75,8 @@ export class Spinner {
             new this.game.ANI(
                 this.duration + 200,
                 this.duration + 400,
-                0.05,
-                0.05,
+                0.1,
+                0.1,
                 this.game.EASINGS.Linear,
                 false,
                 "A"

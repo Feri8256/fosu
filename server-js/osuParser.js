@@ -78,77 +78,7 @@ function parseOsu(str) {
     }
 
 
-    //Find the row start and end of the TimingPoints section
-    let timingPointLinesStart = rows.findIndex(r => r.startsWith('[TimingPoints]'));
-    let timingPointLinesEnd = rows.findIndex((r, i) => r.startsWith('[') && i > timingPointLinesStart);
-
-    for (let i = timingPointLinesStart + 1; i < timingPointLinesEnd; i++) {
-        let timingPointLine = rows[i];
-        if (timingPointLine === '') break;
-        let timingPointTokens = timingPointLine.split(commaSeparator);
-        let timingPoint = {
-            time: parseInt(timingPointTokens[0]),
-            beatLength: parseInt(timingPointTokens[1]),
-            meter: parseInt(timingPointTokens[2]),
-            sampleSet: parseInt(timingPointTokens[3]),
-            sampleIndex: parseInt(timingPointTokens[4]),
-            volume: parseInt(timingPointTokens[5]),
-            uninherited: parseInt(timingPointTokens[6]),
-            effects: parseInt(timingPointTokens[7])
-        };
-        out.TimingPoints.push(timingPoint);
-    }
-
-
-    // Find the row start and end of the HitObjects section
-    let hitObjectLinesStart = rows.findIndex(r => r.startsWith('[HitObjects]'));
-    let hitObjectLinesEnd = rows.findIndex((r, i) => r === '' && i > hitObjectLinesStart);
-
-    for (let i = hitObjectLinesStart + 1; i < hitObjectLinesEnd; i++) {
-        let hitObjectLine = rows[i];
-        if (hitObjectLine === '') break;
-        let hitObjectTokens = hitObjectLine.split(commaSeparator);
-
-        let hitObject = {};
-        // if the row includes letters B, C, L, P, then it's sure it is a slider
-        if (/[BCLP]/.test(hitObjectLine)) {
-            let curveTypePoints = hitObjectTokens[5].split('|');
-            // 2D array [[x,y]...]
-            let curvePointsArray = [];
-            for (let j = 1; j < curveTypePoints.length; j++) {
-                let XY = curveTypePoints[j];
-                curvePointsArray.push(XY.split(':').map(n => parseInt(n)));
-            }
-
-            hitObject = {
-                x: parseInt(hitObjectTokens[0]),
-                y: parseInt(hitObjectTokens[1]),
-                time: parseInt(hitObjectTokens[2]),
-                type: hitObjectTokens[3].split('').map(b => parseInt(b)),
-                hitSound: hitObjectTokens[4],
-                objectParams: hitObjectTokens[5],
-                hitSample: hitObjectTokens[10],
-                curveType: curveTypePoints[0],
-                curvePoints: curvePointsArray,
-                slides: parseInt(hitObjectTokens[6]),
-                length: parseInt(hitObjectTokens[7]),
-                edgeSounds: [],
-                edgeSets: []
-            }
-        } else {
-            hitObject = {
-                x: parseInt(hitObjectTokens[0]),
-                y: parseInt(hitObjectTokens[1]),
-                time: parseInt(hitObjectTokens[2]),
-                type: hitObjectTokens[3].split('').map(b => parseInt(b)),
-                hitSound: hitObjectTokens[4].split('').map(b => parseInt(b)),
-                objectParams: hitObjectTokens[5],
-                hitSample: hitObjectTokens[6],
-            };
-        }
-        out.HitObjects.push(hitObject);
-
-    }
+    
 
     return out;
 }

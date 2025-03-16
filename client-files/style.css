@@ -171,3 +171,31 @@ table {
     
 }
 
+#settings-btn {
+    position: fixed;
+    bottom: 0;
+}
+
+#settings {
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    width: 25%;
+}
+
+.settings-option {
+    margin-left: 25px;
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin-top: 5px;
+}
+
+.settings-category {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
+}

@@ -21,36 +21,48 @@ import { InputOverlay } from "./inputOverlay.js";
 import { ResultScreenUpdater } from "./resultScreenUpdate.js";
 import { HitSoundPlayer } from "./hitSoundPlayer.js";
 import { SpriteFontRenderer } from "./fontRenderer.js";
+import { SettingsManager } from "./settingsManager.js";
 import ui from "./UIelements.js";
 
 const config = {
-    sound: {
-        musicVolume: 0.1,
-        effectVolume: 0.1
-    },
-    visuals: {
-        skin: "",
-        cursorScale: 1.5
-    },
-    gameplay: {
-        mouseButtonsInGame: false,
-        hide300Points: true,
-        backgroundDim: 0.75
-    },
-    inputs: {
-        hitKeyA: "KeyX",
-        hitKeyB: "KeyC"
-    }
+    musicVolume: 0.1,
+    effectVolume: 0.1,
+
+    skin: "",
+    cursorScale: 1.5,
+
+    mouseButtonsInGame: false,
+    hide300Points: true,
+    backgroundDim: 0.75,
+
+    hitKeyA: "KeyX",
+    hitKeyB: "KeyC"
+
 }
 
 class Game {
-    constructor(cfg) {
+    constructor() {
         this.canvas = document.querySelector("canvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext("2d");
 
-        this.CONFIG = cfg;
+        // Hoisted config values with defaults
+        this.CONFIG = {
+            musicVolume: 0.1,
+            effectVolume: 0.1,
+        
+            skin: "",
+            cursorScale: 1.5,
+        
+            mouseButtonsInGame: false,
+            hide300Points: true,
+            backgroundDim: 0.75,
+        
+            hitKeyA: "KeyX",
+            hitKeyB: "KeyC"
+        
+        };
 
         this.inputHandler = new InputHandler();
 
@@ -76,10 +88,10 @@ class Game {
         this.INPUTOVERLAY = InputOverlay;
 
         this.auMgr = new AudioManager();
-        this.auMgr.setMasterVolume(this.CONFIG.sound.effectVolume);
+        this.auMgr.setMasterVolume(this.CONFIG.effectVolume);
 
         this.skinResourceManager = new SkinResourceManager(this);
-        this.skinResourceManager.loadSkin(this.CONFIG.visuals.skin);
+        this.skinResourceManager.loadSkin(this.CONFIG.skin);
 
         this.loadingImg = new SpriteImage("client-files/loading.png");
         this.loadingSprite = new Sprite(this.loadingImg);
@@ -100,6 +112,23 @@ class Game {
         this.hitSoundPlayer = new HitSoundPlayer(this);
         this.resultScreenUpdater = new ResultScreenUpdater(this);
 
+        // A set of functions that are executed when change happens on the settings option elements
+        this.settingsInterface = {
+            setMusicVolume: (v) => {
+                this.songAudioHandler.changeVolume(v, 250);
+                this.CONFIG.musicVolume = v;
+            },
+            setEffectVolume: (v) => {
+                this.auMgr.setMasterVolume(v);
+                this.CONFIG.effectVolume = v;
+            },
+            setCursorScale: (v) => {
+                this.cursor.scale = v;
+                this.CONFIG.cursorScale = v;
+            }
+        }
+        this.settingsManager = new SettingsManager(this);
+
         window.addEventListener("resize", () => { this.resizeHandler() });
         this.UI.pauseButtons.continue.addEventListener("click", () => { this.pauseContinue() });
         this.UI.pauseButtons.retry.addEventListener("click", () => { this.pauseRetry() });
@@ -117,6 +146,7 @@ class Game {
         this.clock = timestamp;
 
         this.currentState.handleInput();
+        this.cursor.update();
         this.songAudioHandler.update();
         this.backgroundManager.update();
         this.beatmapPlayer.update();
@@ -147,6 +177,8 @@ class Game {
             this.inputOverlay.render();
             this.cursor.render();
         }
+
+
     }
 
     setState(stateEnum) {

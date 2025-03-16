@@ -2,7 +2,7 @@ export class SongAudioHandler {
     constructor(game) {
         this.game = game;
         this.audio = document.querySelector("audio");
-        this.currentVolume = this.game.CONFIG.sound.musicVolume;
+        this.currentVolume = this.game.CONFIG.musicVolume;
         this.audio.volume = this.currentVolume;
         this.audio.muted = false;
         this.audio.preservesPitch = false;
@@ -37,7 +37,7 @@ export class SongAudioHandler {
         this.audio.play();
         this.audio.currentTime = this.currentPreviewPoint / 1000; // HTML Audio counts in seconds!
 
-        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.sound.musicVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.musicVolume, this.game.EASINGS.Linear);
 
         this.audio.onended = () => {
             this.repeatPreview();
@@ -47,13 +47,13 @@ export class SongAudioHandler {
     repeatPreview() {
         this.audio.play();
         this.audio.currentTime = this.currentPreviewPoint / 1000;
-        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.sound.musicVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.musicVolume, this.game.EASINGS.Linear);
     }
 
     reset() {
         this.audio.currentTime = 0;
         this.audio.pause();
-        this.volumeAutomation = new this.game.ANI(0, 0, this.game.CONFIG.sound.musicVolume, this.game.CONFIG.sound.musicVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(0, 0, this.game.CONFIG.musicVolume, this.game.CONFIG.musicVolume, this.game.EASINGS.Linear);
         this.audio.onended = () => { }
     }
 

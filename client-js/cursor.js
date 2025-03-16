@@ -33,24 +33,28 @@ export class Cursor {
         this.currentY = 0;
         this.prevX = 0;
         this.prevY = 0;
-        this.scale = this.game.CONFIG.visuals.cursorScale;
+        
+        this.scale = this.game.CONFIG.cursorScale;
 
         this.cursorSprite.scale = this.scale;
     }
 
-    update(x, y) {
+    setPosition(x, y) {
         this.currentX = x;
         this.currentY = y;
+    }
 
-        this.cursorSprite.x = x;
-        this.cursorSprite.y = y;
+    update() {
+        this.cursorSprite.scale = this.scale;
+        
+        this.cursorSprite.x = this.currentX;
+        this.cursorSprite.y = this.currentY;
 
-        // The line algorithm locks sometimes when floating point numbers passed into it...
         this.addCursorPoints(
-            Math.floor(this.currentX),
-            Math.floor(this.currentY),
-            Math.floor(this.prevX),
-            Math.floor(this.prevY)
+            this.prevX,
+            this.prevY,
+            this.currentX,
+            this.currentY
         );
 
         this.prevX = this.currentX;
@@ -90,7 +94,7 @@ export class Cursor {
         let ix = x1 < x2 ? 1 : -1;  // increment direction
         let iy = y1 < y2 ? 1 : -1;
 
-        let k = 4;  // sample size ( it was 5 )
+        let k = 5;  // sample size ( it was 5 )
         if (dy <= dx) {
             for (let i = 0; ; i++) {
                 if (i === k) {

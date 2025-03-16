@@ -24,6 +24,8 @@ export class Slider {
         this.rad = (118 / cs) * scale;
         this.ballSize = scale / (cs * 0.5);
 
+        this.fadeOutMs = 150;
+
         // Put the start x and y coordinates to the begining of the curvePoints array then append the rest of them
         this.curvePoints = [[this.x, this.y], ...curvePoints];
         this.slides = slides;
@@ -78,7 +80,8 @@ export class Slider {
         this.velocity = 1;
         if (v === -100) {
             this.velocity = 1;
-        } else if (v < -100) {
+        }
+        else if (v < -100) {
             this.velocity = (-1 * v / 100) / multiplier;
         } else {
             // ???
@@ -138,8 +141,9 @@ export class Slider {
         // Creating the animations that controls the movement of the sliderball
         // The speed must be constant on every segment
         let currentSegmentTime = 0;
+        let curvePoint;
         for (let i = 0; i < this.ballPath.length; i++) {
-            const curvePoint = this.ballPath[i];
+            curvePoint = this.ballPath[i];
             if (!this.ballPath[i + 1]) break; // Exit when we run out of range
             let segmentLengthPx = 0;
             let segmentLengthMs = 0;
@@ -172,6 +176,31 @@ export class Slider {
             currentSegmentTime += segmentLengthMs;
         };
 
+        // Last pair of keyframes to keep the sliderball at the end posititon when fading out
+        /*this.ballMovement.appendAnimation(
+            new this.game.ANI(
+                currentSegmentTime,
+                currentSegmentTime + this.fadeOutMs,
+                curvePoint[0],
+                curvePoint[0],
+                this.game.EASINGS.Linear,
+                false,
+                "X"
+            )
+        )
+        this.ballMovement.appendAnimation(
+            new this.game.ANI(
+                currentSegmentTime,
+                currentSegmentTime + this.fadeOutMs,
+                curvePoint[1],
+                curvePoint[1],
+                this.game.EASINGS.Linear,
+                false,
+                "Y"
+            )
+        )*/
+
+        // Initial fade in
         this.fading = new this.game.ANI(
             this.t - this.timeWindow,
             this.t,
@@ -188,7 +217,6 @@ export class Slider {
             this.game.EASINGS.SineOut,
             true
         );
-
 
         this.reverseArrows[1].opacity = this.slides > 1 ? 1 : 0;
         this.reverseArrows[0].opacity = this.slides > 2 ? 1 : 0;
@@ -233,7 +261,7 @@ export class Slider {
         this.reverseArrowPulse.update(currentTime);
 
         // Start the movement of the ball when 
-        if (!this.moving && currentTime >= this.t) {
+        if (!this.moving && currentTime >= this.t && !this.endReached) {
             this.ballMovement.currentTime = currentTime;
             this.ballMovement.play();
             this.moving = true;
@@ -241,7 +269,7 @@ export class Slider {
         }
 
         let edgeSoundIndex = Math.floor(this.ballMovement.timelineCurrentTime / this.oneSlideTime);
-        if (this.moving && edgeSoundIndex !== this.currentSoundPlayed) {
+        if (edgeSoundIndex !== this.currentSoundPlayed && this.moving) {
 
             // Edge sounds will be expected
             this.game.auMgr.playAudioClip("normal-hitnormal");
@@ -250,11 +278,11 @@ export class Slider {
         }
 
         // Fade out when reached endTime
-        if (!this.endReached & currentTime >= this.endTime) {
+        if (!this.endReached && currentTime >= this.endTime) {
 
             this.fading = new this.game.ANI(
                 this.endTime,
-                this.endTime + 150,
+                this.endTime + this.fadeOutMs,
                 1,
                 0,
                 this.game.EASINGS.Linear

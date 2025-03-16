@@ -55,7 +55,7 @@ export class BeatmapPlayer {
         this.parsedOSU = parsedOSU;
 
         this.timeWindow = this.calculateApproachRate(parsedOSU.Difficulty.ApproachRate);
-        this.globalScale = (this.game.canvas.height / this.playFieldHeight) * 0.9;
+        this.globalScale = (this.game.canvas.height / this.playFieldHeight) * 0.8;
         this.xScale = this.game.canvas.width / this.playFieldWidth;
         this.yScale = this.game.canvas.height / this.playFieldHeight;
         this.xOffset = (this.game.canvas.width - (this.playFieldWidth * this.globalScale)) * 0.5;
@@ -76,6 +76,7 @@ export class BeatmapPlayer {
                 this.spinners.push(
                     new this.game.SPINNER(
                         this.game,
+                        this.globalScale,
                         element.time,
                         parseInt(element.objectParams)
                     )
@@ -131,7 +132,6 @@ export class BeatmapPlayer {
 
         // Needs fix for instances where a hit objects time is too close to 0 (the first hit object spawn immediately)
         // Possible solution is to start a timer, that can go negative if needed and then switching back to the audio playback time (stutter may occur when the swiching happens)
-        let startDelay = Number(this.hitCircles.at(0)?.t) < 1000 ? 2000 : 1000;
         this.firsthitObjectTime = Math.min(
             this.hitCircles.at(0)?.t ?? Infinity, 
             this.sliders.at(0)?.t ?? Infinity, 
@@ -143,6 +143,8 @@ export class BeatmapPlayer {
             this.spinners.at(-1)?.endTime ?? -Infinity
         );
         let relatedStartTimingPoint = this.getTimingPointAtTime(this.firsthitObjectTime);
+
+        let startDelay = Number(this.firsthitObjectTime) < 1000 ? 2000 : 1000;
 
         if (this.firsthitObjectTime > 5000) {
             this.introSkipable = true;
@@ -317,7 +319,7 @@ export class BeatmapPlayer {
 
         // Check if the configuration enables the 300s to be invisible
         // Add the accuracy judgment to their array
-        if (hitResult === 3 && this.game.CONFIG.gameplay.hide300Points) hitResult = -1;
+        if (hitResult === 3 && this.game.CONFIG.hide300Points) hitResult = -1;
         this.accJudgments.push(
             new this.game.ACCJUDGMENT(
                 this.game,

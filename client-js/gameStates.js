@@ -28,7 +28,7 @@ class SongSelecting extends GameState {
         this.game.comboMeter.reset();
 
         this.game.songAudioHandler.changeVolume(
-            this.game.CONFIG.sound.musicVolume,
+            this.game.CONFIG.musicVolume,
             1000
         );
 
@@ -67,24 +67,23 @@ class Playing extends GameState {
     }
 
     enter() {
-        this.game.backgroundManager.changeOpacity(1 - this.game.CONFIG.gameplay.backgroundDim, 1000);
+        this.game.backgroundManager.changeOpacity(1 - this.game.CONFIG.backgroundDim, 1000);
 
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
         this.game.cursor = new this.game.CURSOR(this.game);
         this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
-        //this.game.accuracyMeter.reset();
-        //this.game.comboMeter.reset();
     }
 
     handleInput() {
         let m = this.game.inputHandler.getMouse();
-        if (this.game.CONFIG.gameplay.mouseButtonsInGame && m.down) this.game.beatmapPlayer.hit(m);
+        if (this.game.CONFIG.mouseButtonsInGame && m.down) this.game.beatmapPlayer.hit(m);
 
-        if (this.game.inputHandler.includesKey(this.game.CONFIG.inputs.hitKeyA, true) || this.game.inputHandler.includesKey(this.game.CONFIG.inputs.hitKeyB, true)) {
+        if (this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, true) || this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, true)) {
             this.game.beatmapPlayer.hit(m);
         }
 
-        this.game.cursor.update(m.x, m.y);
+        this.game.cursor.setPosition(m.x, m.y);
+
         if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
 
         this.game.inputOverlay.update();
