@@ -21,24 +21,9 @@ import { InputOverlay } from "./inputOverlay.js";
 import { ResultScreenUpdater } from "./resultScreenUpdate.js";
 import { HitSoundPlayer } from "./hitSoundPlayer.js";
 import { SpriteFontRenderer } from "./fontRenderer.js";
-import { SettingsManager } from "./settingsManager.js";
-import ui from "./UIelements.js";
-
-const config = {
-    musicVolume: 0.1,
-    effectVolume: 0.1,
-
-    skin: "",
-    cursorScale: 1.5,
-
-    mouseButtonsInGame: false,
-    hide300Points: true,
-    backgroundDim: 0.75,
-
-    hitKeyA: "KeyX",
-    hitKeyB: "KeyC"
-
-}
+import { SettingsManager } from "./settingsManagerV2.js";
+import { AutoplayController } from "./autoplay.js";
+import {getElements} from "./UIelements.js";
 
 class Game {
     constructor() {
@@ -51,22 +36,20 @@ class Game {
         this.CONFIG = {
             musicVolume: 0.1,
             effectVolume: 0.1,
-        
             skin: "",
             cursorScale: 1.5,
-        
+            cursortrailType: 0,
             mouseButtonsInGame: false,
             hide300Points: true,
             backgroundDim: 0.75,
-        
             hitKeyA: "KeyX",
             hitKeyB: "KeyC"
-        
         };
 
         this.inputHandler = new InputHandler();
 
-        this.UI = ui;
+        this.UI = getElements();
+        this.settingsManager = new SettingsManager(this);
 
         this.STATE_ENUM = states
         this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result];
@@ -87,6 +70,7 @@ class Game {
         this.SPINNER = Spinner;
         this.INPUTOVERLAY = InputOverlay;
 
+
         this.auMgr = new AudioManager();
         this.auMgr.setMasterVolume(this.CONFIG.effectVolume);
 
@@ -99,6 +83,8 @@ class Game {
         this.loadingAnimation = new Animation(0, 1000, 0, 6.28, this.EASINGS.Linear, true);
 
         this.ACCJUDGMENT = AccuracyJudgment;
+        this.autoplay = new AutoplayController(this);
+
         this.accuracyMeter = new AccuracyMeter(this);
         this.comboMeter = new ComboMeter(this);
         this.songAudioHandler = new SongAudioHandler(this);
@@ -113,9 +99,10 @@ class Game {
         this.resultScreenUpdater = new ResultScreenUpdater(this);
 
         // A set of functions that are executed when change happens on the settings option elements
+        // I start to not like this....
         this.settingsInterface = {
             setMusicVolume: (v) => {
-                this.songAudioHandler.changeVolume(v, 250);
+                this.songAudioHandler.changeVolume(v);
                 this.CONFIG.musicVolume = v;
             },
             setEffectVolume: (v) => {
@@ -125,9 +112,12 @@ class Game {
             setCursorScale: (v) => {
                 this.cursor.scale = v;
                 this.CONFIG.cursorScale = v;
+            },
+
+            setCursortrailType: (v) => {
+               this.cursor.trailType = v;
             }
         }
-        this.settingsManager = new SettingsManager(this);
 
         window.addEventListener("resize", () => { this.resizeHandler() });
         this.UI.pauseButtons.continue.addEventListener("click", () => { this.pauseContinue() });
@@ -269,7 +259,7 @@ function mainLoop(timestamp) {
     requestAnimationFrame(mainLoop);
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
     game = new Game(config);
     requestAnimationFrame(mainLoop);
 });

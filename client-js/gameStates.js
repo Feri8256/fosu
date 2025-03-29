@@ -27,6 +27,8 @@ class SongSelecting extends GameState {
         this.game.accuracyMeter.reset();
         this.game.comboMeter.reset();
 
+        this.game.settingsManager.setButtonVisibility(true);
+
         this.game.songAudioHandler.changeVolume(
             this.game.CONFIG.musicVolume,
             1000
@@ -57,6 +59,10 @@ class SongSelecting extends GameState {
 
     handleInput() {
 
+        if (this.game.inputHandler.includesKey("KeyA", true)) {
+            if (this.game.autoplay.activated) this.game.autoplay.activated = false;
+            else this.game.autoplay.activate();
+        }
     }
 }
 
@@ -75,6 +81,11 @@ class Playing extends GameState {
     }
 
     handleInput() {
+        if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
+        this.game.inputOverlay.update();
+
+        if (this.game.autoplay.activated) return;
+
         let m = this.game.inputHandler.getMouse();
         if (this.game.CONFIG.mouseButtonsInGame && m.down) this.game.beatmapPlayer.hit(m);
 
@@ -84,9 +95,7 @@ class Playing extends GameState {
 
         this.game.cursor.setPosition(m.x, m.y);
 
-        if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
 
-        this.game.inputOverlay.update();
     }
 }
 
@@ -155,6 +164,7 @@ class Loading extends GameState {
 
     enter() {
         this.game.setLoadingCircle(true);
+        this.game.settingsManager.setButtonVisibility(false);
 
         this.game.UI.songSelectContainer.animate([
             { transform: "translateX(0px)" },
@@ -198,8 +208,8 @@ class Result extends GameState {
 
     enter() {
         this.game.resultScreenUpdater.update();
+        this.game.backgroundManager.changeOpacity(0.5, 500);
 
-        //this.game.backgroundManager.changeOpacity(1, 500);
         this.game.UI.resultScreen.container.style.filter = "opacity(0%)";
         this.game.UI.resultScreen.container.style.visibility = "visible";
         this.game.UI.resultScreen.container.animate(
@@ -208,7 +218,7 @@ class Result extends GameState {
                 { filter: "opacity(100%)" }
             ],
             {
-                delay: 500,
+                delay: 0,
                 duration: 500,
                 fill: "forwards"
             }
@@ -222,7 +232,7 @@ class Result extends GameState {
                 { filter: "opacity(100%)" }
             ],
             {
-                delay: 500,
+                delay: 0,
                 duration: 500,
                 fill: "forwards"
             }
@@ -232,6 +242,7 @@ class Result extends GameState {
             this.game.songAudioHandler.audio.volume * 0.5,
             1000
         );
+
     }
 
     /**
@@ -239,6 +250,7 @@ class Result extends GameState {
      * @param {Boolean} r wanna retry?
      */
     animateElements(r) {
+        this.game.backgroundManager.changeOpacity(0, 500);
         this.game.UI.resultScreen.container.animate(
             [
                 { filter: "opacity(100%)" },
@@ -250,7 +262,7 @@ class Result extends GameState {
             }
         ).onfinish = () => {
             this.game.UI.resultScreen.container.style.visibility = "hidden";
-           
+
         };
 
         this.game.UI.resultMetadata.container.animate(
@@ -279,8 +291,6 @@ class Result extends GameState {
 
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
-
-
             this.animateElements(false);
             this.game.auMgr.playAudioClip("menuback");
         }

@@ -43,6 +43,8 @@ export class SettingsManager {
 
         ////////////////////////////////     
 
+        this.load();
+
         this.optionElements.forEach(element => {
             element.addEventListener("change", (evt) => {
                 let interfaceFnChek = this.game.settingsInterface[evt.target.dataset.execute];
@@ -78,6 +80,18 @@ export class SettingsManager {
 
     save() {
         let configStr = JSON.stringify(this.configuration);
-        window.localStorage.setItem("cfg", configStr);
+        window.localStorage.setItem("fosuConfig", configStr);
+    }
+
+    load() {
+        let cfgObj = JSON.parse(window.localStorage.getItem("fosuConfig") ?? "{}");
+        let cfgObjKeys = Object.keys(cfgObj);
+        
+
+        if (!cfgObjKeys) return;
+
+        for (const key of cfgObjKeys) {
+            console.log(key)
+        }
     }
 }

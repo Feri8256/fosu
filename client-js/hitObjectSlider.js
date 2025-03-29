@@ -41,7 +41,7 @@ export class Slider {
 
             // Copy the curve points in normal or in reverse order
             for (
-                let i = rev ? (this.curvePoints.length - 1) : 0; 
+                let i = rev ? (this.curvePoints.length - 1) : 0;
                 rev ? (i > 0) : (i < this.curvePoints.length);
                 rev ? (i--) : (i++)
             ) {
@@ -76,16 +76,16 @@ export class Slider {
         }
 
         //https://osu.ppy.sh/wiki/hu/Client/File_formats/osu_%28file_format%29
-
+        let vNorm = (-1 * v) / 100;
         this.velocity = 1;
         if (v === -100) {
             this.velocity = 1;
         }
         else if (v < -100) {
-            this.velocity = (-1 * v / 100) / multiplier;
+            this.velocity = vNorm / multiplier;
         } else {
             // ???
-            this.velocity = multiplier / (multiplier * (v / -100));
+            this.velocity = multiplier / (multiplier * vNorm);
         }
 
         this.oneSlideTime = this.pixelLength / (this.multiplier * 100 * this.velocity) * this.beatLength;
@@ -117,7 +117,7 @@ export class Slider {
 
         // Rotate the sprites according to the line angle of the slider segment they are sitting at
         this.reverseArrows[0].rotation = this.calculateLineAngle(
-            { x: this.curvePoints.at(0)[0], y: this.curvePoints.at(0)[1] }, 
+            { x: this.curvePoints.at(0)[0], y: this.curvePoints.at(0)[1] },
             { x: this.curvePoints.at(1)[0], y: this.curvePoints.at(1)[1] }
         ) - (Math.PI * 0.5);
 
@@ -130,8 +130,9 @@ export class Slider {
         this.ballMovement = new this.game.TL();
 
         this.moving = false;
-        this.following = false;
 
+        this.currentFollowState = false;
+        this.previousFollowState = false;
 
         // Since we not dealing with curve types (everything is straight lines) there can be significant differences between the calculated end time (using pixelLength)
         // and the total length that the slider ball movement animation calculates (divide the result of "calculated end time" between the slider segments)
@@ -176,30 +177,6 @@ export class Slider {
             currentSegmentTime += segmentLengthMs;
         };
 
-        // Last pair of keyframes to keep the sliderball at the end posititon when fading out
-        /*this.ballMovement.appendAnimation(
-            new this.game.ANI(
-                currentSegmentTime,
-                currentSegmentTime + this.fadeOutMs,
-                curvePoint[0],
-                curvePoint[0],
-                this.game.EASINGS.Linear,
-                false,
-                "X"
-            )
-        )
-        this.ballMovement.appendAnimation(
-            new this.game.ANI(
-                currentSegmentTime,
-                currentSegmentTime + this.fadeOutMs,
-                curvePoint[1],
-                curvePoint[1],
-                this.game.EASINGS.Linear,
-                false,
-                "Y"
-            )
-        )*/
-
         // Initial fade in
         this.fading = new this.game.ANI(
             this.t - this.timeWindow,
@@ -221,8 +198,28 @@ export class Slider {
         this.reverseArrows[1].opacity = this.slides > 1 ? 1 : 0;
         this.reverseArrows[0].opacity = this.slides > 2 ? 1 : 0;
 
+        this.followCircleScale = new this.game.ANI(
+            0,
+            0,
+            0,
+            0,
+            this.game.EASINGS.Linear,
+        );
+
+        this.followCircleFade = new this.game.ANI(
+            0,
+            0,
+            0,
+            0,
+            this.game.EASINGS.Linear,
+        );
 
         this.endReached = false;
+
+        // Tell the AutoplayController about the end position, the ball following is done in the update method
+        if (this.game.autoplay.activated) {
+            this.game.autoplay.add(this.endTime, curvePoint[0], curvePoint[1]);
+        }
     }
 
     calculateDistance(pointA, pointB) {
@@ -244,7 +241,10 @@ export class Slider {
             const curvePoint = this.curvePoints[i];
             if (!this.curvePoints[i + 1]) break;
 
-            let segmentLengthPx = this.calculateDistance({ x: curvePoint[0], y: curvePoint[1] }, { x: this.curvePoints[i + 1][0], y: this.curvePoints[i + 1][1] }) / this.scale;
+            let segmentLengthPx = this.calculateDistance(
+                { x: curvePoint[0], y: curvePoint[1] }, 
+                { x: this.curvePoints[i + 1][0], y: this.curvePoints[i + 1][1] }
+            ) / this.scale;
             let segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal;
 
             currentSegmentTime += segmentLengthMs;
@@ -259,20 +259,28 @@ export class Slider {
     update(currentTime) {
         this.fading.update(currentTime);
         this.reverseArrowPulse.update(currentTime);
+        this.followCircleScale.update(this.game.clock);
+        this.followCircleFade.update(this.game.clock);
 
         // Start the movement of the ball when 
         if (!this.moving && currentTime >= this.t && !this.endReached) {
             this.ballMovement.currentTime = currentTime;
             this.ballMovement.play();
             this.moving = true;
+            //this.currentFollowState = true;
+
+            if (this.game.autoplay.activated) this.setFollowState(true);
+
             //console.log(`beatLength: ${this.beatLength}\npixelLength: ${this.pixelLength}\nvelocity: ${this.velocity}\nmultiplier: ${this.multiplier}\none slide t: ${this.oneSlideTime}`)
         }
 
         let edgeSoundIndex = Math.floor(this.ballMovement.timelineCurrentTime / this.oneSlideTime);
-        if (edgeSoundIndex !== this.currentSoundPlayed && this.moving) {
+        if (edgeSoundIndex !== this.currentSoundPlayed && this.moving && this.currentFollowState) {
 
             // Edge sounds will be expected
             this.game.auMgr.playAudioClip("normal-hitnormal");
+            this.game.comboMeter.addHit(true);
+            this.game.accuracyMeter.addHit(true, 0);
 
             this.currentSoundPlayed = edgeSoundIndex;
         }
@@ -289,19 +297,35 @@ export class Slider {
             );
 
             this.endReached = true;
+
+            this.setFollowState(false);
+
+            // End
+            this.game.auMgr.playAudioClip("normal-hitnormal");
+            this.game.comboMeter.addHit(true);
+            this.game.accuracyMeter.addHit(true, 0);
         }
 
         this.ballMovement.update(currentTime);
-        this.ballSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.x;
-        this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.ballSprite.y;
+        this.ballSprite.x = this.ballMovement.getValueOf("X") || this.ballPath.at(-1)[0];
+        this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.ballPath.at(-1)[1];
         this.ballSprite.opacity = this.fading.currentValue;
 
-        this.followSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.y;
+        this.followSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.x;
         this.followSprite.y = this.ballMovement.getValueOf("Y") || this.ballSprite.y;
+        this.followSprite.scale = this.followCircleScale.currentValue;
+        this.followSprite.opacity = this.followCircleFade.currentValue;
 
         this.reverseArrows.forEach((r) => {
             r.scale = this.reverseArrowPulse.currentValue;
         });
+
+        // When autoplay is enabled and the slider ball starts moving, move the cursor along with it
+        // It is only possible because here we override the cursor position that the AutoplayController sets on updating
+        // This way we not have to create keyframes for slider following
+        if (this.game.autoplay.activated && this.ballMovement.playing) {
+            this.game.cursor.setPosition(Math.floor(this.ballSprite.x), Math.floor(this.ballSprite.y));
+        }
     }
 
     render() {
@@ -331,7 +355,7 @@ export class Slider {
 
 
         if (this.moving) this.ballSprite.render(this.game.ctx);
-        if (this.following) this.followSprite.render(this.game.ctx);
+        this.followSprite.render(this.game.ctx);
 
         this.reverseArrows.forEach((r) => { r.render(this.game.ctx) });
 
@@ -339,4 +363,50 @@ export class Slider {
     }
 
     tap() { }
+
+    /**
+     * 
+     * @param {Boolean} state is the cursor is in the follow region?
+     * @returns 
+     */
+    setFollowState(state) {
+        this.currentFollowState = state;
+
+        // Do things only on state change
+        if (this.currentFollowState === this.previousFollowState) return;
+
+        if (state) {
+            this.followCircleScale = new this.game.ANI(
+                this.game.clock,
+                this.game.clock + 150,
+                this.ballSize * 0.75,
+                this.ballSize,
+                this.game.EASINGS.SineOut
+            );
+            this.followCircleFade = new this.game.ANI(
+                this.game.clock,
+                this.game.clock + 50,
+                0.25,
+                1,
+                this.game.EASINGS.Linear
+            );
+        } else {
+            this.followCircleScale = new this.game.ANI(
+                this.game.clock,
+                this.game.clock + 150,
+                this.ballSize,
+                this.ballSize * 0.75,
+                this.game.EASINGS.SineIn
+            );
+            this.followCircleFade = new this.game.ANI(
+                this.game.clock,
+                this.game.clock + 150,
+                1,
+                0,
+                this.game.EASINGS.Linear
+            );
+        }
+
+        this.previousFollowState = this.currentFollowState;
+    }
 }

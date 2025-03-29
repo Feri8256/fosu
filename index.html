@@ -33,19 +33,19 @@
     <div id="result" class="ontop">
         <table>
             <tr>
-                <td><img src="./client-files/hit300.png" alt="perfect"></td>
+                <td><img src="./client-files/hit300.png" alt="perfect" title="perfect"></td>
                 <td><span id="result-300">0</span></td>
             </tr>
             <tr>
-                <td><img src="./client-files/hit100.png" alt="okay"></td>
+                <td><img src="./client-files/hit100.png" alt="okay" title="okay"></td>
                 <td><span id="result-100">0</span></td>
             </tr>
             <tr>
-                <td><img src="./client-files/hit50.png" alt="meh"></td>
+                <td><img src="./client-files/hit50.png" alt="meh" title="meh"></td>
                 <td><span id="result-50">0</span></td>
             </tr>
             <tr>
-                <td><img src="./client-files/hit0.png" alt="miss"></td>
+                <td><img src="./client-files/hit0.png" alt="miss" title="miss"></td>
                 <td><span id="result-0">0</span></td>
             </tr>
         </table>
@@ -77,15 +77,15 @@
         <div class="settings-category">
             <h2>🔈 Audio</h2>
             <div class="settings-option">
-                <label for="volumeMusic">Music volume</label>
+                <label for="musicVolume">Music volume</label>
 
-                <input type="range" min="0" max="1" value="0.1" step="0.01" id="volumeMusic" class="option" data-type="float" data-execute="setMusicVolume">
+                <input type="range" min="0" max="1" value="0.1" step="0.01" id="musicVolume" class="option" data-type="float" data-execute="setMusicVolume">
             </div>
 
             <div class="settings-option">
-                <label for="volumeSFX">Effect volume</label>
+                <label for="effectVolume">Effect volume</label>
 
-                <input type="range" min="0" max="1" value="0.1" step="0.01" id="volumeSFX" class="option" data-type="float" data-execute="setEffectVolume">
+                <input type="range" min="0" max="1" value="0.1" step="0.01" id="effectVolume" class="option" data-type="float" data-execute="setEffectVolume">
 
             </div>
         </div>
@@ -95,7 +95,7 @@
         <div class="settings-category">
             <h2>🎨 Skin</h2>
             <div class="settings-option">
-                <select name="" id="skin" class="option" data-type="string" data-execute="">
+                <select name="" id="skin" class="option" data-type="string" data-execute="setSkin">
                     <option value="">default</option>
                 </select>
 
@@ -106,9 +106,21 @@
                 <input type="range" min="0.1" max="5" value="1" step="0.01" id="cursorScale" class="option" data-type="float" data-execute="setCursorScale">
 
             </div>
+            <div class="settings-option">
+                <label for="cursortrailType">Cursor trail:</label>
+
+                <select name="" id="cursortrailType" class="option" data-type="number" data-execute="setCursortrailType" title="change this if your framerate drops when making large movements with the cursor">
+                    <option value="0">fancy</option>
+                    <option value="1">normal</option>
+                    <option value="2">off</option>
+                </select>
+
+            </div>
         </div>
     </div>
-    <button id="settings-btn" class="ontop hidden">Settings</button>
+    <button id="settings-btn" class="ontop">
+        <img src="client-files/settings.png" alt="">
+    </button>
 
     <audio src="" preload="auto"></audio>
 

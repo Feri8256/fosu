@@ -23,6 +23,7 @@ export class BeatmapPlayer {
 
         this.playing = false;
         this.loading = false;
+        this.ended = false;
 
         this.introSkipable = false;
         this.introSkipped = false;
@@ -33,6 +34,8 @@ export class BeatmapPlayer {
         this.lastHitObjectTime = 0;
 
         this.parsedOSU = {};
+
+        this.endedTimestamp = 0;
 
     }
 
@@ -69,7 +72,7 @@ export class BeatmapPlayer {
             element.hitSample.additionSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.additionSet
             element.hitSample.normalSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.normalSet
 
-            let objectType = element.type.reduce((a, b) => {return a + b});
+            let objectType = element.type.reduce((a, b) => { return a + b });
 
             // That is a spinner
             if (objectType === 3) {
@@ -127,19 +130,18 @@ export class BeatmapPlayer {
                     )
                 )
             }
-
         });
 
         // Needs fix for instances where a hit objects time is too close to 0 (the first hit object spawn immediately)
         // Possible solution is to start a timer, that can go negative if needed and then switching back to the audio playback time (stutter may occur when the swiching happens)
         this.firsthitObjectTime = Math.min(
-            this.hitCircles.at(0)?.t ?? Infinity, 
-            this.sliders.at(0)?.t ?? Infinity, 
+            this.hitCircles.at(0)?.t ?? Infinity,
+            this.sliders.at(0)?.t ?? Infinity,
             this.spinners.at(0)?.startTime ?? Infinity
         );
         this.lastHitObjectTime = Math.max(
-            this.hitCircles.at(-1)?.t ?? -Infinity, 
-            this.sliders.at(-1)?.endTime ?? -Infinity, 
+            this.hitCircles.at(-1)?.t ?? -Infinity,
+            this.sliders.at(-1)?.endTime ?? -Infinity,
             this.spinners.at(-1)?.endTime ?? -Infinity
         );
         let relatedStartTimingPoint = this.getTimingPointAtTime(this.firsthitObjectTime);
@@ -169,12 +171,15 @@ export class BeatmapPlayer {
             this.game.songAudioHandler.play();
             if (this.introSkipable) this.setSkipButtonVisibility(true);
             this.playing = true;
+            //this.game.autoplay.start()
         }, startDelay);
     }
 
     update() {
         this.currentTime = this.game.songAudioHandler.getCurrentTime();
         this.progressBarCurrentWidth = this.mapToRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+        
+        if (this.playing) this.game.autoplay.update(this.currentTime);
 
         if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = this.mapToRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
         else this.progressBarCurrentWidth = this.mapToRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
@@ -196,6 +201,29 @@ export class BeatmapPlayer {
         this.hitCirclesToRender.forEach((u) => {
             u.update(this.currentTime);
 
+            // Autoplay can click circles to the beat
+            if (this.game.autoplay.activated && !u.hitCheck && this.currentTime >= u.t) {
+
+                this.game.hitSoundPlayer.playHitSound(u.hitSample.normalSet, u.hitSample.additionSet, u.hitSound);
+
+                this.accJudgments.push(
+                    new this.game.ACCJUDGMENT(
+                        this.game,
+                        u.x,
+                        u.y,
+                        u.scale,
+                        this.game.CONFIG.hide300Points ? -1 : 1
+                    )
+                );
+
+                this.game.accuracyMeter.addHit(3, 0);
+                this.game.comboMeter.addHit(true);
+
+                // Start the hit animation of the hit object
+                u.tap();
+                u.hitCheck = true;
+            }
+
             // When its too late to click and no hit registered on the hit object it counts as a miss
             if (u.hittedAt === 0 && !u.hitCheck && u.t < this.currentTime - 300) {
                 this.accJudgments.push(
@@ -212,6 +240,8 @@ export class BeatmapPlayer {
                 this.game.comboMeter.addHit(false);
                 u.hitCheck = true;
             }
+
+
         });
 
         this.slidersToRender.forEach((s) => { s.update(this.currentTime); });
@@ -227,7 +257,17 @@ export class BeatmapPlayer {
             this.setSkipButtonVisibility(false);
         }
 
-        if (this.currentTime >= this.lastHitObjectTime + 500 && this.playing) this.end();
+
+        // Trasition to result screen at the end
+        if (this.currentTime >= this.lastHitObjectTime && !this.ended && this.playing) {
+            this.endedTimestamp = this.game.clock;
+            this.ended = true;
+            
+            setTimeout(() => { 
+                this.game.backgroundManager.changeOpacity(0, 500);
+            },500);
+        }
+        if (this.game.clock - 1000 > this.endedTimestamp && this.ended && this.playing) this.end();
     }
 
     render() {
@@ -360,6 +400,7 @@ export class BeatmapPlayer {
 
         this.playing = false;
         this.loading = false;
+        this.ended = false;
 
         this.introSkipable = false;
         this.introSkipped = false;
@@ -372,6 +413,7 @@ export class BeatmapPlayer {
         this.setSkipButtonVisibility(false);
         this.game.accuracyMeter.reset();
         this.game.comboMeter.reset();
+        this.game.autoplay.reset();
     }
 
     /**

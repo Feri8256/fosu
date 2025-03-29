@@ -1,3 +1,5 @@
+/* I'm not that good at CSS but I'm trying my best :) */
+
 * {
     margin: 0;
     padding: 0;
@@ -168,12 +170,15 @@ table {
     color: rgb(230, 230, 230);
     font-size: 16pt;
     text-shadow: 0.07em 0.07em 0.05em black;
-    
+
 }
 
 #settings-btn {
     position: fixed;
     bottom: 0;
+    left: 0;
+    background: none;
+    border: 0;
 }
 
 #settings {

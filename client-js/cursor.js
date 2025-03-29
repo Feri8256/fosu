@@ -25,6 +25,9 @@ class Particle {
 export class Cursor {
     constructor(game) {
         this.game = game;
+        
+        this.trailType = this.game.CONFIG.cursortrailType;
+
         this.trails = [];
         this.cursorSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("cursor"));
         this.cursorTrailSpriteImage = this.game.skinResourceManager.getSpriteImage("cursortrail");
@@ -50,12 +53,23 @@ export class Cursor {
         this.cursorSprite.x = this.currentX;
         this.cursorSprite.y = this.currentY;
 
-        this.addCursorPoints(
-            this.prevX,
-            this.prevY,
-            this.currentX,
-            this.currentY
-        );
+        switch(this.trailType) {
+            case 0:
+                this.addCursorPoints(
+                    this.prevX,
+                    this.prevY,
+                    this.currentX,
+                    this.currentY
+                );
+                break;
+
+            case 1:
+                if (this.currentX != this.prevX && this.currentY != this.prevY) this.createTrail(this.currentX, this.currentY);
+                break;
+
+            case 2:
+                break;
+        }
 
         this.prevX = this.currentX;
         this.prevY = this.currentY;

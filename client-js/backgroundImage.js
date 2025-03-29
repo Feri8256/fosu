@@ -77,7 +77,7 @@ export class BackgrondImageManager {
         this.fading = new this.game.ANI(
             this.game.clock, 
             this.game.clock + duration, 
-            1-this.fading.currentValue, // Start and end values inverted because of the fading logic in the update method
+            this.fading.currentValue, // Start and end values inverted because of the fading logic in the update method
             1-value, 
             this.game.EASINGS.Linear
         );

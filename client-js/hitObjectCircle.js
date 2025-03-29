@@ -57,6 +57,8 @@ export class HitCircle {
 
         this.hittedAt = 0;
         this.hitCheck = false;
+
+        if (this.game.autoplay.activated) this.game.autoplay.add(this.t, this.x, this.y);
     }
 
     update(currentTime) {

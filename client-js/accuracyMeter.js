@@ -1,18 +1,28 @@
 export class AccuracyMeter {
-    constructor(game) {
+    constructor(game, od = 5) {
         this.game = game;
+        this.od = od;
+
+        // https://osu.ppy.sh/wiki/hu/Gameplay/Judgement/osu%21
+        this.hitWindowValues = {
+            GREAT: 80 - 6 * this.od,
+            OK: 140 - 8 * this.od,
+            MEH: 200 - 10 * this.od,
+            MISS: 400
+        };
+
         this.currentAcc = 100;
         this.correctHits = 0;
         this.totalHits = 0;
 
-        this.results = [0,0,0,0,100];
+        this.results = [0, 0, 0, 0, 100];
 
         this.fontRenderer = new this.game.SPRITEFONTRENDERER(
             "100%",
-            this.game.skinResourceManager.scoreFontSet, 
-            0, 
-            this.game.canvas.width * 0.5, 
-            8, 
+            this.game.skinResourceManager.scoreFontSet,
+            0,
+            this.game.canvas.width * 0.5,
+            8,
             1,
             1,
             0.5,
@@ -34,19 +44,20 @@ export class AccuracyMeter {
         this.totalHits++;
 
         let hitResult = 0;
-        // 300 points
-        if (hitDeltaTime >= 0 && hitDeltaTime <= 100) {
-            hitResult = 3;
-        }
 
-        // 100 point
-        if (hitDeltaTime > 100 && hitDeltaTime <= 200) {
+        // 50 points (MEH)
+        if (hitDeltaTime < this.hitWindowValues.MEH) {
+            hitResult = 1;
+        }
+        
+        // 100 point (OK)
+        if (hitDeltaTime < this.hitWindowValues.OK) {
             hitResult = 2;
         }
 
-        // 50 points
-        if (hitDeltaTime > 200 && hitDeltaTime <= 300) {
-            hitResult = 1;
+        // 300 points (GREAT)
+        if (hitDeltaTime < this.hitWindowValues.GREAT) {
+            hitResult = 3;
         }
 
         if (hitResult === 3) this.correctHits++;
@@ -56,7 +67,7 @@ export class AccuracyMeter {
         this.currentAcc = 100 - (100 * (1 - (this.correctHits / this.totalHits)));
         this.results[4] = this.currentAcc;
 
-        this.fontRenderer.updateText(`${String(this.currentAcc).slice(0,5)}%`);
+        this.fontRenderer.updateText(`${String(this.currentAcc).slice(0, 5)}%`);
 
         return hitResult;
     }
@@ -69,7 +80,7 @@ export class AccuracyMeter {
         this.currentAcc = 100;
         this.correctHits = 0;
         this.totalHits = 0;
-        this.results = [0,0,0,0,100];
+        this.results = [0, 0, 0, 0, 100];
         this.fontRenderer.updateText("100%");
     }
 
