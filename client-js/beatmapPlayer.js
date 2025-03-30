@@ -50,8 +50,8 @@ export class BeatmapPlayer {
      */
     mapToRange(value, inMin, inMax, outMin, outMax) {
         let ratio = (value - inMin) / (inMax - inMin)
-        let amount = Math.max(0, Math.min(ratio, 1));
-        return outMin + (outMax - outMin) * amount;
+        //let amount = Math.max(0, Math.min(ratio, 1));
+        return outMin + (outMax - outMin) * ratio;
     }
 
     createHitObjects(parsedOSU) {
@@ -88,8 +88,8 @@ export class BeatmapPlayer {
                 this.hitCircles.push(
                     new this.game.HITCIRCLE(
                         this.game,
-                        this.mapToRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                        this.mapToRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
+                        this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                        this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
                         this.globalScale,
                         element.time,
                         parsedOSU.Difficulty.CircleSize,
@@ -106,8 +106,8 @@ export class BeatmapPlayer {
                 element.curvePoints.forEach((cp) => {
                     scaledCurvePoints.push(
                         [
-                            this.mapToRange(cp[0], 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                            this.mapToRange(cp[1], 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset)
+                            this.game.utils.convertRange(cp[0], 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                            this.game.utils.convertRange(cp[1], 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset)
 
                         ]
                     )
@@ -115,8 +115,8 @@ export class BeatmapPlayer {
                 this.sliders.push(
                     new this.game.SLIDER(
                         this.game,
-                        this.mapToRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                        this.mapToRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
+                        this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                        this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
                         this.globalScale,
                         element.time,
                         parsedOSU.Difficulty.CircleSize,
@@ -177,12 +177,12 @@ export class BeatmapPlayer {
 
     update() {
         this.currentTime = this.game.songAudioHandler.getCurrentTime();
-        this.progressBarCurrentWidth = this.mapToRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+        this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
         
         if (this.playing) this.game.autoplay.update(this.currentTime);
 
-        if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = this.mapToRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
-        else this.progressBarCurrentWidth = this.mapToRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+        if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
+        else this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
 
         // Select the hit objects that needs to be rendered and updated at currentTime
         this.slidersToRender = this.sliders.filter((s) => {
@@ -301,19 +301,6 @@ export class BeatmapPlayer {
         return arTime;
     }
 
-    /**
-     * Calculate the distance of two objects both of them have `x` and `y` values
-     * @param {*} hitObject 
-     * @param {*} cursor 
-     * @returns {Number}
-     */
-    calculateCursorDistance(hitObject, cursor) {
-        let distX = (hitObject.x) - cursor.x;
-        let distY = (hitObject.y) - cursor.y;
-        let dist = Math.sqrt((distX * distX) + (distY * distY));
-        return dist;
-    }
-
     getTimingPointAtTime(objectTime) {
         let inheritedTimingPoint = this.parsedOSU.TimingPoints.filter((p) => {
             return p.time <= objectTime && p.uninherited === 0;
@@ -341,7 +328,7 @@ export class BeatmapPlayer {
         // Finds the hit object that is close in time and in distance
         // No notelocking :)
         let obj = this.hitCirclesToRender.find((ho) => {
-            let distance = this.calculateCursorDistance(ho, mouse);
+            let distance = this.game.utils.getDistance(ho.x, ho.y, mouse.x, mouse.y);
             return ho.t - 200 < hitTimestamp && ho.t + 200 > hitTimestamp && !ho.hitCheck && distance <= ho.rad
         });
 

@@ -19,6 +19,7 @@ export class ResultScreenUpdater {
         this.game.UI.resultMetadata.title.textContent = mapMeta.title;
         this.game.UI.resultMetadata.creator.textContent = mapMeta.creator;
         this.game.UI.resultMetadata.diffName.textContent = mapMeta.version;
+        this.game.UI.resultMetadata.playerName.textContent = this.game.autoplay.activated ? "auto" : "you";
 
     }
 }

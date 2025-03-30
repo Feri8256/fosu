@@ -116,14 +116,14 @@ export class Slider {
         this.reverseArrows[1].y = this.sliderEndPos.y;
 
         // Rotate the sprites according to the line angle of the slider segment they are sitting at
-        this.reverseArrows[0].rotation = this.calculateLineAngle(
-            { x: this.curvePoints.at(0)[0], y: this.curvePoints.at(0)[1] },
-            { x: this.curvePoints.at(1)[0], y: this.curvePoints.at(1)[1] }
+        this.reverseArrows[0].rotation = this.game.utils.getLineAngle(
+            this.curvePoints.at(0)[0], this.curvePoints.at(0)[1],
+            this.curvePoints.at(1)[0], this.curvePoints.at(1)[1]
         ) - (Math.PI * 0.5);
 
-        this.reverseArrows[1].rotation = this.calculateLineAngle(
-            { x: this.curvePoints.at(-2)[0], y: this.curvePoints.at(-2)[1] },
-            this.sliderEndPos
+        this.reverseArrows[1].rotation = this.game.utils.getLineAngle(
+            this.curvePoints.at(-2)[0], this.curvePoints.at(-2)[1],
+            this.sliderEndPos.x, this.sliderEndPos.y
         ) + (Math.PI * 0.5);
 
         // The ball movement is controlled by a series of animation in a timeline
@@ -150,7 +150,10 @@ export class Slider {
             let segmentLengthMs = 0;
 
             //if (i === 0) {
-            segmentLengthPx = this.calculateDistance({ x: curvePoint[0], y: curvePoint[1] }, { x: this.ballPath[i + 1][0], y: this.ballPath[i + 1][1] }) / this.scale;
+            segmentLengthPx = this.game.utils.getDistance(
+                curvePoint[0], curvePoint[1],
+                this.ballPath[i + 1][0], this.ballPath[i + 1][1]
+            ) / this.scale;
             segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal * this.pathTimeScale;
             this.ballMovement.appendAnimation(
                 new this.game.ANI(
@@ -241,9 +244,9 @@ export class Slider {
             const curvePoint = this.curvePoints[i];
             if (!this.curvePoints[i + 1]) break;
 
-            let segmentLengthPx = this.calculateDistance(
-                { x: curvePoint[0], y: curvePoint[1] }, 
-                { x: this.curvePoints[i + 1][0], y: this.curvePoints[i + 1][1] }
+            let segmentLengthPx = this.game.utils.getDistance(
+                curvePoint[0], curvePoint[1],
+                this.curvePoints[i + 1][0], this.curvePoints[i + 1][1]
             ) / this.scale;
             let segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal;
 

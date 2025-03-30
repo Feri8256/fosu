@@ -39,6 +39,7 @@ export function getElements() {
             creator: $("#resultmeta-creator"),
             artist: $("#resultmeta-artist"),
             diffName: $("#resultmeta-diffname"),
+            playerName: $("#resultmeta-playername"),
         },
 
 

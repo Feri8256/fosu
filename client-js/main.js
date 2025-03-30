@@ -1,3 +1,4 @@
+import { utils } from "./utils.js";
 import { SongSelectionBuilder } from "./songSelectionBuilder.js";
 import { songSelectionManager } from "./songSelectionManager.js";
 import { Sprite, SpriteImage } from "./sprite.js";
@@ -23,10 +24,11 @@ import { HitSoundPlayer } from "./hitSoundPlayer.js";
 import { SpriteFontRenderer } from "./fontRenderer.js";
 import { SettingsManager } from "./settingsManagerV2.js";
 import { AutoplayController } from "./autoplay.js";
-import {getElements} from "./UIelements.js";
+import { getElements } from "./UIelements.js";
 
 class Game {
     constructor() {
+        this.utils = utils;
         this.canvas = document.querySelector("canvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
@@ -115,7 +117,7 @@ class Game {
             },
 
             setCursortrailType: (v) => {
-               this.cursor.trailType = v;
+                this.cursor.trailType = v;
             }
         }
 
@@ -260,7 +262,7 @@ function mainLoop(timestamp) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    game = new Game(config);
+    game = new Game();
     requestAnimationFrame(mainLoop);
 });
 
