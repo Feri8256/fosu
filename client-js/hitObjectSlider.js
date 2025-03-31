@@ -76,17 +76,7 @@ export class Slider {
         }
 
         //https://osu.ppy.sh/wiki/hu/Client/File_formats/osu_%28file_format%29
-        let vNorm = (-1 * v) / 100;
-        this.velocity = 1;
-        if (v === -100) {
-            this.velocity = 1;
-        }
-        else if (v < -100) {
-            this.velocity = vNorm / multiplier;
-        } else {
-            // ???
-            this.velocity = multiplier / (multiplier * vNorm);
-        }
+        this.velocity = 100 / (-1 * v);
 
         this.oneSlideTime = this.pixelLength / (this.multiplier * 100 * this.velocity) * this.beatLength;
         this.sliderTimeLengthTotal = this.oneSlideTime * slides;
@@ -223,19 +213,6 @@ export class Slider {
         if (this.game.autoplay.activated) {
             this.game.autoplay.add(this.endTime, curvePoint[0], curvePoint[1]);
         }
-    }
-
-    calculateDistance(pointA, pointB) {
-        let distX = pointA.x - pointB.x;
-        let distY = pointA.y - pointB.y;
-        let dist = Math.sqrt(Math.abs(distX * distX) + Math.abs(distY * distY));
-        return dist;
-    }
-
-    calculateLineAngle(pointA, pointB) {
-        let diffX = pointA.x - pointB.x;
-        let diffY = pointA.y - pointB.y;
-        return - Math.atan2(diffX, diffY);
     }
 
     calculateTotalSegmentTime() {

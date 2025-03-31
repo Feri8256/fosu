@@ -303,6 +303,23 @@ class Result extends GameState {
     }
 }
 
+
+class Spectate extends GameState {
+    constructor(game) {
+        super("SPECTATING");
+        this.game = game;
+    }
+
+    enter() {
+        
+    }
+
+    handleInput() {
+
+    }
+}
+
+
 export {
     SongSelecting,
     Playing,
