@@ -48,11 +48,6 @@ export class BeatmapPlayer {
      * @param {Number} outMax 
      * @returns 
      */
-    mapToRange(value, inMin, inMax, outMin, outMax) {
-        let ratio = (value - inMin) / (inMax - inMin)
-        //let amount = Math.max(0, Math.min(ratio, 1));
-        return outMin + (outMax - outMin) * ratio;
-    }
 
     createHitObjects(parsedOSU) {
         this.parsedOSU = parsedOSU;

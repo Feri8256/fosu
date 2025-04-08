@@ -53,7 +53,7 @@ export class AutoplayController {
         let x = this.tl.getValueOf("X") ?? this.game.cursor.currentX;
         let y = this.tl.getValueOf("Y") ?? this.game.cursor.currentY;
 
-        this.game.cursor.setPosition(Math.round(x), Math.round(y));
+        this.game.cursor.setPosition(x, y);
     }
 
     reset() {

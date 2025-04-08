@@ -175,7 +175,7 @@ export class Slider {
             this.t - this.timeWindow,
             this.t,
             0,
-            1,
+            0.85,
             this.game.EASINGS.Linear
         );
 
@@ -271,7 +271,7 @@ export class Slider {
             this.fading = new this.game.ANI(
                 this.endTime,
                 this.endTime + this.fadeOutMs,
-                1,
+                0.85,
                 0,
                 this.game.EASINGS.Linear
             );
@@ -319,7 +319,7 @@ export class Slider {
         this.game.ctx.shadowBlur = 4;
 
         // Slider border      
-        this.game.ctx.strokeStyle = `rgb(224, 224, 224)`;
+        this.game.ctx.strokeStyle = `rgb(140, 140, 140)`;
         this.game.ctx.lineWidth = this.rad * 2;
         this.game.ctx.stroke(this.sliderPath);
 
@@ -327,9 +327,19 @@ export class Slider {
 
 
         // Slider track
-        this.game.ctx.strokeStyle = `rgb(55, 55, 55)`;
+        this.game.ctx.strokeStyle = `rgb(10, 10, 10)`;
         this.game.ctx.lineWidth = this.rad * 1.8;
         this.game.ctx.stroke(this.sliderPath);
+
+        //
+        this.game.ctx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
+        this.game.ctx.strokeStyle = `rgb(0, 0, 0)`;
+        this.game.ctx.shadowColor = "rgba(255, 255, 255, 0.75)";
+        this.game.ctx.lineWidth = this.rad / 4;
+        this.game.ctx.shadowBlur = this.rad * 0.75;
+        this.game.ctx.stroke(this.sliderPath);
+        this.game.ctx.shadowBlur = 0;
+        //
 
         this.game.ctx.globalCompositeOperation = "source-over";
 

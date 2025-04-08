@@ -24,6 +24,7 @@ import { HitSoundPlayer } from "./hitSoundPlayer.js";
 import { SpriteFontRenderer } from "./fontRenderer.js";
 import { SettingsManager } from "./settingsManagerV2.js";
 import { AutoplayController } from "./autoplay.js";
+import { createSkinList } from "./skinListBuilder.js";
 import { getElements } from "./UIelements.js";
 
 class Game {
@@ -52,6 +53,8 @@ class Game {
 
         this.UI = getElements();
         this.settingsManager = new SettingsManager(this);
+
+        createSkinList(this);
 
         this.STATE_ENUM = states
         this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result];
@@ -115,9 +118,14 @@ class Game {
                 this.cursor.scale = v;
                 this.CONFIG.cursorScale = v;
             },
-
             setCursortrailType: (v) => {
+                console.log(v)
                 this.cursor.trailType = v;
+                this.CONFIG.cursortrailType = v;
+            },
+            setSkin: (v) => {
+                this.CONFIG.skin = v;
+                location.reload();
             }
         }
 

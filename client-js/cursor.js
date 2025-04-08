@@ -27,6 +27,7 @@ export class Cursor {
         this.game = game;
         
         this.trailType = this.game.CONFIG.cursortrailType;
+        this.scale = this.game.CONFIG.cursorScale;
 
         this.trails = [];
         this.cursorSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("cursor"));
@@ -37,18 +38,18 @@ export class Cursor {
         this.prevX = 0;
         this.prevY = 0;
         
-        this.scale = this.game.CONFIG.cursorScale;
 
         this.cursorSprite.scale = this.scale;
     }
 
     setPosition(x, y) {
-        this.currentX = x;
-        this.currentY = y;
+        this.currentX = Math.floor(x);
+        this.currentY = Math.floor(y);
     }
 
     update() {
         this.cursorSprite.scale = this.scale;
+        this.trailType = this.game.CONFIG.cursortrailType;
         
         this.cursorSprite.x = this.currentX;
         this.cursorSprite.y = this.currentY;

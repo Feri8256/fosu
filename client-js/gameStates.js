@@ -20,6 +20,7 @@ class SongSelecting extends GameState {
     }
 
     enter() {
+        document.title = "fosu";
         this.game.beatmapPlayer.cleanup();
         this.game.UI.songSelectContainer.style.display = "block";
         this.game.songSelectManager.scrollToLastPosition();
@@ -311,7 +312,7 @@ class Spectate extends GameState {
     }
 
     enter() {
-        
+
     }
 
     handleInput() {
