@@ -12,7 +12,7 @@ import { HitCircle } from "./hitObjectCircle.js";
 import { Slider } from "./hitObjectSlider.js";
 import { Spinner } from "./hitObjectSpinner.js";
 import { AccuracyJudgment } from "./accuracyJudgment.js";
-import { states, SongSelecting, Playing, Paused, Failed, Loading, Result } from "./gameStates.js";
+import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./gameStates.js";
 import { InputHandler } from "./InputHandler.js";
 import { Cursor } from "./cursor.js";
 import { AccuracyMeter } from "./accuracyMeter.js";
@@ -57,7 +57,7 @@ class Game {
         createSkinList(this);
 
         this.STATE_ENUM = states
-        this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result];
+        this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate];
 
         this.SPRITEIMG = SpriteImage;
         this.SPRITE = Sprite;

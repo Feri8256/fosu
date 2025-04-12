@@ -4,7 +4,8 @@ const states = {
     PAUSED: 2,
     FAILED: 3,
     LOADING: 4,
-    RESULT: 5
+    RESULT: 5,
+    SPECTATING: 6
 }
 
 class GameState {
@@ -312,11 +313,18 @@ class Spectate extends GameState {
     }
 
     enter() {
+        this.game.backgroundManager.changeOpacity(1 - this.game.CONFIG.backgroundDim, 1000);
 
+        // Dont ask me why we recreate the cursor here but this is how it works correctly...
+        this.game.cursor = new this.game.CURSOR(this.game);
+        this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
     }
 
     handleInput() {
-
+        if (this.game.inputHandler.includesKey("Escape", true)) {
+            this.game.auMgr.playAudioClip("menuback");
+            this.game.setState(states.SONGSELECT);
+        }
     }
 }
 
@@ -328,5 +336,6 @@ export {
     Failed,
     Loading,
     Result,
+    Spectate,
     states
 }

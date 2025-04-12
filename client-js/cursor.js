@@ -65,7 +65,7 @@ export class Cursor {
                 break;
 
             case 1:
-                if (this.currentX != this.prevX && this.currentY != this.prevY) this.createTrail(this.currentX, this.currentY);
+                if (this.currentX != this.prevX || this.currentY != this.prevY) this.createTrail(this.currentX, this.currentY);
                 break;
 
             case 2:
@@ -109,7 +109,7 @@ export class Cursor {
         let ix = x1 < x2 ? 1 : -1;  // increment direction
         let iy = y1 < y2 ? 1 : -1;
 
-        let k = 5;  // sample size ( it was 5 )
+        let k = 3;  // sample size ( it was 5 )
         if (dy <= dx) {
             for (let i = 0; ; i++) {
                 if (i === k) {

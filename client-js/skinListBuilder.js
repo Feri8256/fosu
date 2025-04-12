@@ -7,6 +7,8 @@ export function createSkinList(game) {
                 opt.value = s.src;
                 opt.text = s.name;
 
+                if (s.src === game.CONFIG.skin) opt.selected = true;
+
                 game.UI.settings.inputs[2].add(opt);
             });
 
