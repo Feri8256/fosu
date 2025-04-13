@@ -75,6 +75,7 @@ export class Cursor {
         this.prevX = this.currentX;
         this.prevY = this.currentY;
 
+        if (this.trails.length > 500) this.trails.pop();
         this.trails.forEach((t) => { t.update(this.game.clock) });
 
         this.trails = this.trails.filter((p) => { return p.fadeOutAni.amount < 1 })

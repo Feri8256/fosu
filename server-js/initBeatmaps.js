@@ -1,5 +1,6 @@
 const fs = require("fs");
 const { parseOsu } = require("./osuParser.js");
+const crypto = require("crypto");
 
 let dbExists = fs.existsSync("maps.json");
 let mapsetCount = 0;
@@ -20,12 +21,16 @@ function buildMapList() {
 
         for (let index = 0; index < osuFiles.length; index++) {
             const osuFileName = osuFiles[index];
+            const osuFileContent = fs.readFileSync(`songs/${folder}/${osuFileName}`).toString();
             let mapObj = {};
-            let { General, Metadata, Events, Difficulty } = parseOsu(fs.readFileSync(`songs/${folder}/${osuFileName}`).toString());
+            let { General, Metadata, Events, Difficulty } = parseOsu(osuFileContent);
+            
 
             // When the beatmaps gamemode is not osu!standard, ignore it
             if (General.Mode !== 0) continue;
 
+            console.log(osuFileName);
+            
             mapObj.mode = General.Mode;
             mapObj.title = Metadata.Title;
             mapObj.artist = Metadata.Artist;
@@ -39,7 +44,8 @@ function buildMapList() {
             mapObj.CS = Difficulty.CircleSize;
             mapObj.OD = Difficulty.OverallDifficulty;
             mapObj.HP = Difficulty.HPDrainRate;
-            mapObj.id = mapCount;
+            mapObj.id = crypto.randomUUID();
+            mapObj.beatmapHash = crypto.createHash("md5").update(osuFileContent).digest("hex"); //
 
             mapsetObj.difficulties.push(mapObj);
             mapCount++;

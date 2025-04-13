@@ -134,11 +134,22 @@ class Game {
         this.UI.pauseButtons.retry.addEventListener("click", () => { this.pauseRetry() });
         this.UI.pauseButtons.back.addEventListener("click", () => { this.pauseBack() });
         this.UI.introSkipButton.addEventListener("click", () => { this.beatmapPlayer.skipIntro() });
+        this.UI.spectate.playbackRateSlider.addEventListener("input", (evt) => {
+            this.songAudioHandler.setPlaybackRate(parseFloat(evt.target.value));
+            this.UI.spectate.playbackRateValue.textContent = evt.target.value;
+        });
+
+        
 
         this.clock = 0;
         // Game starts in the song selection menu
         this.currentState;
         this.setState(0);
+
+        this.inputHandler.onMousemove = (m) => {
+            if (this.currentState.stateName === "SPECTATING") return;
+            this.cursor.setPosition(m.x, m.y);
+        }
     }
 
     update(timestamp) {

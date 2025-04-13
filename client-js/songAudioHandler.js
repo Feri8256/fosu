@@ -82,7 +82,21 @@ export class SongAudioHandler {
         this.audio.pause();
     }
 
+    /**
+     * 
+     * @param {Number} ms 
+     */
     setPlaybackTime(ms) {
         this.audio.currentTime = ms / 1000;
+    }
+
+    /**
+     * 
+     * @param {Number} v 
+     * @returns 
+     */
+    setPlaybackRate(v) {
+        if(!v) return;
+        this.audio.playbackRate = v;
     }
 }

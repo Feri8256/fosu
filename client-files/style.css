@@ -43,8 +43,8 @@ body {
     margin-bottom: 10px;
     width: 690px;
     height: 92px;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
+    
 
 }
 
@@ -203,4 +203,11 @@ table {
 
 .hidden {
     display: none;
+}
+
+#spectate-controls {
+    width: 20%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
 }

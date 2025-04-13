@@ -19,7 +19,9 @@ export class songSelectionManager {
 
         element.scrollIntoView({ behavior: "smooth", block: "center" });
 
-        this.currentSelect = this.game.songSelectBuilder.list[element.dataset.uid];
+
+        //this.currentSelect = this.game.songSelectBuilder.list[element.dataset.uid];
+        this.currentSelect = this.game.songSelectBuilder.list.find((e) => { return e.id === element.dataset.uid; });
 
         if (this.previousSelect.audioSrc !== this.currentSelect.audioSrc) this.changeAudioSource(this.currentSelect.audioSrc, this.currentSelect.previewTime);
         if (this.previousSelect.backgroundSrc !== this.currentSelect.backgroundSrc) this.changeBackground(this.currentSelect.backgroundSrc);

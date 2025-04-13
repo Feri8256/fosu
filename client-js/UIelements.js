@@ -55,6 +55,12 @@ export function getElements() {
                 $("#cursorScale"),
                 $("#cursortrailType"),
             ]
+        },
+
+        spectate: {
+            container: $("#spectate-controls"),
+            playbackRateSlider: $("#spectate-playback-rate"),
+            playbackRateValue: $("#spectate-playback-rate-value")
         }
     }
 }

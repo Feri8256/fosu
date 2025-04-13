@@ -95,7 +95,7 @@ class Playing extends GameState {
             this.game.beatmapPlayer.hit(m);
         }
 
-        this.game.cursor.setPosition(m.x, m.y);
+        //this.game.cursor.setPosition(m.x, m.y);
 
 
     }
@@ -211,6 +211,7 @@ class Result extends GameState {
     enter() {
         this.game.resultScreenUpdater.update();
         this.game.backgroundManager.changeOpacity(0.5, 500);
+        this.game.UI.spectate.container.style.display = "none";
 
         this.game.UI.resultScreen.container.style.filter = "opacity(0%)";
         this.game.UI.resultScreen.container.style.visibility = "visible";
@@ -310,9 +311,12 @@ class Spectate extends GameState {
     constructor(game) {
         super("SPECTATING");
         this.game = game;
+
+        
     }
 
     enter() {
+        this.game.UI.spectate.container.style.display = "block";
         this.game.backgroundManager.changeOpacity(1 - this.game.CONFIG.backgroundDim, 1000);
 
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
@@ -324,6 +328,8 @@ class Spectate extends GameState {
         if (this.game.inputHandler.includesKey("Escape", true)) {
             this.game.auMgr.playAudioClip("menuback");
             this.game.setState(states.SONGSELECT);
+            this.game.UI.spectate.container.style.display = "none";
+
         }
     }
 }
