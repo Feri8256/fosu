@@ -135,10 +135,16 @@ button {
     position: fixed;
     width: 100%;
     height: 100%;
-    display: flex;
-    justify-content: center;
+    
     background-color: rgba(0, 0, 0, 0.6);
     visibility: hidden;
+}
+
+#result-table {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
 }
 
 #result span {
@@ -146,6 +152,15 @@ button {
     color: white;
     text-shadow: 0.07em 0.07em 0.05em black;
 
+}
+
+#result-buttons {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    padding: 40px;
 }
 
 table {
@@ -183,15 +198,18 @@ table {
 
 #settings {
     position: fixed;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.75);
     color: white;
     width: 25%;
+    overflow-y: scroll;
+    height: 100%;
 }
 
 .settings-option {
     margin-left: 25px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: flex-start;
     width: 80%;
     margin-top: 5px;
 }
@@ -210,4 +228,33 @@ table {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     padding: 10px;
+}
+
+#scores {
+    width: 25%;
+    height: 60%;
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    transform: translateY(-50%);
+    top: 50%;
+    overflow-y: scroll;
+}
+
+.scoreentry {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.scoreentry-playername {
+    font-size: 18pt;
+    pointer-events: none;
+
+}
+.scoreentry-date {
+    font-size: 12pt;
+    pointer-events: none;
 }

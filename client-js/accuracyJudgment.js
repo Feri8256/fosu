@@ -57,10 +57,10 @@ export class AccuracyJudgment {
                 new this.game.ANI(this.game.clock + 100, this.game.clock + this.duration, 1, 0, this.game.EASINGS.Linear, false, "F")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock, this.game.clock + 100, this.s * 0.25, this.s * 0.5, this.game.EASINGS.BackOut, false, "S")
+                new this.game.ANI(this.game.clock, this.game.clock + 200, this.s * 0.2, this.s * 0.75, this.game.EASINGS.BackOut, false, "S")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 100, this.game.clock + this.duration, this.s * 0.5, this.s * 0.55, this.game.EASINGS.Linear, false, "S")
+                new this.game.ANI(this.game.clock + 200, this.game.clock + this.duration, this.s * 0.75, this.s * 0.75, this.game.EASINGS.Linear, false, "S")
             );
 
             // Selecting the sprite based on type

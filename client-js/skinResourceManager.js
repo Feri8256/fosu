@@ -92,9 +92,9 @@ export class SkinResourceManager {
      * Loading skin files from the specified directory. If a file not present it will fall back to the default files
      * @param {String} folderName 
      */
-    loadSkin(folderName) {
+    loadSkin(folderName = "") {
 
-        if (!folderName) {
+        if (!folderName || folderName == undefined) {
             this.loadDefault();
             return;
         }

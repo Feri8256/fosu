@@ -19,7 +19,7 @@ export class SongSelectionBuilder {
                 }
 
                 data.forEach((element, i) => {
-                    element.difficulties.forEach((diff, j) => {
+                    element.difficulties.forEach((diff) => {
                         game.UI.songSelectContainer.innerHTML = game.UI.songSelectContainer.innerHTML + ` 
                         <div class="songselect-card" data-uid="${diff.id}"> 
                             <p class="songselect-title">${diff.title}</p> 
@@ -36,5 +36,8 @@ export class SongSelectionBuilder {
 
 
             })
+    }
+    getMetadataOfBeatmap(beatmapHash) {
+        return this.list.find((e) => { return e.beatmapHash === beatmapHash});
     }
 }

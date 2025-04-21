@@ -1,7 +1,7 @@
 {
   "name": "fosu",
   "version": "1.0.0",
-  "main": "server-js/server.js",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,6 +10,7 @@
   "description": "",
   "dependencies": {
     "extract-zip": "^2.0.1",
-    "live-server": "^1.2.2"
+    "live-server": "^1.2.2",
+    "socket.io": "^4.8.1"
   }
 }

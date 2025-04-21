@@ -25,7 +25,11 @@ import { SpriteFontRenderer } from "./fontRenderer.js";
 import { SettingsManager } from "./settingsManagerV2.js";
 import { AutoplayController } from "./autoplay.js";
 import { createSkinList } from "./skinListBuilder.js";
+import { ScoreBoardManager } from "./scoreBoard.js";
+import { ReplayManager } from "./replayManager.js";
 import { getElements } from "./UIelements.js";
+
+import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 
 class Game {
     constructor() {
@@ -37,6 +41,7 @@ class Game {
 
         // Hoisted config values with defaults
         this.CONFIG = {
+            playerName: "",
             musicVolume: 0.1,
             effectVolume: 0.1,
             skin: "",
@@ -46,13 +51,17 @@ class Game {
             hide300Points: true,
             backgroundDim: 0.75,
             hitKeyA: "KeyX",
-            hitKeyB: "KeyC"
+            hitKeyB: "KeyC",
+            betterLookingSliders: true
         };
+
+        this.socket = io("ws://localhost:7271");
 
         this.inputHandler = new InputHandler();
 
         this.UI = getElements();
         this.settingsManager = new SettingsManager(this);
+
 
         createSkinList(this);
 
@@ -93,6 +102,9 @@ class Game {
         this.accuracyMeter = new AccuracyMeter(this);
         this.comboMeter = new ComboMeter(this);
         this.songAudioHandler = new SongAudioHandler(this);
+
+        this.replayManager = new ReplayManager(this);
+
         this.backgroundManager = new BackgrondImageManager(this);
         this.beatmapPlayer = new BeatmapPlayer(this);
         this.beatmapLoader = new BeatmapLoader(this);
@@ -102,6 +114,7 @@ class Game {
         this.inputOverlay = new InputOverlay(this);
         this.hitSoundPlayer = new HitSoundPlayer(this);
         this.resultScreenUpdater = new ResultScreenUpdater(this);
+        this.scoreBoardManager = new ScoreBoardManager(this);
 
         // A set of functions that are executed when change happens on the settings option elements
         // I start to not like this....
@@ -126,6 +139,18 @@ class Game {
             setSkin: (v) => {
                 this.CONFIG.skin = v;
                 location.reload();
+            },
+            setPlayerName: (v) => {
+                this.CONFIG.playerName = String(v).replaceAll(",","").replaceAll("\n","");
+            },
+            setBackgroundDim: (v) => {
+                this.CONFIG.backgroundDim = v;
+            },
+            setSlidersLook: (v) => {
+                this.CONFIG.betterLookingSliders = v;
+            },
+            setPerfectJudgementsVisibility: (v) => {
+                this.CONFIG.hide300Points = v;
             }
         }
 
@@ -139,7 +164,7 @@ class Game {
             this.UI.spectate.playbackRateValue.textContent = evt.target.value;
         });
 
-        
+
 
         this.clock = 0;
         // Game starts in the song selection menu
@@ -158,6 +183,9 @@ class Game {
 
         this.currentState.handleInput();
         this.cursor.update();
+
+        this.replayManager.update(this.songAudioHandler.getCurrentTime());
+
         this.songAudioHandler.update();
         this.backgroundManager.update();
         this.beatmapPlayer.update();
@@ -193,6 +221,7 @@ class Game {
     }
 
     setState(stateEnum) {
+        this.currentState?.leave();
         this.currentState = new this.STATES[stateEnum](this);
         console.log(`game state changed to: ${this.currentState.stateName}`)
 
@@ -269,6 +298,27 @@ class Game {
         setTimeout(() => {
             this.UI.pauseOverlay.style.display = "none";
         }, 500);
+    }
+
+    submitScore() {
+        let obj = { 
+            playerName: this.CONFIG.playerName, 
+            date: Date.now(), 
+            results: { 
+                perfect: this.accuracyMeter.results[3], 
+                okay: this.accuracyMeter.results[2], 
+                meh: this.accuracyMeter.results[1], 
+                miss: this.accuracyMeter.results[0], 
+                accuracy: this.accuracyMeter.results[4], 
+                combo: this.comboMeter.getResults().max 
+            }, 
+            beatmapHash: this.songSelectManager.currentSelect.beatmapHash,
+            replayId: this.replayManager.currentReplayId, dismissed: false 
+        }
+        this.replayManager.stopCapture();
+        
+        this.socket.emit("submitScore", obj);
+
     }
 }
 

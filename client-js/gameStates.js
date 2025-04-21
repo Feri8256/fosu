@@ -12,6 +12,9 @@ class GameState {
     constructor(stateName) {
         this.stateName = stateName;
     }
+    leave() {
+
+    }
 }
 
 class SongSelecting extends GameState {
@@ -30,6 +33,7 @@ class SongSelecting extends GameState {
         this.game.comboMeter.reset();
 
         this.game.settingsManager.setButtonVisibility(true);
+        this.game.scoreBoardManager.setBoardVisibility(true);
 
         this.game.songAudioHandler.changeVolume(
             this.game.CONFIG.musicVolume,
@@ -57,6 +61,12 @@ class SongSelecting extends GameState {
                 fill: "forwards"
             }
         );
+    }
+
+    leave() {
+        this.game.settingsManager.setButtonVisibility(false);
+        this.game.settingsManager.setOverlayVisibility(false);
+        this.game.scoreBoardManager.setBoardVisibility(false);
     }
 
     handleInput() {
@@ -209,7 +219,7 @@ class Result extends GameState {
     }
 
     enter() {
-        this.game.resultScreenUpdater.update();
+
         this.game.backgroundManager.changeOpacity(0.5, 500);
         this.game.UI.spectate.container.style.display = "none";
 
@@ -294,15 +304,23 @@ class Result extends GameState {
 
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
-            this.animateElements(false);
-            this.game.auMgr.playAudioClip("menuback");
+            this.back();
         }
 
         if (this.game.inputHandler.includesKey("KeyR", true)) {
-            this.game.beatmapPlayer.retry();
-            this.animateElements(true);
+            this.retry();
 
         }
+    }
+
+    retry() {
+        this.game.beatmapPlayer.retry();
+        this.animateElements(true);
+    }
+
+    back() {
+        this.animateElements(false);
+        this.game.auMgr.playAudioClip("menuback");
     }
 }
 

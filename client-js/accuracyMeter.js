@@ -1,5 +1,5 @@
 export class AccuracyMeter {
-    constructor(game, od = 5) {
+    constructor(game, od = 1) {
         this.game = game;
         this.od = od;
 
@@ -59,8 +59,10 @@ export class AccuracyMeter {
         if (hitDeltaTime < this.hitWindowValues.GREAT) {
             hitResult = 3;
         }
+        if(!success) hitResult = 0;
 
         if (hitResult === 3) this.correctHits++;
+
 
         this.results[hitResult]++;
 
@@ -86,5 +88,14 @@ export class AccuracyMeter {
 
     getResults() {
         return this.results;
+    }
+
+    setOverallDifficulty(od = 1) {
+        this.hitWindowValues = {
+            GREAT: 80 - 6 * od,
+            OK: 140 - 8 * od,
+            MEH: 200 - 10 * od,
+            MISS: 400
+        };
     }
 }

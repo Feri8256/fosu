@@ -332,13 +332,16 @@ export class Slider {
         this.game.ctx.stroke(this.sliderPath);
 
         //
-        this.game.ctx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
-        this.game.ctx.strokeStyle = `rgb(0, 0, 0)`;
-        this.game.ctx.shadowColor = "rgba(255, 255, 255, 0.75)";
-        this.game.ctx.lineWidth = this.rad / 3;
-        this.game.ctx.shadowBlur = this.rad * 0.8;
-        this.game.ctx.stroke(this.sliderPath);
-        this.game.ctx.shadowBlur = 0;
+        if (this.game.CONFIG.betterLookingSliders) {
+            this.game.ctx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
+            this.game.ctx.strokeStyle = `rgb(0, 0, 0)`;
+            this.game.ctx.shadowColor = "rgba(255, 255, 255, 0.75)";
+            this.game.ctx.lineWidth = this.rad / 3;
+            this.game.ctx.shadowBlur = this.rad * 0.8;
+            this.game.ctx.stroke(this.sliderPath);
+            this.game.ctx.shadowBlur = 0;
+        }
+
         //
 
         this.game.ctx.globalCompositeOperation = "source-over";

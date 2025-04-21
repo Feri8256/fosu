@@ -28,6 +28,7 @@ export class songSelectionManager {
         if (this.previousSelect.id !== this.currentSelect.id) {
             this.changeMetadata();
             this.game.auMgr.playAudioClip("select-difficulty");
+            this.game.scoreBoardManager.getScoresForMap(this.currentSelect.beatmapHash);
         }
 
         if (this.previousSelect.id === this.currentSelect.id) {

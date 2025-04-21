@@ -31,6 +31,11 @@ export function getElements() {
             missCount: $("#result-0"),
             accuracy: $("#result-acc"),
             maxComboCount: $("#result-maxcombo"),
+            buttons: {
+                back: $("#result-back"),
+                retry: $("#result-retry"),
+                watch: $("#result-watch")
+            }
         },
 
         resultMetadata: {
@@ -54,6 +59,10 @@ export function getElements() {
                 $("#skin"),
                 $("#cursorScale"),
                 $("#cursortrailType"),
+                $("#playerName"),
+                $("#backgroundDim"),
+                $("#betterLookingSliders"),
+                $("#hide300Points")
             ]
         },
 
@@ -61,6 +70,10 @@ export function getElements() {
             container: $("#spectate-controls"),
             playbackRateSlider: $("#spectate-playback-rate"),
             playbackRateValue: $("#spectate-playback-rate-value")
+        },
+
+        scoreBoard: {
+            container: $("#scores")
         }
     }
 }

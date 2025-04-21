@@ -29,7 +29,7 @@ export class SettingsManager {
 
                 if (typeof this.game.settingsInterface[fnToExecute] !== "function") return;
 
-                this.game.settingsInterface[fnToExecute](this.parseValueAsType(ev.target.value ?? ev.target.checked, controlType));
+                this.game.settingsInterface[fnToExecute](this.parseValueAsType(controlType === "boolean" ? ev.target.checked : ev.target.value, controlType));
 
                 this.save();
             });
@@ -39,10 +39,16 @@ export class SettingsManager {
     /**
      * 
      * @param {HTMLElement} element 
+     * @param {*} value value
      */
     setValueOnElement(element, value) {
+        console.log(element, value)
         if (!element || !value) return;
-        element.value = value;
+        if (typeof value === "boolean") {
+            element.checked = value;
+        } else {
+            element.value = value;
+        }
     }
 
     /**
@@ -55,11 +61,11 @@ export class SettingsManager {
         let val;
         switch (typeName) {
             case "number":
-                val = parseInt(value);
+                val = parseInt(value ?? 0);
                 break;
 
             case "float":
-                val = parseFloat(value);
+                val = parseFloat(value ?? 0);
                 break;
 
             case "boolean":
@@ -67,7 +73,7 @@ export class SettingsManager {
                 break;
 
             case "string":
-                val = value.toString();
+                val = String(value ?? "");
                 break;
         }
 

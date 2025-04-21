@@ -39,17 +39,7 @@ export class BeatmapPlayer {
 
     }
 
-    /**
-     * Projects a number to output range based on the input range.
-     * @param {Number} value 
-     * @param {Number} inMin 
-     * @param {Number} inMax 
-     * @param {Number} outMin 
-     * @param {Number} outMax 
-     * @returns 
-     */
-
-    createHitObjects(parsedOSU) {
+    createHitObjects(parsedOSU, spectating) {
         this.parsedOSU = parsedOSU;
 
         this.timeWindow = this.calculateApproachRate(parsedOSU.Difficulty.ApproachRate);
@@ -58,6 +48,10 @@ export class BeatmapPlayer {
         this.yScale = this.game.canvas.height / this.playFieldHeight;
         this.xOffset = (this.game.canvas.width - (this.playFieldWidth * this.globalScale)) * 0.5;
         this.yOffset = (this.game.canvas.height - (this.playFieldHeight * this.globalScale)) * 0.5;
+
+        this.game.replayManager.setupPlayfieldDimensions(this.xOffset, this.xScale, this.yOffset, this.yScale);
+
+        this.game.accuracyMeter.setOverallDifficulty(this.parsedOSU.Difficulty.OverallDifficulty);
 
         parsedOSU.HitObjects.forEach((element) => {
 
@@ -166,6 +160,9 @@ export class BeatmapPlayer {
             this.game.songAudioHandler.play();
             if (this.introSkipable) this.setSkipButtonVisibility(true);
             this.playing = true;
+
+            this.game.replayManager.startCapture(this.game.CONFIG.playerName, this.game.songSelectManager.currentSelect.beatmapHash, String(Date.now()));
+
             //this.game.autoplay.start()
         }, startDelay);
     }
@@ -173,7 +170,7 @@ export class BeatmapPlayer {
     update() {
         this.currentTime = this.game.songAudioHandler.getCurrentTime();
         this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
-        
+
         if (this.playing) this.game.autoplay.update(this.currentTime);
 
         if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
@@ -207,11 +204,11 @@ export class BeatmapPlayer {
                         u.x,
                         u.y,
                         u.scale,
-                        this.game.CONFIG.hide300Points ? -1 : 1
+                        this.game.CONFIG.hide300Points ? -1 : 3
                     )
                 );
 
-                this.game.accuracyMeter.addHit(3, 0);
+                this.game.accuracyMeter.addHit(true, 0);
                 this.game.comboMeter.addHit(true);
 
                 // Start the hit animation of the hit object
@@ -257,10 +254,10 @@ export class BeatmapPlayer {
         if (this.currentTime >= this.lastHitObjectTime && !this.ended && this.playing) {
             this.endedTimestamp = this.game.clock;
             this.ended = true;
-            
-            setTimeout(() => { 
+
+            setTimeout(() => {
                 this.game.backgroundManager.changeOpacity(0, 500);
-            },500);
+            }, 500);
         }
         if (this.game.clock - 1000 > this.endedTimestamp && this.ended && this.playing) this.end();
     }
@@ -271,6 +268,12 @@ export class BeatmapPlayer {
         this.slidersToRender.forEach((s) => { s.render() });
         this.hitCirclesToRender.forEach((o) => { o.render() });
         this.accJudgments.forEach((a) => { a.render() });
+
+        // like this!!!!
+        this.game.ctx.fillStyle = "#fff";
+        this.game.ctx.font = "16px Arial";
+        //this.game.ctx.fillText(`${}`, 100, 100)
+        //this.game.ctx.fillText(`${}`, 100, 120)
 
         // Beatmap time progress bar on the bottom
         if (!this.playing) return;
@@ -420,16 +423,24 @@ export class BeatmapPlayer {
 
     end() {
         this.playing = false;
+        this.game.resultScreenUpdater.update({
+            playerName: this.game.CONFIG.playerName,
+            mapTitle: this.parsedOSU.Metadata.Title,
+            mapCreator: this.parsedOSU.Metadata.Creator,
+            mapVersion: this.parsedOSU.Metadata.Version,
+            mapArtist: this.parsedOSU.Metadata.Artist,
+            countPerfect: this.game.accuracyMeter.results[3],
+            countOkay: this.game.accuracyMeter.results[2],
+            countMeh: this.game.accuracyMeter.results[1],
+            countMiss: this.game.accuracyMeter.results[0],
+            countMaxCombo: this.game.comboMeter.getResults().max,
+            acc: this.game.accuracyMeter.results[4]
+        });
+
+        if (this.game.currentState.stateName !== "SPECTATING") {
+            this.game.submitScore();
+        } 
+
         this.game.setState(this.game.STATE_ENUM.RESULT);
     }
-
-    getMapMetadata() {
-        return {
-            title: this.parsedOSU.Metadata.Title,
-            artist: this.parsedOSU.Metadata.Artist,
-            creator: this.parsedOSU.Metadata.Creator,
-            version: this.parsedOSU.Metadata.Version
-        }
-    }
-
 }
