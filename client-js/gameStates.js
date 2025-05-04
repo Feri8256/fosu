@@ -25,6 +25,7 @@ class SongSelecting extends GameState {
 
     enter() {
         document.title = "fosu";
+        this.game.replayManager.setMode(2);
         this.game.beatmapPlayer.cleanup();
         this.game.UI.songSelectContainer.style.display = "block";
         this.game.songSelectManager.scrollToLastPosition();
@@ -90,24 +91,51 @@ class Playing extends GameState {
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
         this.game.cursor = new this.game.CURSOR(this.game);
         this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
+
+        this.game.inputHandler.onMousemove = (m) => {
+            this.game.cursor.setPosition(m.x, m.y);
+        }
+
+        this.game.inputHandler.onKeyup = () => {
+            let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
+            let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
+            let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
+            this.game.inputValidator.updateInputs([ia, ib, ic]);
+        }
+
+        this.game.inputHandler.onKeydown = () => {
+            let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
+            let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
+            let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
+            this.game.inputValidator.updateInputs([ia, ib, ic]);
+
+            this.game.inputValidator.getInputStates().forEach((i) => {
+                if (i.down && i.valid) {
+                    this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
+                    i.valid = false;
+                    return;
+                }
+            });
+        }
+
+        this.game.inputValidator.onInputChange = (a) => {
+            this.game.replayManager.addInputEvents(a, this.game.songAudioHandler.getCurrentTime());
+        }
     }
 
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
+
+        this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
+
         this.game.inputOverlay.update();
+    }
 
-        if (this.game.autoplay.activated) return;
-
-        let m = this.game.inputHandler.getMouse();
-        if (this.game.CONFIG.mouseButtonsInGame && m.down) this.game.beatmapPlayer.hit(m);
-
-        if (this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, true) || this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, true)) {
-            this.game.beatmapPlayer.hit(m);
-        }
-
-        //this.game.cursor.setPosition(m.x, m.y);
-
-
+    leave() {
+        this.game.inputHandler.onMousemove = () => { }
+        this.game.inputHandler.onKeydown = () => { }
+        this.game.inputHandler.onKeyup = () => { }
+        this.game.inputValidator.onInputChange = () => { }
     }
 }
 
@@ -210,6 +238,10 @@ class Loading extends GameState {
     handleInput() {
 
     }
+
+    leave() {
+        this.game.setLoadingCircle(false);
+    }
 }
 
 class Result extends GameState {
@@ -296,10 +328,10 @@ class Result extends GameState {
      * 
      * @param {Boolean} retry 
      */
-    afterUIAnimations(retry) {
+    afterUIAnimations(state) {
         this.game.UI.resultMetadata.container.style.visibility = "hidden";
         this.game.UI.resultScreen.container.style.visibility = "hidden";
-        this.game.setState(retry ? states.PLAYING : states.SONGSELECT);
+        this.game.setState(state);
     }
 
     handleInput() {
@@ -315,12 +347,17 @@ class Result extends GameState {
 
     retry() {
         this.game.beatmapPlayer.retry();
-        this.animateElements(true);
+        this.animateElements(states.PLAYING);
     }
 
     back() {
-        this.animateElements(false);
+        this.animateElements(states.SONGSELECT);
         this.game.auMgr.playAudioClip("menuback");
+    }
+
+    replayWatch() {
+        this.game.UI.resultMetadata.container.style.visibility = "hidden";
+        this.game.UI.resultScreen.container.style.visibility = "hidden";
     }
 }
 
@@ -330,7 +367,7 @@ class Spectate extends GameState {
         super("SPECTATING");
         this.game = game;
 
-        
+
     }
 
     enter() {
@@ -347,8 +384,17 @@ class Spectate extends GameState {
             this.game.auMgr.playAudioClip("menuback");
             this.game.setState(states.SONGSELECT);
             this.game.UI.spectate.container.style.display = "none";
-
         }
+
+        this.game.inputValidator.getInputStates().forEach((i) => {
+            if (i.down && i.valid) {
+                this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
+                i.valid = false;
+                return;
+            }
+        });
+
+        this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
     }
 }
 

@@ -85,12 +85,6 @@ export class Spinner {
 
     }
 
-    calculateLineAngle(pointA, pointB) {
-        let diffX = pointA.x - pointB.x;
-        let diffY = pointA.y - pointB.y;
-        return - Math.atan2(diffX, diffY);
-    }
-
     update(currentTime) {
         this.tl.update(currentTime);
 

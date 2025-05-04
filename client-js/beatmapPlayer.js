@@ -146,7 +146,7 @@ export class BeatmapPlayer {
         }
 
 
-        this.game.setLoadingCircle(false);
+        //this.game.setLoadingCircle(false);
         setTimeout(() => {
 
             // Parsing error?
@@ -161,7 +161,11 @@ export class BeatmapPlayer {
             if (this.introSkipable) this.setSkipButtonVisibility(true);
             this.playing = true;
 
-            this.game.replayManager.startCapture(this.game.CONFIG.playerName, this.game.songSelectManager.currentSelect.beatmapHash, String(Date.now()));
+            if (!spectating) {
+                this.game.replayManager.startCapture(this.game.CONFIG.playerName, this.game.songSelectManager.currentSelect.beatmapHash, String(Date.now()));
+            } else {
+                this.game.replayManager.setMode(1);
+            }
 
             //this.game.autoplay.start()
         }, startDelay);
@@ -317,7 +321,7 @@ export class BeatmapPlayer {
 
     /**
      * Register tapping
-     * @param {*} mouse current mouse status from GameState and InputHandler
+     * @param {*} mouse mouse coordinates
      * @returns 
      */
     hit(mouse) {

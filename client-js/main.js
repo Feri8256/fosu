@@ -19,6 +19,7 @@ import { AccuracyMeter } from "./accuracyMeter.js";
 import { ComboMeter } from "./comboMeter.js";
 import { AudioManager } from "./audioManager.js";
 import { InputOverlay } from "./inputOverlay.js";
+import { InputValidator } from "./inputValidator.js";
 import { ResultScreenUpdater } from "./resultScreenUpdate.js";
 import { HitSoundPlayer } from "./hitSoundPlayer.js";
 import { SpriteFontRenderer } from "./fontRenderer.js";
@@ -27,6 +28,7 @@ import { AutoplayController } from "./autoplay.js";
 import { createSkinList } from "./skinListBuilder.js";
 import { ScoreBoardManager } from "./scoreBoard.js";
 import { ReplayManager } from "./replayManager.js";
+import { ReplayWatchStartHandler } from "./startReplayWatch.js";
 import { getElements } from "./UIelements.js";
 
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
@@ -58,6 +60,7 @@ class Game {
         this.socket = io("ws://localhost:7271");
 
         this.inputHandler = new InputHandler();
+        this.inputValidator = new InputValidator();
 
         this.UI = getElements();
         this.settingsManager = new SettingsManager(this);
@@ -109,6 +112,9 @@ class Game {
         this.beatmapPlayer = new BeatmapPlayer(this);
         this.beatmapLoader = new BeatmapLoader(this);
         this.songSelectBuilder = new SongSelectionBuilder(this);
+        
+        this.replayWatchStartHandler = new ReplayWatchStartHandler(this);
+
         this.songSelectManager = new songSelectionManager(this);
         this.cursor = new Cursor(this);
         this.inputOverlay = new InputOverlay(this);
@@ -167,18 +173,19 @@ class Game {
 
 
         this.clock = 0;
+        this.deltaTime = 0;
         // Game starts in the song selection menu
         this.currentState;
         this.setState(0);
 
-        this.inputHandler.onMousemove = (m) => {
-            if (this.currentState.stateName === "SPECTATING") return;
-            this.cursor.setPosition(m.x, m.y);
-        }
+        //this.inputHandler.onMousemove = (m) => {
+        //    if (this.currentState.stateName === "SPECTATING") return;
+        //    this.cursor.setPosition(m.x, m.y);
+        //}
     }
 
     update(timestamp) {
-
+        this.deltaTime = timestamp - this.clock;
         this.clock = timestamp;
 
         this.currentState.handleInput();

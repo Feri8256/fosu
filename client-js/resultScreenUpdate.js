@@ -1,10 +1,16 @@
 export class ResultScreenUpdater {
     constructor(game) {
         this.game = game;
+        this.replayId = "";
+
         // Only when the current state is "RESULT"
         this.game.UI.resultScreen.buttons.back.addEventListener("click", () => { this.game.currentState.back() });
         this.game.UI.resultScreen.buttons.retry.addEventListener("click", () => { this.game.currentState.retry() });
-        this.game.UI.resultScreen.buttons.watch.addEventListener("click", () => { });
+        this.game.UI.resultScreen.buttons.watch.addEventListener("click", () => { 
+            if(!this.replayId) return;
+            this.game.currentState.replayWatch();
+            this.game.replayWatchStartHandler.sendLoadRequest(this.replayId);
+        });
     }
 
     update({
@@ -18,11 +24,13 @@ export class ResultScreenUpdater {
         countMeh = 0,
         countMiss = 0,
         countMaxCombo = 0,
-        acc = 100
+        acc = 100,
+        replayId = "" 
     }) {
         //let hitResults = this.game.accuracyMeter.getResults();
         //let comboResult = this.game.comboMeter.getResults();
         //let mapMeta = this.game.beatmapPlayer.getMapMetadata();
+        this.replayId = replayId;
 
         this.game.UI.resultScreen.perfectCount.textContent = `${countPerfect}x`;
         this.game.UI.resultScreen.okayCount.textContent = `${countOkay}x`;

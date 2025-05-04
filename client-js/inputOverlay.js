@@ -29,8 +29,6 @@ export class InputOverlay {
             s.x = this.x - this.keyWidth * 0.5;
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
         });
-
-        this.inputHandler = new this.game.INPUTHANDLER();
     }
 
     update() {
@@ -43,27 +41,18 @@ export class InputOverlay {
             s.x = this.x - this.keyWidth * 0.5;
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
         });
-
-        let keyA = this.inputHandler.includesKey(this.game.CONFIG.hitKeyA);
-        let keyB = this.inputHandler.includesKey(this.game.CONFIG.hitKeyB);
-        let mouseDown = this.game.CONFIG.mouseButtonsInGame && this.inputHandler.getMouse().down;
-
-        this.updateInputState([
-            keyA,
-            keyB,
-            mouseDown
-        ]);
     }
 
     updateInputState(arr = [false, false, false]) {
-        for (let i = 0; i < this.inputStates.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
+            let d = arr[i].down;
 
-            if (arr[i] !== this.inputStates[i] && arr[i]) {
+            if (d !== this.inputStates[i] && d) {
                 this.inputCounts[i]++;
             }
-            this.inputStates[i] = arr[i];
+            this.inputStates[i] = d;
 
-            this.keySprites[i].scale = this.inputStates[i] ? 0.85 : 1;
+            this.keySprites[i].scale = d ? 0.85 : 1;
         }
     }
 

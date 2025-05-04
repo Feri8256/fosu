@@ -3,6 +3,8 @@ export class ReplayManager {
         this.game = game;
         this.currentReplayId = "";
 
+        this.currentTime = 0;
+
         this.xOffset = 0;
         this.yOffset = 0;
         this.xScale = 1;
@@ -10,18 +12,33 @@ export class ReplayManager {
 
         this.frameCaptureIntervalMs = 16;
         this.eventAccumulatorLimit = 128;
+        this.chunkRequestIntervalMs = 3000;
 
-        this.lastBatchSentAt = 0;
+        this.lastChunkReceivedAtMs = 0;
+        this.sendChunkRequestAfterMs = 0;
         this.lastCaptureAt = 0;
 
         this.currentMode = 2;
 
         this.eventAccumulator = [];
+        this.inputEvents = [];
+        this.lastInputEventAt = 0;
+
+        this.movementX = [];
+        this.movementY = [];
+        this.movementXtoUpdate = [];
+        this.movementYtoUpdate = [];
 
         this.lastTimestamp = 0;
 
         this.lastCursorX = 0;
         this.lastCursorY = 0;
+
+        this.lastCursorT = 0;
+
+        this.game.socket.on("replayChunk", (arr) => {
+            this.onReplayChunkReceive(arr);
+        });
 
     }
 
@@ -30,6 +47,7 @@ export class ReplayManager {
      * @param {Number} currentTime 
      */
     update(currentTime) {
+        this.currentTime = currentTime;
 
         switch (this.currentMode) {
             case 0:
@@ -53,18 +71,49 @@ export class ReplayManager {
                 }
                 this.lastCursorX = this.game.cursor.currentX;
                 this.lastCursorY = this.game.cursor.currentY;
+                this.lastTimestamp = currentTime;
+
                 break;
 
             case 1:
+                let x = this.lastCursorX;
+                let y = this.lastCursorY;
+
+                this.movementXtoUpdate = this.movementX.filter((mx) => { return mx.startTime <= this.currentTime && mx.endTime >= this.currentTime });
+                this.movementXtoUpdate.forEach((m) => {
+                    m.update(currentTime);
+                    x = m.currentValue;
+                });
+                this.movementYtoUpdate = this.movementY.filter((my) => { return my.startTime <= currentTime && my.endTime >= currentTime });
+                this.movementYtoUpdate.forEach((n) => {
+                    n.update(currentTime);
+                    y = n.currentValue;
+                });
+
+                let currentInputEvent = this.inputEvents.find((ie) => { return ie.t + this.game.deltaTime > currentTime && ie.t - this.game.deltaTime < currentTime });
+                
+                this.game.inputValidator.updateInputs(currentInputEvent?.k.map((i) => { return i === 1 ? true : false }));
+
+                this.game.cursor.setPosition(x, y);
+
+                if (this.currentTime > this.sendChunkRequestAfterMs) {
+                    this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs);
+                    this.sendChunkRequestAfterMs = this.currentTime + this.chunkRequestIntervalMs;
+                }
+
+                this.movementX = this.movementX.filter((ax) => { return ax.amount !== 1 });
+                this.movementY = this.movementY.filter((ay) => { return ay.amount !== 1 });
+                //this.inputEvents = this.inputEvents.filter((ie) => { return ie.t < currentTime + 200 });
+
+                this.lastTimestamp = currentTime;
 
                 break;
 
             case 2:
+
                 break;
         }
 
-        
-        this.lastTimestamp = currentTime;
     }
 
     /**
@@ -73,6 +122,20 @@ export class ReplayManager {
      */
     setMode(mode) {
         this.currentMode = mode;
+        this.movementX.length = 0;
+        this.movementY.length = 0;
+        this.currentReplayId = "";
+        this.currentTime = 0;
+        this.lastCaptureAt = 0;
+        this.lastTimestamp = 0;
+        this.eventAccumulator.length = 0;
+        this.inputEvents.length = 0;
+        this.lastInputEventAt = 0;
+        this.lastChunkReceivedAtMs = 0;
+        this.sendChunkRequestAfterMs = 0;
+        this.lastCursorX = 0;
+        this.lastCursorY = 0;
+        this.lastCursorT = 0;
     }
 
     /**
@@ -92,16 +155,14 @@ export class ReplayManager {
     startCapture(playerName, beatmapHash, replayId) {
         this.setMode(0);
         this.currentReplayId = replayId;
-        this.lastCaptureAt = 0;
-        this.lastTimestamp = 0;
-        this.eventAccumulator.length = 0;
-        this.game.socket.emit("gameplayEventsCaptureStart", { playerName, beatmapHash, replayId});
+
+        this.game.socket.emit("gameplayEventsCaptureStart", { playerName, beatmapHash, replayId });
 
     }
 
     stopCapture() {
-        this.setMode(2);
         if (this.eventAccumulator.length > 0) this.game.socket.emit("gameplayEventsCapture", this.eventAccumulator);
+        this.setMode(2);
         this.game.socket.emit("gameplayEventsCaptureStop", "a");
         this.eventAccumulator.length = 0;
     }
@@ -118,6 +179,48 @@ export class ReplayManager {
         //console.log(JSON.stringify(this.eventAccumulator));
         this.game.socket.emit("gameplayEventsCapture", this.eventAccumulator);
         this.eventAccumulator.length = 0;
+    }
+
+    addInputEvents(arr = [false, false, false], t = 0) {
+        this.eventAccumulator.push({ t, k: arr.map((i) => { return i ? 1 : 0 }) });
+    }
+
+    onReplayChunkReceive(arr) {
+        this.lastChunkReceivedAtMs = this.currentTime;
+
+        arr.forEach((ev) => {
+            if (ev.k) {
+                this.inputEvents.push(ev);
+            } else {
+                let calcX = this.game.utils.convertRange(ev.x, 0, 512, this.xOffset, (512 * this.xScale) - this.xOffset);
+                let calcY = this.game.utils.convertRange(ev.y, 0, 384, this.yOffset, (384 * this.yScale) - this.yOffset);
+                this.movementX.push(
+                    new this.game.ANI(
+                        this.lastCursorT,
+                        ev.t,
+                        this.lastCursorX,
+                        calcX,
+                        this.game.EASINGS.Linear
+                    )
+                );
+
+                this.movementY.push(
+                    new this.game.ANI(
+                        this.lastCursorT,
+                        ev.t,
+                        this.lastCursorY,
+                        calcY,
+                        this.game.EASINGS.Linear
+                    )
+                );
+
+                this.lastCursorX = calcX, this.lastCursorY = calcY, this.lastCursorT = ev.t;
+            }
+
+        });
+
+
+
     }
 
 }

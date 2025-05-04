@@ -13,15 +13,15 @@ export class ScoreBoardManager {
             this.game.UI.scoreBoard.container.innerHTML = "";
             if (list.length === 0) {
                 this.game.UI.scoreBoard.container.innerHTML += `
-                <div class="scoreentry" data-replayid="0">
+                <div class="scoreentry" data-replayid="0" style="--scoreentry-index: 0;">
                     <p class="scoreentry-playername">No scores achieved yet</p>
                 </div>
                 `;
             }
-            list.forEach((s) => {
+            list.forEach((s, i) => {
                 let scoreDate = new Date(s.date).toDateString();
                 this.game.UI.scoreBoard.container.innerHTML += `
-                <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}">
+                <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}" style="--scoreentry-index: ${i};">
                     <p class="scoreentry-playername">${s.playerName}</p>
                     <p class="scoreentry-date">${scoreDate}</p>
                 </div>
@@ -56,6 +56,7 @@ export class ScoreBoardManager {
             countMiss: score.results.miss,
             countMaxCombo: score.results.combo,
             acc: score.results.accuracy,
+            replayId
         });
         this.game.setState(this.game.STATE_ENUM.RESULT);
     }

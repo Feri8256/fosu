@@ -47,6 +47,10 @@ export class Cursor {
         this.currentY = Math.floor(y);
     }
 
+    getPosition() {
+        return { x: this.currentX, y: this.currentY };
+    }
+
     update() {
         this.cursorSprite.scale = this.scale;
         this.trailType = this.game.CONFIG.cursortrailType;

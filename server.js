@@ -6,8 +6,10 @@ const liveserver = require("live-server");
 const { getScoreList } = require("./server-js/getScoreList.js");
 const { setScore } = require("./server-js/setScore.js");
 const { ReplayFileManager } = require("./server-js/replayFileManager.js");
+const { ReplayWatchManager } = require("./server-js/replayWatchManager.js");
 
 const replayFileManager = new ReplayFileManager();
+const replayWatchManager = new ReplayWatchManager();
 
 
 
@@ -60,6 +62,25 @@ io.on("connection", (socket) => {
 	socket.on("gameplayEventsCapture", (a) => { replayFileManager.appendEvents(a) });
 	socket.on("gameplayEventsCaptureStart", (o) => { replayFileManager.beginCapture(o.playerName, o.beatmapHash, o.replayId) });
 	socket.on("gameplayEventsCaptureStop", (x) => { replayFileManager.stopCapture() });
+
+	socket.on("loadReplay", (id) => { 
+		replayFileManager.loadReplay(
+			id, 
+			(d) => {
+				replayWatchManager.onload(d);
+				socket.emit("replayReady", true, d.beatmapHash);
+			}, 
+			() => { 
+				socket.emit("replayReady", false);;
+			}
+		); 
+	});
+
+	socket.on("getReplayChunk", (currentT, aheadMs) => {
+		socket.emit("replayChunk", replayWatchManager.getChunk(currentT, aheadMs));
+	});
+
+
 });
 
 io.listen(7271);

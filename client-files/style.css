@@ -238,15 +238,38 @@ table {
     transform: translateY(-50%);
     top: 50%;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .scoreentry {
     color: white;
     background-color: rgba(0, 0, 0, 0.5);
+    background-image: url("../client-files/menu-button-background.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-x: right;
+    background-blend-mode: hue;
     margin-top: 5px;
     margin-bottom: 5px;
     padding: 5px;
     cursor: pointer;
+
+    animation-name: scoresAnimateIn;
+    animation-duration: 300ms;
+    animation-fill-mode: both;
+    animation-timing-function: ease-out;
+    animation-delay: calc(var(--scoreentry-index) * 50ms);
+}
+
+@keyframes scoresAnimateIn {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
 }
 
 .scoreentry-playername {

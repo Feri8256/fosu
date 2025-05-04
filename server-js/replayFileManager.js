@@ -17,6 +17,8 @@ class ReplayFileManager {
             },
             events: []
         }
+
+        this.loadedReplay = {};
     }
 
     /**
@@ -75,6 +77,31 @@ class ReplayFileManager {
             },
             events: []
         }
+    }
+
+    /**
+     * 
+     * @param {String} replayId 
+     * @param {Function} onReadyCallback 
+     * @param {Function} onFailCallback 
+     */
+    loadReplay(replayId, onReadyCallback, onFailCallback) {
+
+        let replayExixts = fs.existsSync(`./db/r/${replayId}.fosureplay`);
+
+        if (!replayExixts) {
+            onFailCallback();
+            return;
+        }
+
+        fs.readFile(`./db/r/${replayId}.fosureplay`, (err, data) => {
+            if (err) {
+                onFailCallback();
+                return;
+            }
+
+            onReadyCallback(JSON.parse(data.toString()));
+        })
     }
 }
 
