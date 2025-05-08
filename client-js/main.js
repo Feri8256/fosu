@@ -29,6 +29,7 @@ import { createSkinList } from "./skinListBuilder.js";
 import { ScoreBoardManager } from "./scoreBoard.js";
 import { ReplayManager } from "./replayManager.js";
 import { ReplayWatchStartHandler } from "./startReplayWatch.js";
+import { Countdown } from "./countdown.js";
 import { getElements } from "./UIelements.js";
 
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
@@ -86,6 +87,7 @@ class Game {
         this.SLIDER = Slider;
         this.SPINNER = Spinner;
         this.INPUTOVERLAY = InputOverlay;
+        this.COUNTDOWN = Countdown;
 
 
         this.auMgr = new AudioManager();
@@ -107,6 +109,8 @@ class Game {
         this.songAudioHandler = new SongAudioHandler(this);
 
         this.replayManager = new ReplayManager(this);
+
+        this.countdown = new Countdown(this, -1);
 
         this.backgroundManager = new BackgrondImageManager(this);
         this.beatmapPlayer = new BeatmapPlayer(this);
@@ -177,11 +181,6 @@ class Game {
         // Game starts in the song selection menu
         this.currentState;
         this.setState(0);
-
-        //this.inputHandler.onMousemove = (m) => {
-        //    if (this.currentState.stateName === "SPECTATING") return;
-        //    this.cursor.setPosition(m.x, m.y);
-        //}
     }
 
     update(timestamp) {
@@ -198,6 +197,7 @@ class Game {
         this.beatmapPlayer.update();
         this.accuracyMeter.update();
         this.comboMeter.update();
+        this.countdown.update(this.songAudioHandler.getCurrentTime());
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);
@@ -221,6 +221,7 @@ class Game {
             this.accuracyMeter.render();
             this.comboMeter.render();
             this.inputOverlay.render();
+            this.countdown.render();
             this.cursor.render();
         }
 

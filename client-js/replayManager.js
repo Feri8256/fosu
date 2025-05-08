@@ -4,6 +4,7 @@ export class ReplayManager {
         this.currentReplayId = "";
 
         this.currentTime = 0;
+        this.timeStep = 0;
 
         this.xOffset = 0;
         this.yOffset = 0;
@@ -47,6 +48,7 @@ export class ReplayManager {
      * @param {Number} currentTime 
      */
     update(currentTime) {
+        this.timeStep = currentTime - this.currentTime;
         this.currentTime = currentTime;
 
         switch (this.currentMode) {
@@ -90,7 +92,15 @@ export class ReplayManager {
                     y = n.currentValue;
                 });
 
-                let currentInputEvent = this.inputEvents.find((ie) => { return ie.t + this.game.deltaTime > currentTime && ie.t - this.game.deltaTime < currentTime });
+                //let currentInputEvent = this.inputEvents.find((ie) => { return ie.t + this.game.deltaTime > currentTime && ie.t - this.game.deltaTime < currentTime });
+                
+                //let currentInputEvent = this.inputEvents.filter((ie) => {
+                //    return ie.t - this.game.deltaTime <= currentTime;
+                //}).at(-1);
+
+                let currentInputEvent = this.inputEvents.filter((ie) => {
+                    return ie.t - this.timeStep <= currentTime;
+                }).at(-1);
                 
                 this.game.inputValidator.updateInputs(currentInputEvent?.k.map((i) => { return i === 1 ? true : false }));
 

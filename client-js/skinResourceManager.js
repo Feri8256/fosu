@@ -36,7 +36,12 @@ export class SkinResourceManager {
                 "sliderfollowcircle.png",
                 "reversearrow.png",
                 "spinner-circle.png",
-                "spinner-approachcircle.png"
+                "spinner-approachcircle.png",
+                "count1.png",
+                "count2.png",
+                "count3.png",
+                "go.png",
+                "ready.png"
             ],
             sounds: [
                 "combobreak.wav",
@@ -54,7 +59,11 @@ export class SkinResourceManager {
                 "drum-hitwhistle.wav",
                 "select-difficulty.wav",
                 "menuhit.wav",
-                "menuback.wav"
+                "menuback.wav",
+                "count1s.wav",
+                "count2s.wav",
+                "count3s.wav",
+                "gos.wav"
             ]
         }
 

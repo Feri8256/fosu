@@ -116,6 +116,10 @@ export class BeatmapPlayer {
                         this.parsedOSU.Difficulty.SliderMultiplier,
                         timingPoint.inherited?.beatLength, // Inherited `beatLength` actually holds `sliderVelocity` value! (i think i was lazy)
                         timingPoint.uninherited?.beatLength,
+                        element.edgeSounds,
+                        element.edgeSets,
+                        element.hitSound,
+                        element.hitSample
                     )
                 )
             }
@@ -134,6 +138,8 @@ export class BeatmapPlayer {
             this.spinners.at(-1)?.endTime ?? -Infinity
         );
         let relatedStartTimingPoint = this.getTimingPointAtTime(this.firsthitObjectTime);
+
+        if (this.parsedOSU.General.Countdown === 1) this.game.countdown = new this.game.COUNTDOWN(this.game, this.firsthitObjectTime, relatedStartTimingPoint.uninherited?.beatLength || 500);
 
         let startDelay = Number(this.firsthitObjectTime) < 1000 ? 2000 : 1000;
 

@@ -12,7 +12,11 @@ export class Slider {
         pixelLength = 0,
         multiplier = 1,
         v = -100,
-        beatLength
+        beatLength,
+        edgeSounds,
+        edgeSets,
+        hitSound,
+        hitSample
     ) {
         this.game = game;
         this.x = x;
@@ -209,6 +213,11 @@ export class Slider {
 
         this.endReached = false;
 
+        this.edgeSounds = edgeSounds;
+        this.edgeSets = edgeSets;
+        this.hitSound = hitSound;
+        this.hitSample = hitSample;
+
         // Tell the AutoplayController about the end position, the ball following is done in the update method
         if (this.game.autoplay.activated) {
             this.game.autoplay.add(this.endTime, curvePoint[0], curvePoint[1]);
@@ -255,10 +264,24 @@ export class Slider {
         }
 
         let edgeSoundIndex = Math.floor(this.ballMovement.timelineCurrentTime / this.oneSlideTime);
-        if (edgeSoundIndex !== this.currentSoundPlayed && this.moving && this.currentFollowState) {
+        if (edgeSoundIndex !== this.currentSoundPlayed && this.currentFollowState) {
 
-            // Edge sounds will be expected
-            this.game.auMgr.playAudioClip("normal-hitnormal");
+            let edgeSoundTest = typeof this.edgeSounds !== "undefined";
+
+            if (edgeSoundTest) {
+                this.game.hitSoundPlayer.playHitSound(
+                    this.hitSample.normalSet,
+                    this.hitSample.additionSet,
+                    this.edgeSounds[edgeSoundIndex]
+                );
+            } else {
+                this.game.hitSoundPlayer.playHitSound(
+                    this.hitSample.normalSet,
+                    this.hitSample.additionSet,
+                    this.hitSound
+                );
+            }
+
             this.game.comboMeter.addHit(true);
             this.game.accuracyMeter.addHit(true, 0);
 
@@ -277,13 +300,27 @@ export class Slider {
             );
 
             this.endReached = true;
+            this.game.comboMeter.addHit(true);
+            this.game.accuracyMeter.addHit(true, 0);
 
             this.setFollowState(false);
 
-            // End
-            this.game.auMgr.playAudioClip("normal-hitnormal");
-            this.game.comboMeter.addHit(true);
-            this.game.accuracyMeter.addHit(true, 0);
+            let edgeSoundTest = typeof this.edgeSounds !== "undefined";
+
+            if (edgeSoundTest) {
+                this.game.hitSoundPlayer.playHitSound(
+                    this.hitSample.normalSet,
+                    this.hitSample.additionSet,
+                    this.edgeSounds[edgeSoundIndex]
+                );
+            } else {
+                this.game.hitSoundPlayer.playHitSound(
+                    this.hitSample.normalSet,
+                    this.hitSample.additionSet,
+                    this.hitSound
+                );
+            }
+
         }
 
         this.ballMovement.update(currentTime);

@@ -136,6 +136,7 @@ class Playing extends GameState {
         this.game.inputHandler.onKeydown = () => { }
         this.game.inputHandler.onKeyup = () => { }
         this.game.inputValidator.onInputChange = () => { }
+        this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
     }
 }
 
@@ -395,6 +396,10 @@ class Spectate extends GameState {
         });
 
         this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
+    }
+
+    leave() {
+        this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
     }
 }
 

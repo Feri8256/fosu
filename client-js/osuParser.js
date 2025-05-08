@@ -147,8 +147,8 @@ export function parseOsu(str) {
                 curvePoints: curvePointsArray,
                 slides: parseInt(hitObjectTokens[6]),
                 length: parseInt(hitObjectTokens[7]),
-                edgeSounds: [],
-                edgeSets: []
+                edgeSounds: hitObjectTokens[8]?.split("|").map(esnd => createHitSound(esnd)),
+                edgeSets: hitObjectTokens[9]?.split("|").map(eset => createHitSample(eset))
             }
         } else {
             hitObject = {
