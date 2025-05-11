@@ -71,7 +71,45 @@ export class Slider {
             this.sliderPath.moveTo(cp[0], cp[1]);
         }
         ///////////
+        this.prerendered = null;
+        this.objURL = "";
 
+        // Draw the sliders shape onto the offscreen canvas
+        this.game.offscreenCtx.reset();
+        this.game.offscreenCtx.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
+        this.game.offscreenCtx.lineCap = 'round';
+
+        this.game.offscreenCtx.shadowColor = "black";
+        this.game.offscreenCtx.shadowBlur = 4;
+
+        // Slider border      
+        this.game.offscreenCtx.strokeStyle = `rgb(140, 140, 140)`;
+        this.game.offscreenCtx.lineWidth = this.rad * 2;
+        this.game.offscreenCtx.stroke(this.sliderPath);
+
+        this.game.offscreenCtx.shadowBlur = 0;
+
+
+        // Slider track
+        this.game.offscreenCtx.strokeStyle = `rgb(10, 10, 10)`;
+        this.game.offscreenCtx.lineWidth = this.rad * 1.8;
+        this.game.offscreenCtx.stroke(this.sliderPath);
+
+        //
+        if (this.game.CONFIG.betterLookingSliders) {
+            this.game.offscreenCtx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
+            this.game.offscreenCtx.strokeStyle = `rgb(0, 0, 0)`;
+            this.game.offscreenCtx.shadowColor = "rgba(255, 255, 255, 0.75)";
+            this.game.offscreenCtx.lineWidth = this.rad / 3;
+            this.game.offscreenCtx.shadowBlur = this.rad * 0.8;
+            this.game.offscreenCtx.stroke(this.sliderPath);
+            this.game.offscreenCtx.shadowBlur = 0;
+        }
+        this.game.offscreenCanvas.convertToBlob({ type: "image/png" }).then((b) => {
+            let img = new Image();
+            img.src = this.objURL = URL.createObjectURL(b);
+            this.prerendered = img;
+        });
 
         // The last set of coordinates in the curvePoints array is the end position of the slider
         this.sliderEndPos = {
@@ -256,31 +294,17 @@ export class Slider {
             this.ballMovement.currentTime = currentTime;
             this.ballMovement.play();
             this.moving = true;
-            //this.currentFollowState = true;
 
             if (this.game.autoplay.activated) this.setFollowState(true);
 
             //console.log(`beatLength: ${this.beatLength}\npixelLength: ${this.pixelLength}\nvelocity: ${this.velocity}\nmultiplier: ${this.multiplier}\none slide t: ${this.oneSlideTime}`)
         }
 
+        // add +1 to edgeSoundIndex because 0 should play when the slider head is clicked
         let edgeSoundIndex = Math.floor(this.ballMovement.timelineCurrentTime / this.oneSlideTime);
         if (edgeSoundIndex !== this.currentSoundPlayed && this.currentFollowState) {
 
-            let edgeSoundTest = typeof this.edgeSounds !== "undefined";
-
-            if (edgeSoundTest) {
-                this.game.hitSoundPlayer.playHitSound(
-                    this.hitSample.normalSet,
-                    this.hitSample.additionSet,
-                    this.edgeSounds[edgeSoundIndex]
-                );
-            } else {
-                this.game.hitSoundPlayer.playHitSound(
-                    this.hitSample.normalSet,
-                    this.hitSample.additionSet,
-                    this.hitSound
-                );
-            }
+            this.playEdgeSound(edgeSoundIndex + 1);
 
             this.game.comboMeter.addHit(true);
             this.game.accuracyMeter.addHit(true, 0);
@@ -305,22 +329,7 @@ export class Slider {
 
             this.setFollowState(false);
 
-            let edgeSoundTest = typeof this.edgeSounds !== "undefined";
-
-            if (edgeSoundTest) {
-                this.game.hitSoundPlayer.playHitSound(
-                    this.hitSample.normalSet,
-                    this.hitSample.additionSet,
-                    this.edgeSounds[edgeSoundIndex]
-                );
-            } else {
-                this.game.hitSoundPlayer.playHitSound(
-                    this.hitSample.normalSet,
-                    this.hitSample.additionSet,
-                    this.hitSound
-                );
-            }
-
+            this.playEdgeSound(edgeSoundIndex + 1);
         }
 
         this.ballMovement.update(currentTime);
@@ -343,6 +352,12 @@ export class Slider {
         if (this.game.autoplay.activated && this.ballMovement.playing) {
             this.game.cursor.setPosition(Math.floor(this.ballSprite.x), Math.floor(this.ballSprite.y));
         }
+
+        // Will this going to help reduce memory usage? 
+        if(currentTime > this.endTime + this.fadeOutMs) {
+            URL.revokeObjectURL(this.objURL);
+            this.prerendered = null;
+        }
     }
 
     render() {
@@ -350,39 +365,7 @@ export class Slider {
 
         this.game.ctx.globalAlpha = this.fading.currentValue;
 
-        this.game.ctx.lineCap = 'round';
-
-        this.game.ctx.shadowColor = "black";
-        this.game.ctx.shadowBlur = 4;
-
-        // Slider border      
-        this.game.ctx.strokeStyle = `rgb(140, 140, 140)`;
-        this.game.ctx.lineWidth = this.rad * 2;
-        this.game.ctx.stroke(this.sliderPath);
-
-        this.game.ctx.shadowBlur = 0;
-
-
-        // Slider track
-        this.game.ctx.strokeStyle = `rgb(10, 10, 10)`;
-        this.game.ctx.lineWidth = this.rad * 1.8;
-        this.game.ctx.stroke(this.sliderPath);
-
-        //
-        if (this.game.CONFIG.betterLookingSliders) {
-            this.game.ctx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
-            this.game.ctx.strokeStyle = `rgb(0, 0, 0)`;
-            this.game.ctx.shadowColor = "rgba(255, 255, 255, 0.75)";
-            this.game.ctx.lineWidth = this.rad / 3;
-            this.game.ctx.shadowBlur = this.rad * 0.8;
-            this.game.ctx.stroke(this.sliderPath);
-            this.game.ctx.shadowBlur = 0;
-        }
-
-        //
-
-        this.game.ctx.globalCompositeOperation = "source-over";
-
+        if (this.prerendered !== null) this.game.ctx.drawImage(this.prerendered, 0, 0);
 
         if (this.moving) this.ballSprite.render(this.game.ctx);
         this.followSprite.render(this.game.ctx);
@@ -438,5 +421,25 @@ export class Slider {
         }
 
         this.previousFollowState = this.currentFollowState;
+    }
+
+    playEdgeSound(index = 0) {
+        // an edge sound at `index` should never be undefined, but who knows
+        let edgeSoundTest = typeof this.edgeSounds !== "undefined" && typeof this.edgeSounds[index] !== "undefined";
+
+        // passes the undefined check
+        if (edgeSoundTest) {
+            this.game.hitSoundPlayer.playHitSound(
+                this.hitSample.normalSet,
+                this.hitSample.additionSet,
+                this.edgeSounds[index]
+            );
+        } else {
+            this.game.hitSoundPlayer.playHitSound(
+                this.hitSample.normalSet,
+                this.hitSample.additionSet,
+                this.hitSound
+            );
+        }
     }
 }

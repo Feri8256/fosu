@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { parseSkinConfig } = require("./skinConfigParser");
 
 let dbExists = fs.existsSync("skins.json");
 
@@ -9,13 +10,22 @@ function buildSkinList() {
     files.forEach((folder) => {
         let files = fs.readdirSync(`skins/${folder}/`);
 
-        let skinObj = {
+        let skinListObj = {
             name: folder,
             src: `skins/${folder}/`
         };
 
-        skinList.push(skinObj);
-        fs.writeFileSync(`skins/${folder}/files.json`, JSON.stringify(files));
+        skinList.push(skinListObj);
+
+
+        let skinINIexists = fs.existsSync(`skins/${folder}/skin.ini`);
+        let skinINIcontent = "";
+        if (skinINIexists) skinINIcontent = fs.readFileSync(`skins/${folder}/skin.ini`).toString();
+
+        fs.writeFileSync(`skins/${folder}/skin.json`, JSON.stringify({
+            config: skinINIexists ? parseSkinConfig(skinINIcontent) : null,
+            files
+        }));
 
     });
 

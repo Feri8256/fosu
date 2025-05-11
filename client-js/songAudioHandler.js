@@ -71,7 +71,7 @@ export class SongAudioHandler {
      * @returns { Number }
      */
     getCurrentTime() {
-        return Math.floor(this.audio.currentTime * 1000);
+        return this.audio.currentTime * 1000;
     }
 
     play() {

@@ -92,14 +92,8 @@ export class ReplayManager {
                     y = n.currentValue;
                 });
 
-                //let currentInputEvent = this.inputEvents.find((ie) => { return ie.t + this.game.deltaTime > currentTime && ie.t - this.game.deltaTime < currentTime });
-                
-                //let currentInputEvent = this.inputEvents.filter((ie) => {
-                //    return ie.t - this.game.deltaTime <= currentTime;
-                //}).at(-1);
-
                 let currentInputEvent = this.inputEvents.filter((ie) => {
-                    return ie.t - this.timeStep <= currentTime;
+                    return ie.t <= currentTime + this.timeStep;
                 }).at(-1);
                 
                 this.game.inputValidator.updateInputs(currentInputEvent?.k.map((i) => { return i === 1 ? true : false }));
@@ -113,7 +107,6 @@ export class ReplayManager {
 
                 this.movementX = this.movementX.filter((ax) => { return ax.amount !== 1 });
                 this.movementY = this.movementY.filter((ay) => { return ay.amount !== 1 });
-                //this.inputEvents = this.inputEvents.filter((ie) => { return ie.t < currentTime + 200 });
 
                 this.lastTimestamp = currentTime;
 

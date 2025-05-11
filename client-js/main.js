@@ -37,10 +37,16 @@ import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 class Game {
     constructor() {
         this.utils = utils;
+
         this.canvas = document.querySelector("canvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext("2d");
+
+        this.offscreenCanvas = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+        this.offscreenCtx = this.offscreenCanvas.getContext("2d", { willReadFrequently: true });
+
+        //this.offscreenCanvas.convertToBlob()
 
         // Hoisted config values with defaults
         this.CONFIG = {
@@ -116,7 +122,7 @@ class Game {
         this.beatmapPlayer = new BeatmapPlayer(this);
         this.beatmapLoader = new BeatmapLoader(this);
         this.songSelectBuilder = new SongSelectionBuilder(this);
-        
+
         this.replayWatchStartHandler = new ReplayWatchStartHandler(this);
 
         this.songSelectManager = new songSelectionManager(this);
@@ -151,7 +157,7 @@ class Game {
                 location.reload();
             },
             setPlayerName: (v) => {
-                this.CONFIG.playerName = String(v).replaceAll(",","").replaceAll("\n","");
+                this.CONFIG.playerName = String(v).replaceAll(",", "").replaceAll("\n", "");
             },
             setBackgroundDim: (v) => {
                 this.CONFIG.backgroundDim = v;
@@ -243,6 +249,8 @@ class Game {
     resizeHandler() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        this.offscreenCanvas.width = window.innerWidth;
+        this.offscreenCanvas.height = window.innerHeight;
         this.backgroundManager.resize();
     }
 
@@ -309,22 +317,22 @@ class Game {
     }
 
     submitScore() {
-        let obj = { 
-            playerName: this.CONFIG.playerName, 
-            date: Date.now(), 
-            results: { 
-                perfect: this.accuracyMeter.results[3], 
-                okay: this.accuracyMeter.results[2], 
-                meh: this.accuracyMeter.results[1], 
-                miss: this.accuracyMeter.results[0], 
-                accuracy: this.accuracyMeter.results[4], 
-                combo: this.comboMeter.getResults().max 
-            }, 
+        let obj = {
+            playerName: this.CONFIG.playerName,
+            date: Date.now(),
+            results: {
+                perfect: this.accuracyMeter.results[3],
+                okay: this.accuracyMeter.results[2],
+                meh: this.accuracyMeter.results[1],
+                miss: this.accuracyMeter.results[0],
+                accuracy: this.accuracyMeter.results[4],
+                combo: this.comboMeter.getResults().max
+            },
             beatmapHash: this.songSelectManager.currentSelect.beatmapHash,
-            replayId: this.replayManager.currentReplayId, dismissed: false 
+            replayId: this.replayManager.currentReplayId, dismissed: false
         }
         this.replayManager.stopCapture();
-        
+
         this.socket.emit("submitScore", obj);
 
     }

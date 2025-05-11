@@ -108,12 +108,12 @@ export class SkinResourceManager {
             return;
         }
 
-        fetch(`${folderName}files.json`)
+        fetch(`${folderName}skin.json`)
             .then((resp) => resp.json())
             .then((d) => {
                 // Load sprites
                 this.filesNeeded.sprites.forEach((fileName) => {
-                    if (d.includes(fileName)) {
+                    if (d.files.includes(fileName)) {
                         this.spriteImages[fileName.split(".").at(0)] = new this.game.SPRITEIMG(`${folderName}${fileName}`);
                     } else {
                         this.spriteImages[fileName.split(".").at(0)] = new this.game.SPRITEIMG(`${this.defaultPath}/${fileName}`);
@@ -125,7 +125,7 @@ export class SkinResourceManager {
 
                 // Load sounds
                 this.filesNeeded.sounds.forEach((fileName) => {
-                    if (d.includes(fileName)) {
+                    if (d.files.includes(fileName)) {
                         this.game.auMgr.loadFile(`${folderName}${fileName}`, fileName.split(".").at(0));
                     } else {
                         this.game.auMgr.loadFile(`${this.defaultPath}/${fileName}`, fileName.split(".").at(0));
