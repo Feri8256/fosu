@@ -74,42 +74,7 @@ export class Slider {
         this.prerendered = null;
         this.objURL = "";
 
-        // Draw the sliders shape onto the offscreen canvas
-        this.game.offscreenCtx.reset();
-        this.game.offscreenCtx.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
-        this.game.offscreenCtx.lineCap = 'round';
-
-        this.game.offscreenCtx.shadowColor = "black";
-        this.game.offscreenCtx.shadowBlur = 4;
-
-        // Slider border      
-        this.game.offscreenCtx.strokeStyle = `rgb(140, 140, 140)`;
-        this.game.offscreenCtx.lineWidth = this.rad * 2;
-        this.game.offscreenCtx.stroke(this.sliderPath);
-
-        this.game.offscreenCtx.shadowBlur = 0;
-
-
-        // Slider track
-        this.game.offscreenCtx.strokeStyle = `rgb(10, 10, 10)`;
-        this.game.offscreenCtx.lineWidth = this.rad * 1.8;
-        this.game.offscreenCtx.stroke(this.sliderPath);
-
-        //
-        if (this.game.CONFIG.betterLookingSliders) {
-            this.game.offscreenCtx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
-            this.game.offscreenCtx.strokeStyle = `rgb(0, 0, 0)`;
-            this.game.offscreenCtx.shadowColor = "rgba(255, 255, 255, 0.75)";
-            this.game.offscreenCtx.lineWidth = this.rad / 3;
-            this.game.offscreenCtx.shadowBlur = this.rad * 0.8;
-            this.game.offscreenCtx.stroke(this.sliderPath);
-            this.game.offscreenCtx.shadowBlur = 0;
-        }
-        this.game.offscreenCanvas.convertToBlob({ type: "image/png" }).then((b) => {
-            let img = new Image();
-            img.src = this.objURL = URL.createObjectURL(b);
-            this.prerendered = img;
-        });
+        this.createRender();
 
         // The last set of coordinates in the curvePoints array is the end position of the slider
         this.sliderEndPos = {
@@ -354,9 +319,8 @@ export class Slider {
         }
 
         // Will this going to help reduce memory usage? 
-        if(currentTime > this.endTime + this.fadeOutMs) {
-            URL.revokeObjectURL(this.objURL);
-            this.prerendered = null;
+        if (currentTime > this.endTime + this.fadeOutMs) {
+            this.destroyRender();
         }
     }
 
@@ -441,5 +405,50 @@ export class Slider {
                 this.hitSound
             );
         }
+    }
+
+    createRender() {
+        // Draw the sliders shape onto the offscreen canvas
+        this.game.offscreenCtx.reset();
+        this.game.offscreenCtx.clearRect(0, 0, this.game.canvas.width, this.game.canvas.height);
+        this.game.offscreenCtx.lineCap = 'round';
+
+        this.game.offscreenCtx.shadowColor = "black";
+        this.game.offscreenCtx.shadowBlur = 4;
+
+        // Slider border      
+        this.game.offscreenCtx.strokeStyle = `rgb(140, 140, 140)`;
+        this.game.offscreenCtx.lineWidth = this.rad * 2;
+        this.game.offscreenCtx.stroke(this.sliderPath);
+
+        this.game.offscreenCtx.shadowBlur = 0;
+
+
+        // Slider track
+        this.game.offscreenCtx.strokeStyle = `rgb(10, 10, 10)`;
+        this.game.offscreenCtx.lineWidth = this.rad * 1.8;
+        this.game.offscreenCtx.stroke(this.sliderPath);
+
+        //
+        if (this.game.CONFIG.betterLookingSliders) {
+            this.game.offscreenCtx.globalCompositeOperation = "lighter"; // this composite operation removes the black stroke and adds the color of the shadow to the slider track color
+            this.game.offscreenCtx.strokeStyle = `rgb(0, 0, 0)`;
+            this.game.offscreenCtx.shadowColor = "rgba(255, 255, 255, 0.75)";
+            this.game.offscreenCtx.lineWidth = this.rad / 3;
+            this.game.offscreenCtx.shadowBlur = this.rad * 0.8;
+            this.game.offscreenCtx.stroke(this.sliderPath);
+            this.game.offscreenCtx.shadowBlur = 0;
+        }
+        this.game.offscreenCanvas.convertToBlob({ type: "image/png" }).then((b) => {
+            let img = new Image();
+            img.decoding = "async";
+            img.src = this.objURL = URL.createObjectURL(b);
+            this.prerendered = img;
+        });
+    }
+
+    destroyRender() {
+        URL.revokeObjectURL(this.objURL);
+        this.prerendered = null;
     }
 }

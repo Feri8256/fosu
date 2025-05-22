@@ -68,10 +68,10 @@ io.on("connection", (socket) => {
 			id, 
 			(d) => {
 				replayWatchManager.onload(d);
-				socket.emit("replayReady", true, d.beatmapHash);
+				socket.emit("replayReady", true, d.beatmapHash, d.playerName, d.date);
 			}, 
 			() => { 
-				socket.emit("replayReady", false);;
+				socket.emit("replayReady", false);
 			}
 		); 
 	});

@@ -40,7 +40,7 @@ class SongSelecting extends GameState {
             this.game.CONFIG.musicVolume,
             1000
         );
-
+        
         this.game.backgroundManager.changeOpacity(1, 1000);
         this.game.UI.songSelectContainer.animate([
             { transform: "translateX(690px)" },
@@ -400,6 +400,7 @@ class Spectate extends GameState {
 
     leave() {
         this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
+        this.game.beatmapPlayer.cleanup();
     }
 }
 

@@ -46,8 +46,6 @@ class Game {
         this.offscreenCanvas = new OffscreenCanvas(window.innerWidth, window.innerHeight);
         this.offscreenCtx = this.offscreenCanvas.getContext("2d", { willReadFrequently: true });
 
-        //this.offscreenCanvas.convertToBlob()
-
         // Hoisted config values with defaults
         this.CONFIG = {
             playerName: "",
@@ -179,11 +177,15 @@ class Game {
             this.songAudioHandler.setPlaybackRate(parseFloat(evt.target.value));
             this.UI.spectate.playbackRateValue.textContent = evt.target.value;
         });
+        this.UI.spectate.playbackRatePitchPreservation.addEventListener("change", (evt) => {
+            this.songAudioHandler.setPitchPreservation(evt.target.checked);
+        });
 
 
 
         this.clock = 0;
         this.deltaTime = 0;
+        this.songClock = 0;
         // Game starts in the song selection menu
         this.currentState;
         this.setState(0);
@@ -192,18 +194,19 @@ class Game {
     update(timestamp) {
         this.deltaTime = timestamp - this.clock;
         this.clock = timestamp;
+        this.songClock = this.songAudioHandler.getCurrentTime()
 
         this.currentState.handleInput();
         this.cursor.update();
 
-        this.replayManager.update(this.songAudioHandler.getCurrentTime());
+        this.replayManager.update(this.songClock);
 
         this.songAudioHandler.update();
         this.backgroundManager.update();
         this.beatmapPlayer.update();
         this.accuracyMeter.update();
         this.comboMeter.update();
-        this.countdown.update(this.songAudioHandler.getCurrentTime());
+        this.countdown.update(this.songClock);
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);

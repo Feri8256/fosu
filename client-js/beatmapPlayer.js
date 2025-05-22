@@ -37,10 +37,12 @@ export class BeatmapPlayer {
 
         this.endedTimestamp = 0;
 
+        this.isSpectating = false;
     }
 
     createHitObjects(parsedOSU, spectating) {
         this.parsedOSU = parsedOSU;
+        this.isSpectating = spectating
 
         this.timeWindow = this.calculateApproachRate(parsedOSU.Difficulty.ApproachRate);
         this.globalScale = (this.game.canvas.height / this.playFieldHeight) * 0.8;
@@ -151,8 +153,6 @@ export class BeatmapPlayer {
             console.log(`intro is skipable. First hit object is at ${this.firsthitObjectTime}. Skip to: ${this.skipToTime}`);
         }
 
-
-        //this.game.setLoadingCircle(false);
         setTimeout(() => {
 
             // Parsing error?
@@ -167,13 +167,14 @@ export class BeatmapPlayer {
             if (this.introSkipable) this.setSkipButtonVisibility(true);
             this.playing = true;
 
-            if (!spectating) {
+            if (!this.isSpectating) {
+                // we not spectating.. start capture the gameplay
                 this.game.replayManager.startCapture(this.game.CONFIG.playerName, this.game.songSelectManager.currentSelect.beatmapHash, String(Date.now()));
             } else {
-                this.game.replayManager.setMode(1);
+                // We spectating but who? The machine (mode 2) or human (mode 1)?
+                this.game.replayManager.setMode(this.game.autoplay.activated ? 2 : 1);
             }
-
-            //this.game.autoplay.start()
+            this.game.setState(this.isSpectating ? this.game.STATE_ENUM.SPECTATING : this.game.STATE_ENUM.PLAYING);
         }, startDelay);
     }
 
@@ -279,12 +280,6 @@ export class BeatmapPlayer {
         this.hitCirclesToRender.forEach((o) => { o.render() });
         this.accJudgments.forEach((a) => { a.render() });
 
-        // like this!!!!
-        this.game.ctx.fillStyle = "#fff";
-        this.game.ctx.font = "16px Arial";
-        //this.game.ctx.fillText(`${}`, 100, 100)
-        //this.game.ctx.fillText(`${}`, 100, 120)
-
         // Beatmap time progress bar on the bottom
         if (!this.playing) return;
         this.game.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -383,6 +378,8 @@ export class BeatmapPlayer {
         this.xScale = 1;
         this.hitCircles.length = 0;
         this.hitCirclesToRender.length = 0;
+
+        this.sliders.forEach((sl) => { sl.destroyRender(); });
         this.sliders.length = 0;
         this.slidersToRender.length = 0;
         this.spinners.length = 0;
@@ -410,6 +407,8 @@ export class BeatmapPlayer {
         this.game.comboMeter.reset();
         this.game.autoplay.reset();
     }
+
+    
 
     /**
      * Clear the current map and load it again

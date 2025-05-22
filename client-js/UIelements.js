@@ -69,7 +69,8 @@ export function getElements() {
         spectate: {
             container: $("#spectate-controls"),
             playbackRateSlider: $("#spectate-playback-rate"),
-            playbackRateValue: $("#spectate-playback-rate-value")
+            playbackRateValue: $("#spectate-playback-rate-value"),
+            playbackRatePitchPreservation: $("#spectate-playback-rate-pitch")
         },
 
         scoreBoard: {

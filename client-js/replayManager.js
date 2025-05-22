@@ -37,6 +37,9 @@ export class ReplayManager {
 
         this.lastCursorT = 0;
 
+        this.convertedCursorX = 0
+        this.convertedCursorY = 0
+
         this.game.socket.on("replayChunk", (arr) => {
             this.onReplayChunkReceive(arr);
         });
@@ -53,7 +56,8 @@ export class ReplayManager {
 
         switch (this.currentMode) {
             case 0:
-
+                this.convertedCursorX = this.game.utils.convertRange(this.game.cursor.currentX, this.xOffset, (512 * this.xScale) - this.xOffset, 0, 512);
+                this.convertedCursorY = this.game.utils.convertRange(this.game.cursor.currentY, this.yOffset, (384 * this.yScale) - this.yOffset, 0, 384);
                 // this means the map paused
                 if (currentTime === this.lastTimestamp) break;
 
@@ -63,8 +67,8 @@ export class ReplayManager {
                 if (currentTime - this.lastCaptureAt > this.frameCaptureIntervalMs) {
                     this.eventAccumulator.push({
                         t: currentTime,
-                        x: this.game.utils.convertRange(this.game.cursor.currentX, this.xOffset, (512 * this.xScale) - this.xOffset, 0, 512),
-                        y: this.game.utils.convertRange(this.game.cursor.currentY, this.yOffset, (384 * this.yScale) - this.yOffset, 0, 384)
+                        x: this.convertedCursorX,
+                        y: this.convertedCursorY
                     });
 
                     this.lastCaptureAt = currentTime;
@@ -95,8 +99,10 @@ export class ReplayManager {
                 let currentInputEvent = this.inputEvents.filter((ie) => {
                     return ie.t <= currentTime + this.timeStep;
                 }).at(-1);
-                
-                this.game.inputValidator.updateInputs(currentInputEvent?.k.map((i) => { return i === 1 ? true : false }));
+
+                this.game.inputValidator.updateInputs(
+                    currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
+                );
 
                 this.game.cursor.setPosition(x, y);
 
@@ -185,7 +191,12 @@ export class ReplayManager {
     }
 
     addInputEvents(arr = [false, false, false], t = 0) {
-        this.eventAccumulator.push({ t, k: arr.map((i) => { return i ? 1 : 0 }) });
+        this.eventAccumulator.push(
+            { t, k: arr.map((i) => { return i ? 1 : 0 }) },
+            { t, x: this.convertedCursorX, y: this.convertedCursorY }
+        );
+        this.lastCursorX = this.game.cursor.currentX;
+        this.lastCursorY = this.game.cursor.currentY;
     }
 
     onReplayChunkReceive(arr) {

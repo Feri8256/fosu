@@ -4,6 +4,13 @@ export class SkinResourceManager {
         this.skinsBaseUrl = "skins";
         this.defaultPath = "client-files";
 
+        this.skinConfig = {
+            general: {},
+            colours: {
+                combo: ["255,128,0", "0,123,255", "222,255,0", "0,255,111"]
+            }
+        }
+
         this.scoreFontSet = new Map();
 
         this.filesNeeded = {
@@ -63,7 +70,8 @@ export class SkinResourceManager {
                 "count1s.wav",
                 "count2s.wav",
                 "count3s.wav",
-                "gos.wav"
+                "gos.wav",
+                "readys.wav"
             ]
         }
 
@@ -77,12 +85,12 @@ export class SkinResourceManager {
 
     setupScoreFont() {
         for (let n = 0; n < 10; n++) {
-            this.scoreFontSet.set(String(n), new this.game.SPRITE(this.spriteImages[`score-${n}`],0,0,0,0,0,0));
+            this.scoreFontSet.set(String(n), new this.game.SPRITE(this.spriteImages[`score-${n}`], 0, 0, 0, 0, 0, 0));
         }
-        this.scoreFontSet.set(".", new this.game.SPRITE(this.spriteImages["score-dot"],0,0,0,0,0,0));
-        this.scoreFontSet.set(",", new this.game.SPRITE(this.spriteImages["score-comma"],0,0,0,0,0,0));
-        this.scoreFontSet.set("%", new this.game.SPRITE(this.spriteImages["score-percent"],0,0,0,0,0,0));
-        this.scoreFontSet.set("x", new this.game.SPRITE(this.spriteImages["score-x"],0,0,0,0,0,0));
+        this.scoreFontSet.set(".", new this.game.SPRITE(this.spriteImages["score-dot"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set(",", new this.game.SPRITE(this.spriteImages["score-comma"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set("%", new this.game.SPRITE(this.spriteImages["score-percent"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set("x", new this.game.SPRITE(this.spriteImages["score-x"], 0, 0, 0, 0, 0, 0));
     }
 
     loadDefault() {
@@ -111,6 +119,7 @@ export class SkinResourceManager {
         fetch(`${folderName}skin.json`)
             .then((resp) => resp.json())
             .then((d) => {
+
                 // Load sprites
                 this.filesNeeded.sprites.forEach((fileName) => {
                     if (d.files.includes(fileName)) {
@@ -139,7 +148,7 @@ export class SkinResourceManager {
     }
 
     unload() {
-        
+
     }
 
 

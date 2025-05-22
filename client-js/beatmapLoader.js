@@ -20,8 +20,8 @@ export class BeatmapLoader {
 
                 document.title = `fosu | ${this.isSpectateMode ? "Spectating " + this.spectatedPlayerName + " playing" : "Playing"} ${p.Metadata.Artist} - ${p.Metadata.Title} [${p.Metadata.Version}]`;
 
-                this.game.beatmapPlayer.createHitObjects(p, isSpectateMode);
-                this.game.setState(this.isSpectateMode ? this.game.STATE_ENUM.SPECTATING : this.game.STATE_ENUM.PLAYING);
+                this.game.beatmapPlayer.createHitObjects(p, this.isSpectateMode);
+                
             });
     }
 }

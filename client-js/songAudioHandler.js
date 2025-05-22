@@ -5,7 +5,7 @@ export class SongAudioHandler {
         this.currentVolume = this.game.CONFIG.musicVolume;
         this.audio.volume = this.currentVolume;
         this.audio.muted = false;
-        this.audio.preservesPitch = false;
+        this.audio.preservesPitch = true;
         // Fun fact: 0.075 is the minimum supported playback rate
 
         this.volumeAutomation = new this.game.ANI(0, 0, this.currentVolume, this.currentVolume, this.game.EASINGS.Linear);
@@ -98,5 +98,9 @@ export class SongAudioHandler {
     setPlaybackRate(v) {
         if(!v) return;
         this.audio.playbackRate = v;
+    }
+
+    setPitchPreservation(state) {
+        this.audio.preservesPitch = state ? true : false;
     }
 }

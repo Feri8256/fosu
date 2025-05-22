@@ -9,8 +9,10 @@ export class Countdown {
         this.game = game;
         this.firstHitObjectTime = firstHitObjectTime;
         this.beatLength = beatLength;
-
+        this.currentCountSoundIndex = 0;
+        this.lastCountSoundIndex = 0;
         this.disabled = this.firstHitObjectTime === -1;
+
 
         if (this.disabled) return;
 
@@ -22,8 +24,7 @@ export class Countdown {
             new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("count3")),
             new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("ready"))
         ];
-        this.currentCountSoundIndex = 0;
-        this.lastCountSoundIndex = 0;
+
         this.fourBeatsBehindAtMs = this.firstHitObjectTime - (this.beatLength * 4);
         this.sixBeatsBehindAtMs = this.firstHitObjectTime - (this.beatLength * 6);
     }
@@ -47,11 +48,16 @@ export class Countdown {
             this.lastCountSoundIndex = this.currentCountSoundIndex;
         }
 
+        if (this.currentCountSoundIndex === 6 && this.currentCountSoundIndex !== this.lastCountSoundIndex) {
+            this.game.auMgr.playAudioClip("readys");
+            this.lastCountSoundIndex = this.currentCountSoundIndex;
+        }
+
         this.countSprites.forEach((s, i) => {
             s.x = this.game.canvas.width * 0.5;
             s.y = this.game.canvas.height * 0.5;
             s.opacity = i === this.currentCountSoundIndex ? 1 : 0;
-            s.scale = this.game.beatmapPlayer.globalScale;
+            s.scale = 1;
         });
 
     }
