@@ -23,7 +23,7 @@ import { InputValidator } from "./inputValidator.js";
 import { ResultScreenUpdater } from "./resultScreenUpdate.js";
 import { HitSoundPlayer } from "./hitSoundPlayer.js";
 import { SpriteFontRenderer } from "./fontRenderer.js";
-import { SettingsManager } from "./settingsManagerV2.js";
+import { SettingsManager } from "./settingsManager.js";
 import { AutoplayController } from "./autoplay.js";
 import { createSkinList } from "./skinListBuilder.js";
 import { ScoreBoardManager } from "./scoreBoard.js";
@@ -45,10 +45,11 @@ class Game {
 
         this.offscreenCanvas = new OffscreenCanvas(window.innerWidth, window.innerHeight);
         this.offscreenCtx = this.offscreenCanvas.getContext("2d", { willReadFrequently: true });
+        if (!this.offscreenCtx) console.error("Unable to initialize context for offscreen canvas");
 
         // Hoisted config values with defaults
         this.CONFIG = {
-            playerName: "",
+            playerName: "anonymous",
             musicVolume: 0.1,
             effectVolume: 0.1,
             skin: "",

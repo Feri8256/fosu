@@ -4,94 +4,112 @@
  */
 export class SettingsManager {
     constructor(game) {
-        this.configuration = {};
+        this.lsKey = "fosuConfig";
         this.game = game;
-        this.optionElements = document.querySelectorAll(".option");
 
-        // The default settings determined by the default state of the inputs in the HTML document
-        // Override them with the saved settings later
-        this.optionElements.forEach(e => {
-            let { id, value, checked } = e;
-            let { type } = e.dataset;
+        this.buttonVisible = true;
+        this.overlayVisible = false;
 
-            let val;
-            switch (type) {
-                case "number":
-                    val = parseInt(value);
-                    break;
-
-                case "float":
-                    val = parseFloat(value);
-                    break;
-
-                case "boolean":
-                    val = checked;
-                    break;
-
-                case "string":
-                    val = value.toString();
-                    break;
-
-                default:
-                    val = value;
-                    break;
+        this.game.UI.settings.button.addEventListener("click", () => {
+            if (this.overlayVisible) {
+                this.setOverlayVisibility(false);
+                this.overlayVisible = false;
+            } else {
+                this.setOverlayVisibility(true);
+                this.overlayVisible = true;
             }
-            this.configuration[id] = val;
         });
-
-        console.log(this.configuration)
-
-        ////////////////////////////////     
 
         this.load();
 
-        this.optionElements.forEach(element => {
-            element.addEventListener("change", (evt) => {
-                let interfaceFnChek = this.game.settingsInterface[evt.target.dataset.execute];
-                let controlReturnType = evt.target.dataset.type;
+        this.game.UI.settings.inputs.forEach((el) => {
+            el.addEventListener("change", (ev) => {
+                let controlType = ev.target.dataset["type"];
+                let fnToExecute = ev.target.dataset["execute"];
 
-                if (typeof interfaceFnChek !== "function") return;
-                let val;
-                switch (controlReturnType) {
-                    case "number":
-                        val = parseInt(evt.target.value);
-                        break;
+                if (typeof this.game.settingsInterface[fnToExecute] !== "function") return;
 
-                    case "float":
-                        val = parseFloat(evt.target.value);
-                        break;
+                this.game.settingsInterface[fnToExecute](this.parseValueAsType(controlType === "boolean" ? ev.target.checked : ev.target.value, controlType));
 
-                    case "boolean":
-                        val = evt.target.checked;
-                        break;
-
-                    case "string":
-                        val = evt.target.value.toString();
-                        break;
-                }
-
-                interfaceFnChek(val);
-
-                this.configuration[evt.target.id] = val;
                 this.save();
             });
-        });
+        })
+    }
+
+    /**
+     * 
+     * @param {HTMLElement} element 
+     * @param {*} value value
+     */
+    setValueOnElement(element, value) {
+        if (!element || !value) return;
+        if (typeof value === "boolean") {
+            element.checked = value;
+        } else {
+            element.value = value;
+        }
+    }
+
+    /**
+     * 
+     * @param {*} value 
+     * @param {String} typeName number, float, boolean, string
+     * @returns 
+     */
+    parseValueAsType(value, typeName) {
+        let val;
+        switch (typeName) {
+            case "number":
+                val = parseInt(value ?? 0);
+                break;
+
+            case "float":
+                val = parseFloat(value ?? 0);
+                break;
+
+            case "boolean":
+                val = value === true;
+                break;
+
+            case "string":
+                val = String(value ?? "");
+                break;
+        }
+
+        return val;
+    }
+
+    /**
+     * 
+     * @param {Boolean} state 
+     */
+    setButtonVisibility(state) {
+        state ? this.game.UI.settings.button.classList.remove("hidden") : this.game.UI.settings.button.classList.add("hidden");
+    }
+
+    /**
+    * 
+    * @param {Boolean} state 
+    */
+    setOverlayVisibility(state) {
+        state ? this.game.UI.settings.container.classList.remove("hidden") : this.game.UI.settings.container.classList.add("hidden");
     }
 
     save() {
-        let configStr = JSON.stringify(this.configuration);
-        window.localStorage.setItem("fosuConfig", configStr);
+        let configStr = JSON.stringify(this.game.CONFIG);
+        window.localStorage.setItem(this.lsKey, configStr);
     }
 
     load() {
-        let cfgObj = JSON.parse(window.localStorage.getItem("fosuConfig") ?? "{}");
+        let cfgObj = JSON.parse(window.localStorage.getItem(this.lsKey) ?? "{}");
         let cfgObjKeys = Object.keys(cfgObj);
-        
 
-        if (!cfgObjKeys) return;
+        cfgObjKeys.forEach((key) => {
+            this.game.CONFIG[key] = cfgObj[key];
 
-        for (const key of cfgObjKeys) {
-            console.log(key)
-        }
+            let inputElement = this.game.UI.settings.inputs.find((el) => { return el.id === key; });
+            this.setValueOnElement(inputElement, cfgObj[key]);
+        })
+
     }
 }

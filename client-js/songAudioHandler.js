@@ -8,7 +8,7 @@ export class SongAudioHandler {
         this.audio.preservesPitch = true;
         // Fun fact: 0.075 is the minimum supported playback rate
 
-        this.volumeAutomation = new this.game.ANI(0, 0, this.currentVolume, this.currentVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(0, 0, this.currentVolume, this.currentVolume);
         this.currentPreviewPoint = 0;
 
     }
@@ -37,7 +37,7 @@ export class SongAudioHandler {
         this.audio.play();
         this.audio.currentTime = this.currentPreviewPoint / 1000; // HTML Audio counts in seconds!
 
-        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.musicVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.musicVolume);
 
         this.audio.onended = () => {
             this.repeatPreview();
@@ -47,13 +47,13 @@ export class SongAudioHandler {
     repeatPreview() {
         this.audio.play();
         this.audio.currentTime = this.currentPreviewPoint / 1000;
-        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.musicVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + 1000, 0, this.game.CONFIG.musicVolume);
     }
 
     reset() {
         this.audio.currentTime = 0;
         this.audio.pause();
-        this.volumeAutomation = new this.game.ANI(0, 0, this.game.CONFIG.musicVolume, this.game.CONFIG.musicVolume, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(0, 0, this.game.CONFIG.musicVolume, this.game.CONFIG.musicVolume);
         this.audio.onended = () => { }
     }
 
@@ -63,7 +63,7 @@ export class SongAudioHandler {
      * @param {Number} duration rate of volume change in ms
      */
     changeVolume(value, duration = 100) {
-        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + duration, this.audio.volume, value, this.game.EASINGS.Linear);
+        this.volumeAutomation = new this.game.ANI(this.game.clock, this.game.clock + duration, this.audio.volume, value);
     }
 
     /**

@@ -81,7 +81,7 @@ export class Animation {
      * @param {Boolean} looped animation looped
      * @param {String} id identifier for timeline
      */
-    constructor(startTime, endTime, startValue, endValue, easing, looped, id) {
+    constructor(startTime = 0, endTime = 0, startValue = 0, endValue = 0, easing, looped, id) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.startValue = startValue;
@@ -89,7 +89,7 @@ export class Animation {
         this.currentValue = this.startValue;
         this.duration = this.endTime - this.startTime;
         this.amount = 0;
-        this.easing = easing;
+        this.easing = easing ?? EASING.Linear;
         this.looped = looped === true ? true : false;
         this.id = id ?? "nah";
         this.timelineDelta = startTime;

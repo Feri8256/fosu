@@ -182,8 +182,7 @@ export class Slider {
             this.t - this.timeWindow,
             this.t,
             0,
-            0.85,
-            this.game.EASINGS.Linear
+            0.85
         );
 
         this.reverseArrowPulse = new this.game.ANI(
@@ -198,21 +197,9 @@ export class Slider {
         this.reverseArrows[1].opacity = this.slides > 1 ? 1 : 0;
         this.reverseArrows[0].opacity = this.slides > 2 ? 1 : 0;
 
-        this.followCircleScale = new this.game.ANI(
-            0,
-            0,
-            0,
-            0,
-            this.game.EASINGS.Linear,
-        );
+        this.followCircleScale = new this.game.ANI();
 
-        this.followCircleFade = new this.game.ANI(
-            0,
-            0,
-            0,
-            0,
-            this.game.EASINGS.Linear,
-        );
+        this.followCircleFade = new this.game.ANI();
 
         this.endReached = false;
 

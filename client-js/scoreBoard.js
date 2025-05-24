@@ -20,12 +20,24 @@ export class ScoreBoardManager {
             }
             list.forEach((s, i) => {
                 let scoreDate = new Date(s.date).toDateString();
-                this.game.UI.scoreBoard.container.innerHTML += `
-                <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}" style="--scoreentry-index: ${i};">
+
+                // No need to animate a scoreboard element that is not visible, so the style tag of those elements will be left empty
+                if (i > 10) {
+                    this.game.UI.scoreBoard.container.innerHTML += `
+                    <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}">
                     <p class="scoreentry-playername">${s.playerName}</p>
                     <p class="scoreentry-date">${scoreDate}</p>
-                </div>
-                `;
+                    </div>
+                    `;
+                } else {
+                    this.game.UI.scoreBoard.container.innerHTML += `
+                    <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}" style="--scoreentry-index: ${i};">
+                    <p class="scoreentry-playername">${s.playerName}</p>
+                    <p class="scoreentry-date">${scoreDate}</p>
+                    </div>
+                    `;
+                }
+
             });
         })
     }
@@ -42,13 +54,14 @@ export class ScoreBoardManager {
 
 
     select(replayId, beatmapHash, playerName) {
-        if(!beatmapHash) return;
+        if (!beatmapHash) return;
         let mapMeta = this.game.songSelectBuilder.getMetadataOfBeatmap(beatmapHash);
         let score = this.currentScoreList.find((s) => { return s.replayId === replayId; })
         this.game.resultScreenUpdater.update({
             playerName,
             mapArtist: mapMeta.artist,
             mapTitle: mapMeta.title,
+            mapCreator: mapMeta.creator,
             mapVersion: mapMeta.difficultyName,
             countPerfect: score.results.perfect,
             countOkay: score.results.okay,
@@ -56,7 +69,8 @@ export class ScoreBoardManager {
             countMiss: score.results.miss,
             countMaxCombo: score.results.combo,
             acc: score.results.accuracy,
-            replayId
+            replayId,
+            date: score.date
         });
         this.game.setState(this.game.STATE_ENUM.RESULT);
     }

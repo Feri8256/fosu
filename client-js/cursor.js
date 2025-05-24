@@ -2,9 +2,8 @@ class Particle {
     constructor(game, cur, x, y, sprite) {
         this.game = game;
         this.cur = cur;
-        
-        //this.sp.additiveColor = true;
-        this.fadeOutAni = new this.game.ANI(this.game.clock, this.game.clock + 250, 1, 0, this.game.EASINGS.Linear);
+
+        this.fadeOutAni = new this.game.ANI(this.game.clock, this.game.clock + 250, 1, 0);
         this.sprite = sprite;
         this.sprite.x = x;
         this.sprite.y = y;

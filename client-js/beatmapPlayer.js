@@ -443,7 +443,8 @@ export class BeatmapPlayer {
             countMeh: this.game.accuracyMeter.results[1],
             countMiss: this.game.accuracyMeter.results[0],
             countMaxCombo: this.game.comboMeter.getResults().max,
-            acc: this.game.accuracyMeter.results[4]
+            acc: this.game.accuracyMeter.results[4],
+            date: Date.now()
         });
 
         if (this.game.currentState.stateName !== "SPECTATING") {

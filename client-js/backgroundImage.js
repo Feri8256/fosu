@@ -4,7 +4,7 @@ export class BackgrondImageManager {
         this.fadeInDurationMs = 300;
         this.images = [];
         this.defaultImage = new this.game.SPRITEIMG("./client-files/default-background.jpg");
-        this.fading = new this.game.ANI(0, 0, 1, 1, this.game.EASINGS.Linear);
+        this.fading = new this.game.ANI();
         this.setImage();
     }
 
@@ -21,7 +21,7 @@ export class BackgrondImageManager {
             s.y = this.game.canvas.height * 0.5;
             s.opacity = 1;
             this.images.push(s);
-            this.fading = new this.game.ANI(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1, this.game.EASINGS.Linear);
+            this.fading = new this.game.ANI(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1);
             return;
         }
         let im = new this.game.SPRITEIMG(url);
@@ -31,7 +31,7 @@ export class BackgrondImageManager {
         s.opacity = 0;
 
         this.images.push(s);
-        this.fading = new this.game.ANI(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1, this.game.EASINGS.Linear);
+        this.fading = new this.game.ANI(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1);
 
     }
 
@@ -78,8 +78,7 @@ export class BackgrondImageManager {
             this.game.clock, 
             this.game.clock + duration, 
             this.fading.currentValue, // Start and end values inverted because of the fading logic in the update method
-            1-value, 
-            this.game.EASINGS.Linear
+            1-value
         );
     }
 }

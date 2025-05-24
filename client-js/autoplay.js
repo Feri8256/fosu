@@ -58,6 +58,7 @@ export class AutoplayController {
 
     reset() {
         this.tl = new this.game.TL();
+        this.activated = false;
     }
 
 }

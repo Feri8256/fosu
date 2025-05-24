@@ -387,7 +387,9 @@ class Spectate extends GameState {
             this.game.UI.spectate.container.style.display = "none";
         }
 
-        this.game.inputValidator.getInputStates().forEach((i) => {
+        let validatedInputStates = this.game.inputValidator.getInputStates()
+
+        validatedInputStates.forEach((i) => {
             if (i.down && i.valid) {
                 this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
                 i.valid = false;
@@ -395,12 +397,14 @@ class Spectate extends GameState {
             }
         });
 
-        this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
+        this.game.inputOverlay.updateInputState(validatedInputStates);
     }
 
     leave() {
         this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
         this.game.beatmapPlayer.cleanup();
+
+        if (this.game.autoplay.activated) this.game.autoplay.reset();
     }
 }
 
