@@ -268,9 +268,9 @@ export class BeatmapPlayer {
 
             setTimeout(() => {
                 this.game.backgroundManager.changeOpacity(0, 500);
-            }, 500);
+            }, 1000);
         }
-        if (this.game.clock - 1000 > this.endedTimestamp && this.ended && this.playing) this.end();
+        if (this.game.clock - 1500 > this.endedTimestamp && this.ended && this.playing) this.end();
     }
 
     render() {
@@ -444,7 +444,7 @@ export class BeatmapPlayer {
             countMiss: this.game.accuracyMeter.results[0],
             countMaxCombo: this.game.comboMeter.getResults().max,
             acc: this.game.accuracyMeter.results[4],
-            date: Date.now()
+            date: Date.now() // Not now...
         });
 
         if (this.game.currentState.stateName !== "SPECTATING") {

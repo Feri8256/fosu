@@ -9,10 +9,6 @@ function createHitSample(t) {
     }
 }
 
-function createHitSound(t) {
-    return Number(t).toString(2).split("").map((n) => { return parseInt(n) });
-}
-
 /**
  * Converts the content of an osu file to Javascript object
  * https://osu.ppy.sh/wiki/en/Client/File_formats/Osu_%28file_format%29
@@ -140,14 +136,14 @@ export function parseOsu(str) {
                 y: parseInt(hitObjectTokens[1]),
                 time: parseInt(hitObjectTokens[2]),
                 type: hitObjectTokens[3].split('').map(b => parseInt(b)),
-                hitSound: createHitSound(hitObjectTokens[4]),
+                hitSound: Number(hitObjectTokens[4]),
                 objectParams: hitObjectTokens[5],
                 hitSample: createHitSample(hitObjectTokens[10]),
                 curveType: curveTypePoints[0],
                 curvePoints: curvePointsArray,
                 slides: parseInt(hitObjectTokens[6]),
                 length: parseInt(hitObjectTokens[7]),
-                edgeSounds: hitObjectTokens[8]?.split("|").map(esnd => createHitSound(esnd)),
+                edgeSounds: hitObjectTokens[8]?.split("|").map(esnd => Number(esnd)),
                 edgeSets: hitObjectTokens[9]?.split("|").map(eset => createHitSample(eset))
             }
         } else {
@@ -156,7 +152,7 @@ export function parseOsu(str) {
                 y: parseInt(hitObjectTokens[1]),
                 time: parseInt(hitObjectTokens[2]),
                 type: hitObjectTokens[3].split('').map(b => parseInt(b)),
-                hitSound: createHitSound(hitObjectTokens[4]),
+                hitSound: Number(hitObjectTokens[4]),
                 objectParams: hitObjectTokens[5],
                 hitSample: createHitSample(hitObjectTokens[6]),
             };

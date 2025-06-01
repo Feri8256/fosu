@@ -37,17 +37,14 @@ export class HitSoundPlayer {
      * https://osu.ppy.sh/wiki/hu/Client/File_formats/osu_%28file_format%29#hitsounds
      * @param {Number} normal 
      * @param {Number} addition
-     * @param {Number []} hitSound bit flags
+     * @param {Number} hitSound
      */
     playHitSound(normal = 0, addition = 0, hitSound) {
         this.game.auMgr.playAudioClip(this.hitsounds[normal][0]);
 
-        for (let i = 0; i < hitSound.length; i++) {
-            const bit = hitSound[i];
-            if (bit === 1){ 
-                let bitIndex = ((hitSound.length-1)-i);
-                this.game.auMgr.playAudioClip(this.hitsounds[addition][bitIndex]);
-            };
+        for (let i = 0; i < 4; i++) {
+            let a = (hitSound & (1 << i)) !== 0;
+            if (a) this.game.auMgr.playAudioClip(this.hitsounds[addition][i]);
         }
 
     }
