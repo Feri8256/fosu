@@ -9,6 +9,8 @@ export class BeatmapPlayer {
         this.yScale = 1;
         this.xScale = 1;
 
+        this.difficultyMultiplier = 0;
+
         this.hitCircles = [];
         this.hitCirclesToRender = [];
         this.sliders = [];
@@ -139,6 +141,9 @@ export class BeatmapPlayer {
             this.sliders.at(-1)?.endTime ?? -Infinity,
             this.spinners.at(-1)?.endTime ?? -Infinity
         );
+
+        this.calculateDifficultyMultiplier();
+
         let relatedStartTimingPoint = this.getTimingPointAtTime(this.firsthitObjectTime);
 
         if (this.parsedOSU.General.Countdown === 1) this.game.countdown = new this.game.COUNTDOWN(this.game, this.firsthitObjectTime, relatedStartTimingPoint.uninherited?.beatLength || 500);
@@ -342,7 +347,10 @@ export class BeatmapPlayer {
         // Register the hit to the accuracy meter that returns a number for judgment
         // When the result is not a miss (0) do not break combo
         let hitResult = this.game.accuracyMeter.addHit(true, hitDeltaTime);
-        if (hitResult > 0) this.game.comboMeter.addHit(true);
+        if (hitResult > 0){ 
+            this.game.comboMeter.addHit(true);
+            this.game.scoreMeter.add(hitResult);
+        }
 
         // Play a hitsound
         this.game.hitSoundPlayer.playHitSound(obj.hitSample.normalSet, obj.hitSample.additionSet, obj.hitSound);
@@ -408,7 +416,7 @@ export class BeatmapPlayer {
         this.game.autoplay.reset();
     }
 
-    
+
 
     /**
      * Clear the current map and load it again
@@ -449,8 +457,15 @@ export class BeatmapPlayer {
 
         if (this.game.currentState.stateName !== "SPECTATING") {
             this.game.submitScore();
-        } 
+        }
 
         this.game.setState(this.game.STATE_ENUM.RESULT);
+    }
+
+    calculateDifficultyMultiplier() {
+        // The lastHitObjectTime as "drain time" is not really correct for this formula...
+        this.difficultyMultiplier = Math.round((this.parsedOSU.Difficulty.HPDrainRate + this.parsedOSU.Difficulty.CircleSize + this.parsedOSU.Difficulty.OverallDifficulty + this.game.utils.clamp(this.parsedOSU.HitObjects.length / (this.lastHitObjectTime / 1000) * 8, 0, 16)) / 38 * 5);
+        console.log(`Difficulty multiplier for this beatmap is: ${this.difficultyMultiplier}`);
+
     }
 }

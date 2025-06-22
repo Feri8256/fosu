@@ -30,6 +30,7 @@ import { ScoreBoardManager } from "./scoreBoard.js";
 import { ReplayManager } from "./replayManager.js";
 import { ReplayWatchStartHandler } from "./startReplayWatch.js";
 import { Countdown } from "./countdown.js";
+import { ScoreMeter } from "./scoreMeter.js";
 import { getElements } from "./UIelements.js";
 
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
@@ -110,7 +111,7 @@ class Game {
         this.autoplay = new AutoplayController(this);
 
         this.accuracyMeter = new AccuracyMeter(this);
-        this.comboMeter = new ComboMeter(this);
+        this.comboMeter = new ComboMeter(this);        
         this.songAudioHandler = new SongAudioHandler(this);
 
         this.replayManager = new ReplayManager(this);
@@ -130,6 +131,9 @@ class Game {
         this.hitSoundPlayer = new HitSoundPlayer(this);
         this.resultScreenUpdater = new ResultScreenUpdater(this);
         this.scoreBoardManager = new ScoreBoardManager(this);
+        
+        this.scoreMeter = new ScoreMeter(this);
+
 
         // A set of functions that are executed when change happens on the settings option elements
         // I start to not like this....
@@ -208,6 +212,7 @@ class Game {
         this.accuracyMeter.update();
         this.comboMeter.update();
         this.countdown.update(this.songClock);
+        this.scoreMeter.update();
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);
@@ -233,6 +238,7 @@ class Game {
             this.inputOverlay.render();
             this.countdown.render();
             this.cursor.render();
+            this.scoreMeter.render();
         }
 
 

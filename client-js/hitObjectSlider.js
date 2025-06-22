@@ -241,6 +241,8 @@ export class Slider {
         this.followCircleScale.update(this.game.clock);
         this.followCircleFade.update(this.game.clock);
 
+        if (!this.endReached && currentTime >= this.t) this.checkFollowing();
+
         // Start the movement of the ball when 
         if (!this.moving && currentTime >= this.t && !this.endReached) {
             this.ballMovement.currentTime = currentTime;
@@ -262,6 +264,8 @@ export class Slider {
             this.game.accuracyMeter.addHit(true, 0);
 
             this.currentSoundPlayed = edgeSoundIndex;
+
+            this.game.scoreMeter.add(4);
         }
 
         // Fade out when reached endTime
@@ -282,6 +286,7 @@ export class Slider {
             this.setFollowState(false);
 
             this.playEdgeSound(edgeSoundIndex + 1);
+            this.game.scoreMeter.add(4);
         }
 
         this.ballMovement.update(currentTime);
@@ -437,5 +442,30 @@ export class Slider {
     destroyRender() {
         URL.revokeObjectURL(this.objURL);
         this.prerendered = null;
+    }
+
+    checkFollowing() {
+        if (this.game.autoplay.activated) return;
+        
+        let cursorToBallDist = this.game.utils.getDistance(this.game.cursor.currentX, this.game.cursor.currentY, this.ballSprite.x, this.ballSprite.y);
+        let inputDown = this.game.inputValidator.isAnyInputDown();
+
+        if (!this.currentFollowState && inputDown) {
+            if (cursorToBallDist < this.rad) {
+                this.setFollowState(true);
+            }
+        }
+
+        if (this.currentFollowState && inputDown) {
+            if (cursorToBallDist < this.rad * 2) {
+                this.setFollowState(true);
+            } else {
+                this.setFollowState(false);
+            }
+        }
+
+        if (!inputDown) {
+            this.setFollowState(false);
+        }
     }
 }

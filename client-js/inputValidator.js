@@ -29,4 +29,8 @@ export class InputValidator {
 
         this.inputStates.at(index).valid = false;
     }
+
+    isAnyInputDown() {
+        return this.inputStates.findIndex((ik) => { return ik.down }) !== -1;
+    }
 }

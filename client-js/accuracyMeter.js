@@ -11,14 +11,14 @@ export class AccuracyMeter {
             MISS: 400
         };
 
-        this.currentAcc = 100;
+        this.currentAcc = 100.0;
         this.correctHits = 0;
         this.totalHits = 0;
 
         this.results = [0, 0, 0, 0, 100];
 
         this.fontRenderer = new this.game.SPRITEFONTRENDERER(
-            "100%",
+            "100.00%",
             this.game.skinResourceManager.scoreFontSet,
             0,
             this.game.canvas.width * 0.5,
@@ -66,10 +66,10 @@ export class AccuracyMeter {
 
         this.results[hitResult]++;
 
-        this.currentAcc = 100 - (100 * (1 - (this.correctHits / this.totalHits)));
+        this.currentAcc = this.fix(100 - (100 * (1 - (this.correctHits / this.totalHits))));
         this.results[4] = this.currentAcc;
 
-        this.fontRenderer.updateText(`${String(this.currentAcc).slice(0, 5)}%`);
+        this.fontRenderer.updateText(`${this.currentAcc}%`);
 
         return hitResult;
     }
@@ -83,7 +83,7 @@ export class AccuracyMeter {
         this.correctHits = 0;
         this.totalHits = 0;
         this.results = [0, 0, 0, 0, 100];
-        this.fontRenderer.updateText("100%");
+        this.fontRenderer.updateText("100.00%");
     }
 
     getResults() {
@@ -97,5 +97,9 @@ export class AccuracyMeter {
             MEH: 200 - 10 * od,
             MISS: 400
         };
+    }
+
+    fix(x) {
+        return Number.parseFloat(x).toFixed(2);
     }
 }

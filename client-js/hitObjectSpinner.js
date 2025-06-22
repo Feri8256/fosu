@@ -103,7 +103,7 @@ export class Spinner {
         this.approach.x = this.game.canvas.width * 0.5;
         this.approach.y = this.game.canvas.height * 0.5;
 
-        if (this.game.inputHandler.getMouse().down && currentTime >= this.startTime && currentTime <= this.endTime && this.tl.playing) {
+        if (this.game.inputValidator.isAnyInputDown() && currentTime >= this.startTime && currentTime <= this.endTime && this.tl.playing) {
             this.circle.rotation = this.game.utils.getLineAngle(this.circle.x, this.circle.y, this.game.cursor.currentX, this.game.cursor.currentY)
         }
     }

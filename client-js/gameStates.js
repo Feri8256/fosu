@@ -32,6 +32,7 @@ class SongSelecting extends GameState {
 
         this.game.accuracyMeter.reset();
         this.game.comboMeter.reset();
+        this.game.scoreMeter.reset();
 
         this.game.settingsManager.setButtonVisibility(true);
         this.game.scoreBoardManager.setBoardVisibility(true);
