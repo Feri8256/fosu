@@ -74,7 +74,8 @@ export class BeatmapPlayer {
                         this.game,
                         this.globalScale,
                         element.time,
-                        parseInt(element.objectParams)
+                        parseInt(element.objectParams),
+                        this.parsedOSU.Difficulty.OverallDifficulty
                     )
                 )
             } else { // That is a circle

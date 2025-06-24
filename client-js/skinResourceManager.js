@@ -71,7 +71,8 @@ export class SkinResourceManager {
                 "count2s.wav",
                 "count3s.wav",
                 "gos.wav",
-                "readys.wav"
+                "readys.wav",
+                "spinnerbonus.wav"
             ]
         }
 

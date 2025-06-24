@@ -60,10 +60,10 @@ export class Cursor {
         switch(this.trailType) {
             case 0:
                 this.addCursorPoints(
-                    this.prevX,
-                    this.prevY,
                     this.currentX,
-                    this.currentY
+                    this.currentY,
+                    this.prevX,
+                    this.prevY
                 );
                 break;
 

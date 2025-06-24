@@ -1,5 +1,5 @@
 export class Spinner {
-    constructor(game, scale, startTime, endTime) {
+    constructor(game, scale, startTime, endTime, od) {
         this.game = game;
         this.scale = scale;
         this.circle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-circle"));
@@ -7,7 +7,16 @@ export class Spinner {
 
         this.startTime = startTime;
         this.endTime = endTime;
+        this.od = od;
         this.duration = this.endTime - this.startTime;
+
+        this.ended = false;
+
+        this.judge = new this.game.SPINNERJUDGE(this, this.od, this.duration);
+
+        this.currentAngle = 0;
+        this.previousAngle = 0;
+        this.angleCheck = 0;
 
         // Use heights to scale
         this.circle.scale = (384 / (this.circle.spriteImage.h ?? 666)) * this.scale;
@@ -103,8 +112,35 @@ export class Spinner {
         this.approach.x = this.game.canvas.width * 0.5;
         this.approach.y = this.game.canvas.height * 0.5;
 
-        if (this.game.inputValidator.isAnyInputDown() && currentTime >= this.startTime && currentTime <= this.endTime && this.tl.playing) {
-            this.circle.rotation = this.game.utils.getLineAngle(this.circle.x, this.circle.y, this.game.cursor.currentX, this.game.cursor.currentY)
+        let angleDelta = 0;
+
+        if (this.game.inputValidator.isAnyInputDown() &&
+            currentTime >= this.startTime &&
+            currentTime <= this.endTime &&
+            this.tl.playing 
+        ) {
+            this.currentAngle = this.game.utils.getLineAngle(this.circle.x, this.circle.y, this.game.cursor.currentX, this.game.cursor.currentY);
+            this.circle.rotation = this.currentAngle;
+        }
+
+        angleDelta = this.currentAngle - this.previousAngle;
+
+        if (angleDelta > Math.PI) angleDelta -= Math.PI * 2;
+        if (angleDelta < -Math.PI) angleDelta += Math.PI * 2;
+
+        // The spinner may count normally even if the player not making full rotations because of this...
+        this.angleCheck += this.game.utils.clamp(Math.abs(angleDelta), 0, 1);
+
+        if (this.angleCheck > Math.PI * 2) {
+            this.judge.onFullRotation();
+            this.angleCheck = 0;
+        }
+
+        this.previousAngle = this.currentAngle;
+
+        if (!this.ended && currentTime > this.endTime) {
+            this.ended = true;
+            this.judge.onEnd();
         }
     }
 

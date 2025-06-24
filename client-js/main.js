@@ -31,6 +31,8 @@ import { ReplayManager } from "./replayManager.js";
 import { ReplayWatchStartHandler } from "./startReplayWatch.js";
 import { Countdown } from "./countdown.js";
 import { ScoreMeter } from "./scoreMeter.js";
+import { SpinnerJudge } from "./spinnerJudge.js";
+import { SpinnerBonusDisplay } from "./spinnerBonusDisplay.js";
 import { getElements } from "./UIelements.js";
 
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
@@ -92,6 +94,7 @@ class Game {
         this.HITCIRCLE = HitCircle;
         this.SLIDER = Slider;
         this.SPINNER = Spinner;
+        this.SPINNERJUDGE = SpinnerJudge;
         this.INPUTOVERLAY = InputOverlay;
         this.COUNTDOWN = Countdown;
 
@@ -110,8 +113,10 @@ class Game {
         this.ACCJUDGMENT = AccuracyJudgment;
         this.autoplay = new AutoplayController(this);
 
+        this.spinnerBonusDisplay = new SpinnerBonusDisplay(this);
+
         this.accuracyMeter = new AccuracyMeter(this);
-        this.comboMeter = new ComboMeter(this);        
+        this.comboMeter = new ComboMeter(this);
         this.songAudioHandler = new SongAudioHandler(this);
 
         this.replayManager = new ReplayManager(this);
@@ -131,7 +136,7 @@ class Game {
         this.hitSoundPlayer = new HitSoundPlayer(this);
         this.resultScreenUpdater = new ResultScreenUpdater(this);
         this.scoreBoardManager = new ScoreBoardManager(this);
-        
+
         this.scoreMeter = new ScoreMeter(this);
 
 
@@ -213,6 +218,7 @@ class Game {
         this.comboMeter.update();
         this.countdown.update(this.songClock);
         this.scoreMeter.update();
+        this.spinnerBonusDisplay.update();
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);
@@ -237,8 +243,9 @@ class Game {
             this.comboMeter.render();
             this.inputOverlay.render();
             this.countdown.render();
-            this.cursor.render();
             this.scoreMeter.render();
+            this.spinnerBonusDisplay.render();
+            this.cursor.render();
         }
 
 

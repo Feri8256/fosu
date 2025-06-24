@@ -102,7 +102,7 @@ export class ScoreMeter {
 
         this.scoreRolling = new this.game.ANI(
             this.game.clock,
-            this.game.clock + 300,
+            this.game.clock + 400,
             previousScoreValue,
             this.currentScore,
             this.game.EASINGS.SineOut
