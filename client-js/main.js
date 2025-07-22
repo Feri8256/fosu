@@ -156,7 +156,6 @@ class Game {
                 this.CONFIG.cursorScale = v;
             },
             setCursortrailType: (v) => {
-                console.log(v)
                 this.cursor.trailType = v;
                 this.CONFIG.cursortrailType = v;
             },
@@ -204,7 +203,7 @@ class Game {
     update(timestamp) {
         this.deltaTime = timestamp - this.clock;
         this.clock = timestamp;
-        this.songClock = this.songAudioHandler.getCurrentTime()
+        this.songClock = this.songAudioHandler.getCurrentTime();
 
         this.currentState.handleInput();
         this.cursor.update();
@@ -343,7 +342,8 @@ class Game {
                 meh: this.accuracyMeter.results[1],
                 miss: this.accuracyMeter.results[0],
                 accuracy: this.accuracyMeter.results[4],
-                combo: this.comboMeter.getResults().max
+                combo: this.comboMeter.getResults().max,
+                score: this.scoreMeter.currentScore
             },
             beatmapHash: this.songSelectManager.currentSelect.beatmapHash,
             replayId: this.replayManager.currentReplayId, dismissed: false

@@ -96,9 +96,23 @@ export class ReplayManager {
                     y = n.currentValue;
                 });
 
-                let currentInputEvent = this.inputEvents.filter((ie) => {
-                    return ie.t <= currentTime + this.timeStep;
-                }).at(-1);
+                //let currentInputEvent = this.inputEvents.find((ie) => {
+                //    return ie.t <= currentTime;
+                //})//.at(-1);
+
+                let currentInputEvent = [0, 0, 0];
+                let steppedCurrentTime = currentTime;
+                while (steppedCurrentTime < currentTime + this.game.deltaTime) {
+
+                    currentInputEvent = this.inputEvents.filter((ie) => {
+                        return ie.t <= steppedCurrentTime;
+                    }).at(-1);
+
+                    steppedCurrentTime += 1;
+
+                    if (this.game.deltaTime > 500) break;
+                }
+
 
                 this.game.inputValidator.updateInputs(
                     currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
@@ -107,7 +121,7 @@ export class ReplayManager {
                 this.game.cursor.setPosition(x, y);
 
                 if (this.currentTime > this.sendChunkRequestAfterMs) {
-                    this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs);
+                    this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs - this.game.deltaTime);
                     this.sendChunkRequestAfterMs = this.currentTime + this.chunkRequestIntervalMs;
                 }
 

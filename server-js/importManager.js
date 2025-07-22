@@ -35,7 +35,7 @@ function checkImportsFolder(callback) {
             return;
         }
 
-        let currentFileType = importableTypes.find((s) => { return files[i].split(".").at(1) === s.ext });
+        let currentFileType = importableTypes.find((s) => { return files[i].split(".").at(-1) === s.ext });
 
         // A non-supported file appears, just skip it
         if (!currentFileType) {

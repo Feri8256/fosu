@@ -26,6 +26,7 @@ export class ScoreBoardManager {
                     this.game.UI.scoreBoard.container.innerHTML += `
                     <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}">
                     <p class="scoreentry-playername">${s.playerName}</p>
+                    <p class="scoreentry-score">${s.results.score} (${s.results.combo}x)</p>
                     <p class="scoreentry-date">${scoreDate}</p>
                     </div>
                     `;
@@ -33,6 +34,7 @@ export class ScoreBoardManager {
                     this.game.UI.scoreBoard.container.innerHTML += `
                     <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}" style="--scoreentry-index: ${i};">
                     <p class="scoreentry-playername">${s.playerName}</p>
+                    <p class="scoreentry-score">${s.results.score} (${s.results.combo}x)</p>
                     <p class="scoreentry-date">${scoreDate}</p>
                     </div>
                     `;
@@ -70,7 +72,8 @@ export class ScoreBoardManager {
             countMaxCombo: score.results.combo,
             acc: score.results.accuracy,
             replayId,
-            date: score.date
+            date: score.date,
+            score: score.score
         });
         this.game.setState(this.game.STATE_ENUM.RESULT);
     }

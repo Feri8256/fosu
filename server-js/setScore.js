@@ -16,7 +16,7 @@ function setScore(playerName, beatmapHash, replayId, results) {
     if (!scoresExists) fs.mkdirSync("db/s");
     if (!beatmapFolderExists) fs.mkdirSync(`./db/s/${beatmapHash}`);
 
-    let out = `${playerName},${Date.now()},${replayId},${beatmapHash},${results.perfect},${results.okay},${results.meh},${results.miss},${results.accuracy},${results.combo}`;
+    let out = `${playerName},${Date.now()},${replayId},${beatmapHash},${results.perfect},${results.okay},${results.meh},${results.miss},${results.accuracy},${results.combo},${results.score}`;
 
     fs.writeFile(`./db/s/${beatmapHash}/${Date.now()}`, Buffer.from(out), () => { console.log("played: %s by: %s", beatmapHash, playerName)});
     

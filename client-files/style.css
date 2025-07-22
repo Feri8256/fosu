@@ -281,3 +281,7 @@ table {
     font-size: 12pt;
     pointer-events: none;
 }
+.scoreentry-score {
+    font-size: 12pt;
+    pointer-events: none;
+}

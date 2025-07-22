@@ -19,14 +19,17 @@ function getScoreList(socket, beatmapHash) {
                     results: {
                         perfect: parseInt(tokens[4]),
                         okay: parseInt(tokens[5]),
-                        meh: tokens[6],
-                        miss: tokens[7],
-                        accuracy: tokens[8],
-                        combo: tokens[9]
+                        meh: parseInt(tokens[6]),
+                        miss: parseInt(tokens[7]),
+                        accuracy: parseFloat(tokens[8]),
+                        combo: parseInt(tokens[9]),
+                        score: Number(tokens[10] ?? 0)
                     }
                 }
             );
         });
+
+        out.sort((a, b) => { return b.results.score - a.results.score; });
 
         socket.emit("scoreList", out);
     } else {
