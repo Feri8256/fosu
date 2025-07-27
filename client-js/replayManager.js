@@ -82,25 +82,13 @@ export class ReplayManager {
                 break;
 
             case 1:
-                let x = this.lastCursorX;
-                let y = this.lastCursorY;
 
-                this.movementXtoUpdate = this.movementX.filter((mx) => { return mx.startTime <= this.currentTime && mx.endTime >= this.currentTime });
-                this.movementXtoUpdate.forEach((m) => {
-                    m.update(currentTime);
-                    x = m.currentValue;
-                });
-                this.movementYtoUpdate = this.movementY.filter((my) => { return my.startTime <= currentTime && my.endTime >= currentTime });
-                this.movementYtoUpdate.forEach((n) => {
-                    n.update(currentTime);
-                    y = n.currentValue;
-                });
 
                 //let currentInputEvent = this.inputEvents.find((ie) => {
                 //    return ie.t <= currentTime;
                 //})//.at(-1);
 
-                let currentInputEvent = [0, 0, 0];
+                /*let currentInputEvent = [0, 0, 0];
                 let steppedCurrentTime = currentTime;
                 while (steppedCurrentTime < currentTime + this.game.deltaTime) {
 
@@ -111,14 +99,39 @@ export class ReplayManager {
                     steppedCurrentTime += 1;
 
                     if (this.game.deltaTime > 500) break;
-                }
+                }*/
 
+                let x = this.game.cursor.currentX;
+                let y = this.game.cursor.currentY;
 
-                this.game.inputValidator.updateInputs(
-                    currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
-                );
+                this.movementXtoUpdate = this.movementX.filter((mx) => { return mx.startTime <= currentTime && mx.endTime >= currentTime });
+                this.movementXtoUpdate.forEach((m) => {
+                    m.update(currentTime);
+                    x = m.currentValue;
+                });
+                this.movementYtoUpdate = this.movementY.filter((my) => { return my.startTime <= currentTime && my.endTime >= currentTime });
+                this.movementYtoUpdate.forEach((n) => {
+                    n.update(currentTime);
+                    y = n.currentValue;
+                });
 
                 this.game.cursor.setPosition(x, y);
+
+                let steppedCurrentTime = currentTime;
+                while (steppedCurrentTime < currentTime + this.game.deltaTime) {
+                    let currentInputEvent = [0, 0, 0];
+                    currentInputEvent = this.inputEvents.filter((ie) => {
+                        return ie.t <= steppedCurrentTime;
+                    }).at(-1);
+
+                    this.game.inputValidator.updateInputs(
+                        currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
+                    );
+
+                    steppedCurrentTime += 1;
+
+                    if (this.game.deltaTime > 500) break;
+                }
 
                 if (this.currentTime > this.sendChunkRequestAfterMs) {
                     this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs - this.game.deltaTime);

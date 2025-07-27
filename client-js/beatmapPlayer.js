@@ -227,6 +227,7 @@ export class BeatmapPlayer {
 
                 this.game.accuracyMeter.addHit(true, 0);
                 this.game.comboMeter.addHit(true);
+                this.game.scoreMeter.add(3);
 
                 // Start the hit animation of the hit object
                 u.tap();

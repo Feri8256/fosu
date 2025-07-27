@@ -10,6 +10,9 @@ export class Spinner {
         this.od = od;
         this.duration = this.endTime - this.startTime;
 
+        this.autoplayRotateRadius = 80;
+        this.autoplayRotateSpeed = 0.45;
+
         this.ended = false;
 
         this.judge = new this.game.SPINNERJUDGE(this, this.od, this.duration);
@@ -92,6 +95,10 @@ export class Spinner {
             )
         );
 
+        if (this.game.autoplay.activated) {
+            this.game.autoplay.add(this.startTime, this.game.canvas.width * 0.5, this.game.canvas.height * 0.5);
+            this.game.autoplay.add(this.endTime, this.game.canvas.width * 0.5, this.game.canvas.height * 0.5);
+        }
     }
 
     update(currentTime) {
@@ -117,9 +124,18 @@ export class Spinner {
         if (this.game.inputValidator.isAnyInputDown() &&
             currentTime >= this.startTime &&
             currentTime <= this.endTime &&
-            this.tl.playing 
+            this.tl.playing
         ) {
             this.currentAngle = this.game.utils.getLineAngle(this.circle.x, this.circle.y, this.game.cursor.currentX, this.game.cursor.currentY);
+            this.circle.rotation = this.currentAngle;
+        }
+
+        if (this.game.autoplay.activated && currentTime >= this.startTime) {
+            this.currentAngle += this.autoplayRotateSpeed;
+            this.game.cursor.setPosition(
+                this.circle.x + Math.cos(this.currentAngle) * this.autoplayRotateRadius,
+                this.circle.y + Math.sin(this.currentAngle) * this.autoplayRotateRadius
+            );
             this.circle.rotation = this.currentAngle;
         }
 
