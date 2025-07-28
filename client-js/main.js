@@ -189,9 +189,7 @@ class Game {
         this.UI.spectate.playbackRatePitchPreservation.addEventListener("change", (evt) => {
             this.songAudioHandler.setPitchPreservation(evt.target.checked);
         });
-
-
-
+        
         this.clock = 0;
         this.deltaTime = 0;
         this.songClock = 0;

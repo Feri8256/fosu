@@ -11,7 +11,7 @@ export class Spinner {
         this.duration = this.endTime - this.startTime;
 
         this.autoplayRotateRadius = 80;
-        this.autoplayRotateSpeed = 0.45;
+        this.autoplayRotateSpeed = 0.85;
 
         this.ended = false;
 
@@ -97,7 +97,6 @@ export class Spinner {
 
         if (this.game.autoplay.activated) {
             this.game.autoplay.add(this.startTime, this.game.canvas.width * 0.5, this.game.canvas.height * 0.5);
-            this.game.autoplay.add(this.endTime, this.game.canvas.width * 0.5, this.game.canvas.height * 0.5);
         }
     }
 
@@ -121,22 +120,22 @@ export class Spinner {
 
         let angleDelta = 0;
 
-        if (this.game.inputValidator.isAnyInputDown() &&
+        if ((this.game.inputValidator.isAnyInputDown() || this.game.autoplay.activated) &&
             currentTime >= this.startTime &&
             currentTime <= this.endTime &&
             this.tl.playing
         ) {
-            this.currentAngle = this.game.utils.getLineAngle(this.circle.x, this.circle.y, this.game.cursor.currentX, this.game.cursor.currentY);
-            this.circle.rotation = this.currentAngle;
-        }
-
-        if (this.game.autoplay.activated && currentTime >= this.startTime) {
-            this.currentAngle += this.autoplayRotateSpeed;
-            this.game.cursor.setPosition(
-                this.circle.x + Math.cos(this.currentAngle) * this.autoplayRotateRadius,
-                this.circle.y + Math.sin(this.currentAngle) * this.autoplayRotateRadius
-            );
-            this.circle.rotation = this.currentAngle;
+            if (this.game.autoplay.activated) {
+                this.currentAngle += this.autoplayRotateSpeed * (this.game.deltaTime / 16);
+                this.game.cursor.setPosition(
+                    this.circle.x + Math.cos(this.currentAngle) * this.autoplayRotateRadius,
+                    this.circle.y + Math.sin(this.currentAngle) * this.autoplayRotateRadius
+                );
+                this.circle.rotation = this.currentAngle;
+            } else {
+                this.currentAngle = this.game.utils.getLineAngle(this.circle.x, this.circle.y, this.game.cursor.currentX, this.game.cursor.currentY);
+                this.circle.rotation = this.currentAngle;
+            }
         }
 
         angleDelta = this.currentAngle - this.previousAngle;
