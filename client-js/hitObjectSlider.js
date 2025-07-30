@@ -114,12 +114,12 @@ export class Slider {
 
         // Rotate the sprites according to the line angle of the slider segment they are sitting at
         this.reverseArrows[0].rotation = this.game.utils.getLineAngle(
-            this.curvePoints.at(0)[0], this.curvePoints.at(0)[1],
-            this.curvePoints.at(1)[0], this.curvePoints.at(1)[1]
+            this.ballPath.at(0)[0], this.ballPath.at(0)[1],
+            this.ballPath.at(1)[0], this.ballPath.at(1)[1]
         ) - (Math.PI * 0.5);
 
         this.reverseArrows[1].rotation = this.game.utils.getLineAngle(
-            this.curvePoints.at(-2)[0], this.curvePoints.at(-2)[1],
+            this.ballPath.at(-2)[0], this.ballPath.at(-2)[1],
             this.sliderEndPos.x, this.sliderEndPos.y
         ) + (Math.PI * 0.5);
 
