@@ -1,7 +1,9 @@
 const fs = require("fs");
 const { parseSkinConfig } = require("./skinConfigParser");
 
-let dbExists = fs.existsSync("skins.json");
+const skinListLocation = "db/skins.json";
+
+let dbExists = fs.existsSync(skinListLocation);
 
 function buildSkinList() {
     const files = fs.readdirSync("skins/")
@@ -29,14 +31,14 @@ function buildSkinList() {
 
     });
 
-    fs.writeFileSync("skins.json", JSON.stringify(skinList));
+    fs.writeFileSync(skinListLocation, JSON.stringify(skinList));
     console.log(`Initialized ${skinList.length} skins\n`);
 }
 
 function initSkins() {
     if (dbExists) {
         console.log("skins.json file found. Checking for changes...");
-        let skinListStored = JSON.parse(fs.readFileSync("skins.json"));
+        let skinListStored = JSON.parse(fs.readFileSync(skinListLocation));
         let skinListReaded = fs.readdirSync("skins/");
 
         if (skinListStored.length === skinListReaded.length) {

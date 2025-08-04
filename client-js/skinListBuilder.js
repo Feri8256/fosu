@@ -1,5 +1,5 @@
 export function createSkinList(game) {
-    fetch("skins.json")
+    fetch("./db/skins.json")
         .then(resp => resp.json())
         .then((d) => {
             d.forEach((s) => {

@@ -2,7 +2,9 @@ const fs = require("fs");
 const { parseOsu } = require("./osuParser.js");
 const crypto = require("crypto");
 
-let dbExists = fs.existsSync("maps.json");
+const mapListLocation = "db/maps.json";
+
+let dbExists = fs.existsSync(mapListLocation);
 let mapsetCount = 0;
 let mapCount = 0;
 
@@ -58,14 +60,14 @@ function buildMapList() {
         mapsetCount++;
     });
 
-    fs.writeFileSync("maps.json", JSON.stringify(output));
+    fs.writeFileSync(mapListLocation, JSON.stringify(output));
     console.log(`Initialized ${mapsetCount} mapsets with a total of ${mapCount} beatmaps\n`);
 }
 
 function initSongs() {
     if (dbExists) {
         console.log("maps.json file found. Checking for changes...");
-        let mapListStored = JSON.parse(fs.readFileSync("maps.json"));
+        let mapListStored = JSON.parse(fs.readFileSync(mapListLocation));
         let mapListReaded = fs.readdirSync("songs/");
 
         if (mapListStored.length === mapListReaded.length) {

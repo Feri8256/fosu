@@ -2,7 +2,7 @@ export class SongSelectionBuilder {
     constructor(game) {
         this.game = game;
         this.list = [];
-        fetch("./maps.json")
+        fetch("./db/maps.json")
             .then(resp => resp.json())
             .then((data) => {
 
