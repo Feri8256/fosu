@@ -281,6 +281,7 @@ class Game {
         );
         this.comboMeter.reset();
         this.accuracyMeter.reset();
+        this.scoreMeter.reset();
         this.songAudioHandler.reset();
         this.beatmapPlayer.retry();
         setTimeout(() => {

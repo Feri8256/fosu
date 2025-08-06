@@ -41,7 +41,7 @@ class SongSelecting extends GameState {
             this.game.CONFIG.musicVolume,
             1000
         );
-        
+
         this.game.backgroundManager.changeOpacity(1, 1000);
         this.game.UI.songSelectContainer.animate([
             { transform: "translateX(690px)" },
@@ -349,11 +349,13 @@ class Result extends GameState {
 
     retry() {
         this.game.beatmapPlayer.retry();
+        this.game.scoreMeter.reset();
         this.animateElements(states.PLAYING);
     }
 
     back() {
         this.animateElements(states.SONGSELECT);
+        this.game.scoreMeter.reset();
         this.game.auMgr.playAudioClip("menuback");
     }
 
@@ -383,9 +385,14 @@ class Spectate extends GameState {
 
     handleInput() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
-            this.game.auMgr.playAudioClip("menuback");
             this.game.setState(states.SONGSELECT);
-            this.game.UI.spectate.container.style.display = "none";
+            this.game.auMgr.playAudioClip("menuback");
+        }
+
+        if (this.game.inputHandler.includesKey("KeyH", true)) {
+            this.game.UI.spectate.container.style.visibility === "hidden"
+                ? this.game.UI.spectate.container.style.visibility = "visible"
+                : this.game.UI.spectate.container.style.visibility = "hidden";
         }
 
         let validatedInputStates = this.game.inputValidator.getInputStates()
@@ -403,9 +410,10 @@ class Spectate extends GameState {
 
     leave() {
         this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
+        this.game.UI.spectate.container.style.display = "none";
         this.game.beatmapPlayer.cleanup();
-
         if (this.game.autoplay.activated) this.game.autoplay.reset();
+        this.game.scoreMeter.reset();
     }
 }
 

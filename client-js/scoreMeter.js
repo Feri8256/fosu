@@ -108,11 +108,11 @@ export class ScoreMeter {
             this.game.EASINGS.SineOut
         );
 
-        //this.scoreNumberRenderer.updateText(String(this.currentScore));
     }
 
     reset() {
         this.currentScore = 0;
         this.scoreNumberRenderer.updateText("0");
+        this.scoreRolling = new this.game.ANI();
     }
 }
