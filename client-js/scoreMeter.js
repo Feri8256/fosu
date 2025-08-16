@@ -24,17 +24,17 @@ export class ScoreMeter {
         this.currentScore = 0;
         this.displayedValue = 0;
 
-        this.scoreNumberRenderer = new this.game.SPRITEFONTRENDERER(
-            "0",
-            this.game.skinResourceManager.scoreFontSet,
-            16,
-            this.game.canvas.width,
-            this.game.canvas.height - 8,
-            1.5,
-            1,
-            1,
-            1
-        );
+        let initialValue = "0",
+            fontSet = this.game.skinResourceManager.scoreFontSet,
+            defaultSpacing = 32,
+            positionX = this.game.canvas.width,
+            positionY = this.game.canvas.height - 8,
+            scaling = 1 * window.devicePixelRatio,
+            opacity = 1,
+            originX = 1,
+            originY = 1;
+
+        this.scoreNumberRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
 
         this.scoreRolling = new this.game.ANI();
     }

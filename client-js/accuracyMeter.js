@@ -17,17 +17,17 @@ export class AccuracyMeter {
 
         this.results = [0, 0, 0, 0, 100];
 
-        this.fontRenderer = new this.game.SPRITEFONTRENDERER(
-            "100.00%",
-            this.game.skinResourceManager.scoreFontSet,
-            0,
-            this.game.canvas.width * 0.5,
-            8,
-            1,
-            1,
-            0.5,
-            0
-        );
+        let initialValue = "100.00%",
+            fontSet = this.game.skinResourceManager.scoreFontSet,
+            defaultSpacing = -1,
+            positionX = this.game.canvas.width * 0.5,
+            positionY = 8,
+            scaling = 0.75 * window.devicePixelRatio,
+            opacity = 1,
+            originX = 0.5,
+            originY = 0;
+
+        this.fontRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
     }
 
     update() {
@@ -49,7 +49,7 @@ export class AccuracyMeter {
         if (hitDeltaTime < this.hitWindowValues.MEH) {
             hitResult = 1;
         }
-        
+
         // 100 point (OK)
         if (hitDeltaTime < this.hitWindowValues.OK) {
             hitResult = 2;
@@ -59,7 +59,7 @@ export class AccuracyMeter {
         if (hitDeltaTime < this.hitWindowValues.GREAT) {
             hitResult = 3;
         }
-        if(!success) hitResult = 0;
+        if (!success) hitResult = 0;
 
         if (hitResult === 3) this.correctHits++;
 

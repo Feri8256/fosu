@@ -7,7 +7,7 @@ export class SpinnerBonusDisplay {
         this.fontRenderer = new this.game.SPRITEFONTRENDERER(
             "1000",
             this.game.skinResourceManager.scoreFontSet,
-            16,
+            -1,
             this.game.canvas.width * 0.5,
             this.game.canvas.height * 0.7,
             2,

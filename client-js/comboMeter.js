@@ -5,39 +5,30 @@ export class ComboMeter {
         this.previousCombo = 0;
         this.maxCombo = 0;
 
+        this.defaultScaling = 1 * window.devicePixelRatio;
+
         this.change = false;
 
-        this.fontRenderer = new this.game.SPRITEFONTRENDERER(
-            "0x",
-            this.game.skinResourceManager.scoreFontSet,
-            0,
-            8,
-            this.game.canvas.height - 8,
-            1.5,
-            1,
-            0,
-            1
-        );
+        let initialValue = "0x",
+            fontSet = this.game.skinResourceManager.scoreFontSet,
+            defaultSpacing = -1,
+            positionX = 8,
+            positionY = this.game.canvas.height - 8,
+            scaling = this.defaultScaling,
+            opacity = 1,
+            originX = 0,
+            originY = 1;
 
-        this.fontRendererBack = new this.game.SPRITEFONTRENDERER(
-            "0x",
-            this.game.skinResourceManager.scoreFontSet,
-            0,
-            8,
-            this.game.canvas.height - 8,
-            2,
-            0.4,
-            0,
-            1
-        );
+        this.fontRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
+        this.fontRendererBack = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
 
         this.tl = new this.game.TL();
         this.tl.appendAnimation(
             new this.game.ANI(
                 0,
                 250,
-                2.5,
-                1.5,
+                this.defaultScaling * 1.5,
+                this.defaultScaling,
                 this.game.EASINGS.Linear,
                 false,
                 "SA"
@@ -60,8 +51,8 @@ export class ComboMeter {
             new this.game.ANI(
                 70,
                 120,
-                1.5,
-                1.85,
+                this.defaultScaling,
+                this.defaultScaling * 1.1,
                 this.game.EASINGS.SineIn,
                 false,
                 "S"
@@ -71,8 +62,8 @@ export class ComboMeter {
             new this.game.ANI(
                 120,
                 220,
-                1.85,
-                1.5,
+                this.defaultScaling * 1.1,
+                this.defaultScaling,
                 this.game.EASINGS.Linear,
                 false,
                 "S"
@@ -84,8 +75,8 @@ export class ComboMeter {
         this.fontRenderer.y = this.game.canvas.height - 8;
         this.fontRendererBack.y = this.game.canvas.height - 8;
         this.tl.update(this.game.clock);
-        this.fontRenderer.scale = this.tl.getValueOf("S") ?? 1.5;
-        this.fontRendererBack.scale = this.tl.getValueOf("SA") ?? 1.5;
+        this.fontRenderer.scale = this.tl.getValueOf("S") ?? this.defaultScaling;
+        this.fontRendererBack.scale = this.tl.getValueOf("SA") ?? this.defaultScaling;
         this.fontRendererBack.opacity = this.tl.getValueOf("FA") ?? 0;
 
         if (this.tl.timelineCurrentTime > 100 && this.change) {

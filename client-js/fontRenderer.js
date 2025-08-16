@@ -1,17 +1,17 @@
 export class SpriteFontRenderer {
-/**
- * 
- * @param {String} text 
- * @param {Map<String, Sprite>} fontSet 
- * @param {Number} spacing 
- * @param {Number} x 
- * @param {Number} y 
- * @param {Number} scale 
- * @param {Number} opacity 
- * @param {Number} origin_x 
- * @param {Number} origin_y 
- */
-    constructor(text = "", fontSet, spacing = 16, x = 0, y = 0, scale = 1, opacity = 1, origin_x = 0, origin_y = 0) {
+    /**
+     * 
+     * @param {String} text 
+     * @param {Map<String, Sprite>} fontSet 
+     * @param {Number} spacing spacing between the sprites. Set it to `-1` for automatic
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} scale 
+     * @param {Number} opacity 
+     * @param {Number} origin_x 
+     * @param {Number} origin_y 
+     */
+    constructor(text = "", fontSet, spacing = -1, x = 0, y = 0, scale = 1, opacity = 1, origin_x = 0, origin_y = 0) {
         this.text = text;
         this.x = x;
         this.y = y;
@@ -64,12 +64,15 @@ export class SpriteFontRenderer {
             sprite.y = -(sprite.spriteImage.h * this.origin_y);
             sprite.opacity = this.opacity;
 
-            sprite.render(ctx);
 
             this.currentX += spacingToNext;
-            spacingToNext = sprite.spriteImage.w ?? this.defaultSpacing;
+            spacingToNext = this.defaultSpacing === -1 ? sprite.spriteImage.w : this.defaultSpacing;
+
+            sprite.render(ctx);
+
+            
         }
-        
+
         this.textWidth = this.currentX + spacingToNext;
 
         ctx.resetTransform();

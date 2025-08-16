@@ -76,8 +76,8 @@ export class Slider {
 
         this.createRender();
 
-        // The last set of coordinates in the curvePoints array is the end position of the slider
-        this.sliderEndPos = {
+        // The last set of coordinates in the ballPath array is the end position of the slider
+        this.visualEndPos = {
             x: this.curvePoints.at(-1)[0],
             y: this.curvePoints.at(-1)[1],
         }
@@ -109,18 +109,18 @@ export class Slider {
         this.reverseArrows[0].y = this.y;
 
         // Set position for the slider end reverse
-        this.reverseArrows[1].x = this.sliderEndPos.x;
-        this.reverseArrows[1].y = this.sliderEndPos.y;
+        this.reverseArrows[1].x = this.visualEndPos.x;
+        this.reverseArrows[1].y = this.visualEndPos.y;
 
         // Rotate the sprites according to the line angle of the slider segment they are sitting at
         this.reverseArrows[0].rotation = this.game.utils.getLineAngle(
-            this.ballPath.at(0)[0], this.ballPath.at(0)[1],
-            this.ballPath.at(1)[0], this.ballPath.at(1)[1]
+            this.curvePoints.at(0)[0], this.curvePoints.at(0)[1],
+            this.curvePoints.at(1)[0], this.curvePoints.at(1)[1]
         ) - (Math.PI * 0.5);
 
         this.reverseArrows[1].rotation = this.game.utils.getLineAngle(
-            this.ballPath.at(-2)[0], this.ballPath.at(-2)[1],
-            this.sliderEndPos.x, this.sliderEndPos.y
+            this.curvePoints.at(-2)[0], this.curvePoints.at(-2)[1],
+            this.visualEndPos.x, this.visualEndPos.y
         ) + (Math.PI * 0.5);
 
         // The ball movement is controlled by a series of animation in a timeline

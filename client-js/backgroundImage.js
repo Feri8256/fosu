@@ -75,10 +75,10 @@ export class BackgrondImageManager {
      */
     changeOpacity(value, duration = 200) {
         this.fading = new this.game.ANI(
-            this.game.clock, 
-            this.game.clock + duration, 
+            this.game.clock,
+            this.game.clock + duration,
             this.fading.currentValue, // Start and end values inverted because of the fading logic in the update method
-            1-value
+            1 - value
         );
     }
 }
