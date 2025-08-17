@@ -90,7 +90,7 @@ class Playing extends GameState {
         this.game.backgroundManager.changeOpacity(1 - this.game.CONFIG.backgroundDim, 1000);
 
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
-        this.game.cursor = new this.game.CURSOR(this.game);
+        this.game.cursor = new this.game.CURSOR(this.game, true);
         this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
 
         this.game.inputHandler.onMousemove = (m) => {
@@ -379,7 +379,7 @@ class Spectate extends GameState {
         this.game.backgroundManager.changeOpacity(1 - this.game.CONFIG.backgroundDim, 1000);
 
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
-        this.game.cursor = new this.game.CURSOR(this.game);
+        this.game.cursor = new this.game.CURSOR(this.game, true);
         this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
     }
 

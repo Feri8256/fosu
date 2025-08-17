@@ -22,9 +22,11 @@ class Particle {
 }
 
 export class Cursor {
-    constructor(game) {
+    constructor(game, isRotating) {
         this.game = game;
-        
+        this.isRotatingEnabled = isRotating;
+        this.rotationConstant = 0.01;
+
         this.trailType = this.game.CONFIG.cursortrailType;
         this.scale = this.game.CONFIG.cursorScale;
 
@@ -36,7 +38,7 @@ export class Cursor {
         this.currentY = 0;
         this.prevX = 0;
         this.prevY = 0;
-        
+
 
         this.cursorSprite.scale = this.scale;
     }
@@ -53,11 +55,12 @@ export class Cursor {
     update() {
         this.cursorSprite.scale = this.scale;
         this.trailType = this.game.CONFIG.cursortrailType;
-        
+
         this.cursorSprite.x = this.currentX;
         this.cursorSprite.y = this.currentY;
+        if (this.isRotatingEnabled) this.cursorSprite.rotation += this.rotationConstant * (this.game.deltaTime / 16);
 
-        switch(this.trailType) {
+        switch (this.trailType) {
             case 0:
                 this.addCursorPoints(
                     this.currentX,
@@ -78,7 +81,6 @@ export class Cursor {
         this.prevX = this.currentX;
         this.prevY = this.currentY;
 
-        if (this.trails.length > 500) this.trails.pop();
         this.trails.forEach((t) => { t.update(this.game.clock) });
 
         this.trails = this.trails.filter((p) => { return p.fadeOutAni.amount < 1 })
@@ -93,6 +95,7 @@ export class Cursor {
         let s = new this.game.SPRITE(this.cursorTrailSpriteImage);
         let trailParticle = new Particle(this.game, this, x, y, s);
         this.trails.push(trailParticle);
+        if (this.trails.length > 1000) this.trails.pop();
     }
 
     /**
@@ -113,7 +116,7 @@ export class Cursor {
         let ix = x1 < x2 ? 1 : -1;  // increment direction
         let iy = y1 < y2 ? 1 : -1;
 
-        let k = 3;  // sample size ( it was 5 )
+        let k = 5;  // sample size
         if (dy <= dx) {
             for (let i = 0; ; i++) {
                 if (i === k) {
