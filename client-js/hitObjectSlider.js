@@ -74,7 +74,7 @@ export class Slider {
         this.prerendered = null;
         this.objURL = "";
 
-        this.createRender();
+        this.firstUpdate = true;
 
         // The last set of coordinates in the ballPath array is the end position of the slider
         this.visualEndPos = {
@@ -236,6 +236,11 @@ export class Slider {
      * @param {Number} currentTime song clock
      */
     update(currentTime) {
+        if (this.firstUpdate && !this.prerendered) {
+            this.createRender();
+            this.firstUpdate = false;
+        }
+
         this.fading.update(currentTime);
         this.reverseArrowPulse.update(currentTime);
         this.followCircleScale.update(this.game.clock);
@@ -446,7 +451,7 @@ export class Slider {
 
     checkFollowing() {
         if (this.game.autoplay.activated) return;
-        
+
         let cursorToBallDist = this.game.utils.getDistance(this.game.cursor.currentX, this.game.cursor.currentY, this.ballSprite.x, this.ballSprite.y);
         let inputDown = this.game.inputValidator.isAnyInputDown();
 

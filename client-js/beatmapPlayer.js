@@ -130,6 +130,11 @@ export class BeatmapPlayer {
             }
         });
 
+
+        this.sliders.forEach((s) => {
+            if (s.t < 5000) s.createRender();
+        });
+
         // Needs fix for instances where a hit objects time is too close to 0 (the first hit object spawn immediately)
         // Possible solution is to start a timer, that can go negative if needed and then switching back to the audio playback time (stutter may occur when the swiching happens)
         this.firsthitObjectTime = Math.min(
@@ -349,7 +354,7 @@ export class BeatmapPlayer {
         // Register the hit to the accuracy meter that returns a number for judgment
         // When the result is not a miss (0) do not break combo
         let hitResult = this.game.accuracyMeter.addHit(true, hitDeltaTime);
-        if (hitResult > 0){ 
+        if (hitResult > 0) {
             this.game.comboMeter.addHit(true);
             this.game.scoreMeter.add(hitResult);
         }
