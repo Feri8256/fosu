@@ -29,8 +29,8 @@ export class SpinnerJudge {
     onFullRotation() {
         this.currentSpins += 1;
 
+        if (this.currentSpins >= this.minSpins) this.cleared = true;
         if (this.currentSpins > this.minSpins) {
-            this.cleared = true;
             this.bonusCount += 1;
 
             this.s.game.scoreMeter.add(7);

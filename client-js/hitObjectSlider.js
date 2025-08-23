@@ -432,7 +432,7 @@ export class Slider {
             this.game.offscreenCtx.strokeStyle = `rgb(0, 0, 0)`;
             this.game.offscreenCtx.shadowColor = "rgba(255, 255, 255, 0.75)";
             this.game.offscreenCtx.lineWidth = this.rad / 3;
-            this.game.offscreenCtx.shadowBlur = this.rad * 0.8;
+            this.game.offscreenCtx.shadowBlur = this.rad * 0.75;
             this.game.offscreenCtx.stroke(this.sliderPath);
             this.game.offscreenCtx.shadowBlur = 0;
         }

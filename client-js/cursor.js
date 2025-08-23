@@ -32,6 +32,7 @@ export class Cursor {
 
         this.trails = [];
         this.cursorSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("cursor"));
+        this.cursorMiddleSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("cursormiddle"));
         this.cursorTrailSpriteImage = this.game.skinResourceManager.getSpriteImage("cursortrail");
 
         this.currentX = 0;
@@ -54,10 +55,11 @@ export class Cursor {
 
     update() {
         this.cursorSprite.scale = this.scale;
+        this.cursorMiddleSprite.scale = this.scale;
         this.trailType = this.game.CONFIG.cursortrailType;
 
-        this.cursorSprite.x = this.currentX;
-        this.cursorSprite.y = this.currentY;
+        this.cursorSprite.x = this.cursorMiddleSprite.x = this.currentX;
+        this.cursorSprite.y = this.cursorMiddleSprite.y = this.currentY;
         if (this.isRotatingEnabled) this.cursorSprite.rotation += this.rotationConstant * (this.game.deltaTime / 16);
 
         switch (this.trailType) {
@@ -89,6 +91,7 @@ export class Cursor {
     render() {
         this.trails.forEach((t) => { t.render() });
         this.cursorSprite.render(this.game.ctx);
+        this.cursorMiddleSprite.render(this.game.ctx);
     }
 
     createTrail(x, y) {

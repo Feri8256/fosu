@@ -4,6 +4,7 @@ export class Spinner {
         this.scale = scale;
         this.circle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-circle"));
         this.approach = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-approachcircle"));
+        this.cleared = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-clear"));
 
         this.startTime = startTime;
         this.endTime = endTime;
@@ -118,6 +119,10 @@ export class Spinner {
         this.approach.x = this.game.canvas.width * 0.5;
         this.approach.y = this.game.canvas.height * 0.5;
 
+        this.cleared.x = this.circle.x
+        this.cleared.y = this.game.canvas.height * 0.25;
+        this.cleared.opacity = this.judge.cleared && !this.ended ? 1 : 0;
+
         let angleDelta = 0;
 
         if ((this.game.inputValidator.isAnyInputDown() || this.game.autoplay.activated) &&
@@ -162,5 +167,6 @@ export class Spinner {
     render() {
         this.circle.render(this.game.ctx);
         this.approach.render(this.game.ctx);
+        this.cleared.render(this.game.ctx);
     }
 }

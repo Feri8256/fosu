@@ -130,6 +130,13 @@ class Playing extends GameState {
         this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
 
         this.game.inputOverlay.update();
+
+        if (this.game.inputHandler.includesKey("Space", true)
+            && this.game.beatmapPlayer.introSkipable
+            && !this.game.beatmapPlayer.introSkipped
+        ) {
+            this.game.beatmapPlayer.skipIntro();
+        }
     }
 
     leave() {

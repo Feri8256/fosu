@@ -19,16 +19,11 @@ export class AccuracyJudgment {
 
         this.sprite;
 
-        this.timeline = new this.game.TL();
-
-        // When we want 300s to be invisible add a dummy animation to the timeline that keeps opacity to 0 and set the sprite
         if (this.type === -1) {
-            this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock, this.game.clock + 200, 0, 0, 0, false, "F")
-            );
-            this.sprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hit300"));
             return;
         }
+
+        this.timeline = new this.game.TL();
 
         // Creating the animation for the timeline of the `hit0` judgment
         if (this.type === 0) {
@@ -54,13 +49,13 @@ export class AccuracyJudgment {
         } else {
             // Animations of the rest of the judgments are identical
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 100, this.game.clock + this.duration, 1, 0, this.game.EASINGS.Linear, false, "F")
+                new this.game.ANI(this.game.clock + 300, this.game.clock + this.duration, 1, 0, this.game.EASINGS.Linear, false, "F")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock, this.game.clock + 200, this.s * 0.2, this.s * 0.75, this.game.EASINGS.BackOut, false, "S")
+                new this.game.ANI(this.game.clock, this.game.clock + 300, this.s * 0.5, this.s * 0.75, this.game.EASINGS.BounceOut, false, "S")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 200, this.game.clock + this.duration, this.s * 0.75, this.s * 0.75, this.game.EASINGS.Linear, false, "S")
+                new this.game.ANI(this.game.clock + 300, this.game.clock + this.duration, this.s * 0.75, this.s * 0.85, this.game.EASINGS.Linear, false, "S")
             );
 
             // Selecting the sprite based on type
@@ -81,6 +76,7 @@ export class AccuracyJudgment {
     }
 
     update() {
+        if (this.type === -1) return;
         this.timeline.update(this.game.clock);
 
         // Update the properties of the sprite to the value of the animations. Don't forget the default values!
@@ -96,6 +92,7 @@ export class AccuracyJudgment {
     }
 
     render() {
+        if (this.type === -1) return;
         this.sprite.render(this.game.ctx);
     }
 }
