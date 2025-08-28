@@ -115,8 +115,6 @@ export class ReplayManager {
                     y = n.currentValue;
                 });
 
-                this.game.cursor.setPosition(x, y);
-
                 let steppedCurrentTime = currentTime;
                 while (steppedCurrentTime < currentTime + this.game.deltaTime) {
                     let currentInputEvent = [0, 0, 0];
@@ -132,6 +130,8 @@ export class ReplayManager {
 
                     if (this.game.deltaTime > 500) break;
                 }
+
+                this.game.cursor.setPosition(x, y);
 
                 if (this.currentTime > this.sendChunkRequestAfterMs) {
                     this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs - this.game.deltaTime);
