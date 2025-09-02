@@ -9,13 +9,13 @@ let mapsetCount = 0;
 let mapCount = 0;
 
 function buildMapList() {
-    const files = fs.readdirSync("songs/");
+    const songsFiles = fs.readdirSync("./songs/");
 
     let output = [];
 
-    files.forEach((folder) => {
-        let files = fs.readdirSync(`songs/${folder}/`);
-        let osuFiles = files.filter((checkFileName) => { return checkFileName.endsWith(".osu") });
+    songsFiles.forEach((folder) => {
+        let beatmapFiles = fs.readdirSync(`./songs/${folder}/`);
+        let osuFiles = beatmapFiles.filter((checkFileName) => { return checkFileName.endsWith("osu"); });
 
         let mapsetObj = {
             difficulties: []
@@ -23,7 +23,7 @@ function buildMapList() {
 
         for (let index = 0; index < osuFiles.length; index++) {
             const osuFileName = osuFiles[index];
-            const osuFileContent = fs.readFileSync(`songs/${folder}/${osuFileName}`).toString();
+            const osuFileContent = fs.readFileSync(`./songs/${folder}/${osuFileName}`).toString();
             let mapObj = {};
             let { General, Metadata, Events, Difficulty } = parseOsu(osuFileContent);
             

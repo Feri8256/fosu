@@ -1,3 +1,10 @@
+const TYPE_PARAM = {
+    CIRCLE: 0,
+    SLIDER: 1,
+    NEW_COMBO: 2,
+    SPINNER: 3
+}
+
 export class BeatmapPlayer {
     constructor(game) {
         this.game = game;
@@ -42,6 +49,10 @@ export class BeatmapPlayer {
         this.isSpectating = false;
     }
 
+    getBitAtIndex(int, index) {
+        return (int & (1 << index)) !== 0;
+    }
+
     createHitObjects(parsedOSU, spectating) {
         this.parsedOSU = parsedOSU;
         this.isSpectating = spectating
@@ -65,20 +76,9 @@ export class BeatmapPlayer {
             element.hitSample.additionSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.additionSet
             element.hitSample.normalSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.normalSet
 
-            let objectType = element.type.reduce((a, b) => { return a + b });
+            let objectType = element.type;
 
-            // That is a spinner
-            if (objectType === 3) {
-                this.spinners.push(
-                    new this.game.SPINNER(
-                        this.game,
-                        this.globalScale,
-                        element.time,
-                        parseInt(element.objectParams),
-                        this.parsedOSU.Difficulty.OverallDifficulty
-                    )
-                )
-            } else { // That is a circle
+            if (this.getBitAtIndex(objectType, TYPE_PARAM.CIRCLE)) {
                 this.hitCircles.push(
                     new this.game.HITCIRCLE(
                         this.game,
@@ -91,11 +91,27 @@ export class BeatmapPlayer {
                         element.hitSample,
                         element.hitSound
                     )
-                )
-            }
+                );
+            };
 
-            // That is a slider
-            if (typeof element.curveType === "string") {
+            if (this.getBitAtIndex(objectType, TYPE_PARAM.SLIDER)) {
+                let objectX = this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset);
+                let objectY = this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset);
+
+                this.hitCircles.push(
+                    new this.game.HITCIRCLE(
+                        this.game,
+                        objectX,
+                        objectY,
+                        this.globalScale,
+                        element.time,
+                        parsedOSU.Difficulty.CircleSize,
+                        this.timeWindow,
+                        element.hitSample,
+                        element.hitSound
+                    )
+                );
+
                 let scaledCurvePoints = [];
                 element.curvePoints.forEach((cp) => {
                     scaledCurvePoints.push(
@@ -109,8 +125,8 @@ export class BeatmapPlayer {
                 this.sliders.push(
                     new this.game.SLIDER(
                         this.game,
-                        this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                        this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
+                        objectX,
+                        objectY,
                         this.globalScale,
                         element.time,
                         parsedOSU.Difficulty.CircleSize,
@@ -128,6 +144,21 @@ export class BeatmapPlayer {
                     )
                 )
             }
+
+            console.log(this.getBitAtIndex(objectType, TYPE_PARAM.SPINNER), this.getBitAtIndex(objectType, TYPE_PARAM.NEW_COMBO))
+
+            if (this.getBitAtIndex(objectType, TYPE_PARAM.SPINNER)) {
+                this.spinners.push(
+                    new this.game.SPINNER(
+                        this.game,
+                        this.globalScale,
+                        element.time,
+                        parseInt(element.objectParams),
+                        this.parsedOSU.Difficulty.OverallDifficulty
+                    )
+                )
+            }
+            
         });
 
 
