@@ -203,14 +203,12 @@ class Game {
         this.clock = timestamp;
         this.songClock = this.songAudioHandler.getCurrentTime();
 
-        this.currentState.handleInput();
         this.cursor.update();
-
         this.replayManager.update(this.songClock);
-
+        this.currentState.handleInput();
+        this.beatmapPlayer.update();
         this.songAudioHandler.update();
         this.backgroundManager.update();
-        this.beatmapPlayer.update();
         this.accuracyMeter.update();
         this.comboMeter.update();
         this.countdown.update(this.songClock);

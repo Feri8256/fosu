@@ -36,16 +36,14 @@ body {
     background-size: cover;
     display: flex;
     flex-direction: column;
-    right: 0;
+    /*right: 0;*/
     transform: translateX(0px);
     transition: ease-out 0.8s;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     width: 690px;
     height: 92px;
     padding: 5px;
-    
-
 }
 
 .songselect-card p {
@@ -135,7 +133,7 @@ button {
     position: fixed;
     width: 100%;
     height: 100%;
-    
+
     background-color: rgba(0, 0, 0, 0.6);
     visibility: hidden;
 }
@@ -188,19 +186,25 @@ table {
 
 }
 
-#settings-btn {
+/*#settings-btn {
     position: fixed;
     bottom: 0;
     left: 0;
     background: none;
     border: 0;
+}*/
+
+#songselect-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
 }
 
 #settings {
     position: fixed;
     background-color: rgba(0, 0, 0, 0.75);
     color: white;
-    width: 25%;
+    width: 35%;
     overflow-y: scroll;
     height: 100%;
 }
@@ -266,6 +270,7 @@ table {
         transform: translateX(-100%);
         opacity: 0;
     }
+
     100% {
         transform: translateX(0%);
         opacity: 1;
@@ -277,10 +282,12 @@ table {
     pointer-events: none;
 
 }
+
 .scoreentry-date {
     font-size: 12pt;
     pointer-events: none;
 }
+
 .scoreentry-score {
     font-size: 12pt;
     pointer-events: none;

@@ -28,6 +28,7 @@ class SongSelecting extends GameState {
         this.game.replayManager.setMode(2);
         this.game.beatmapPlayer.cleanup();
         this.game.UI.songSelectContainer.style.display = "block";
+        this.game.UI.songSelectActions.container.style.display = "block";
         this.game.songSelectManager.scrollToLastPosition();
 
         this.game.accuracyMeter.reset();
@@ -69,6 +70,7 @@ class SongSelecting extends GameState {
         this.game.settingsManager.setButtonVisibility(false);
         this.game.settingsManager.setOverlayVisibility(false);
         this.game.scoreBoardManager.setBoardVisibility(false);
+        this.game.UI.songSelectActions.container.style.display = "none";
     }
 
     handleInput() {
@@ -76,6 +78,10 @@ class SongSelecting extends GameState {
         if (this.game.inputHandler.includesKey("KeyA", true)) {
             if (this.game.autoplay.activated) this.game.autoplay.activated = false;
             else this.game.autoplay.activate();
+        }
+
+        if (this.game.inputHandler.includesKey("KeyR", true)) {
+            this.game.songSelectManager.selectRandom();
         }
     }
 }

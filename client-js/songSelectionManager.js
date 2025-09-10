@@ -5,23 +5,24 @@ export class songSelectionManager {
         this.scroll = 0;
 
         window.addEventListener("click", (ev) => { this.select(ev.target); });
+        this.game.UI.songSelectActions.randomBtn.addEventListener("click", () => { this.selectRandom(); });
 
         this.listElements = document.querySelectorAll(".songselect-card");
         this.currentSelectionIndex = 0;
         this.lastSelectionTimestamp = 0;
 
-        this.previousSelect = { audioSrc: 0, id: -1, backgroundSrc: "", beatmapSrc: "", previewTime: 0 };
+        this.previousSelect = { audioSrc: "", id: -1, backgroundSrc: "", beatmapSrc: "", previewTime: 0 };
         this.currentSelect = {};
     }
 
     select(element) {
         if (!element.dataset.uid) return;
 
-        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.scrollIntoView({ behavior: "smooth", block: "center", inline: "start" });
 
-
-        //this.currentSelect = this.game.songSelectBuilder.list[element.dataset.uid];
         this.currentSelect = this.game.songSelectBuilder.list.find((e) => { return e.id === element.dataset.uid; });
+
+        if (!this.currentSelect) return;
 
         if (this.previousSelect.audioSrc !== this.currentSelect.audioSrc) this.changeAudioSource(this.currentSelect.audioSrc, this.currentSelect.previewTime);
         if (this.previousSelect.backgroundSrc !== this.currentSelect.backgroundSrc) this.changeBackground(this.currentSelect.backgroundSrc);
@@ -74,5 +75,17 @@ export class songSelectionManager {
 
     scrollToLastPosition() {
         window.scrollTo(0, this.scroll);
+    }
+
+    getRandomListItem() {
+        let ri = Math.floor(Math.random() * this.listElements.length);
+        return this.listElements[ri];
+    }
+
+    selectRandom() {
+        if (this.listElements.length === 0) this.listElements = document.querySelectorAll(".songselect-card");
+        this.previousSelect.id = -1; // the same index twice in a row gonna start the beatmap right away, we not let it do that
+        let randomElement = this.getRandomListItem();
+        this.select(randomElement);
     }
 }

@@ -47,6 +47,8 @@ export class Cursor {
     setPosition(x, y) {
         this.currentX = Math.floor(x);
         this.currentY = Math.floor(y);
+        this.cursorSprite.x = this.cursorMiddleSprite.x = this.currentX;
+        this.cursorSprite.y = this.cursorMiddleSprite.y = this.currentY;
     }
 
     getPosition() {
@@ -58,8 +60,7 @@ export class Cursor {
         this.cursorMiddleSprite.scale = this.scale;
         this.trailType = this.game.CONFIG.cursortrailType;
 
-        this.cursorSprite.x = this.cursorMiddleSprite.x = this.currentX;
-        this.cursorSprite.y = this.cursorMiddleSprite.y = this.currentY;
+        
         if (this.isRotatingEnabled) this.cursorSprite.rotation += this.rotationConstant * (this.game.deltaTime / 16);
 
         switch (this.trailType) {

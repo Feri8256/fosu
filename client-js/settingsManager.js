@@ -10,13 +10,49 @@ export class SettingsManager {
         this.buttonVisible = true;
         this.overlayVisible = false;
 
+        this.overlayAnimation = "cubic-bezier(0.16, 1, 0.3, 1)";
+
         this.game.UI.settings.button.addEventListener("click", () => {
             if (this.overlayVisible) {
-                this.setOverlayVisibility(false);
+
                 this.overlayVisible = false;
+
+                this.game.UI.settings.container.animate([
+                    {
+                        transform: "translate(0px)",
+                        filter: "opacity(100%)"
+                    },
+                    {
+                        transform: "translate(-300px)",
+                        filter: "opacity(0%)"
+                    }
+                ],
+                {
+                    duration: 500,
+                    fill: "forwards",
+                    easing: this.overlayAnimation
+                }).onfinish = () => {
+                    this.setOverlayVisibility(false);
+                };
             } else {
                 this.setOverlayVisibility(true);
                 this.overlayVisible = true;
+
+                this.game.UI.settings.container.animate([
+                    {
+                        transform: "translate(-300px)",
+                        filter: "opacity(0%)"
+                    },
+                    {
+                        transform: "translate(0px)",
+                        filter: "opacity(100%)"
+                    }
+                ],
+                    {
+                        duration: 500,
+                        fill: "forwards",
+                        easing: this.overlayAnimation
+                    });
             }
         });
 

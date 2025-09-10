@@ -145,8 +145,6 @@ export class BeatmapPlayer {
                 )
             }
 
-            console.log(this.getBitAtIndex(objectType, TYPE_PARAM.SPINNER), this.getBitAtIndex(objectType, TYPE_PARAM.NEW_COMBO))
-
             if (this.getBitAtIndex(objectType, TYPE_PARAM.SPINNER)) {
                 this.spinners.push(
                     new this.game.SPINNER(

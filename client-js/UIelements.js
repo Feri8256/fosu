@@ -47,7 +47,6 @@ export function getElements() {
             playerName: $("#resultmeta-playername"),
         },
 
-
         introSkipButton: $("#play-skip-btn"),
 
         settings: {
@@ -77,6 +76,11 @@ export function getElements() {
 
         scoreBoard: {
             container: $("#scores")
+        },
+
+        songSelectActions: {
+            container: $("#songselect-actions"),
+            randomBtn: $("#random-btn")
         }
     }
 }
