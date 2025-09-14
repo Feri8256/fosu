@@ -187,7 +187,7 @@ export class Slider {
 
         this.reverseArrowPulse = new this.game.ANI(
             0,
-            this.beatLength,
+            this.beatLength / this.velocity,
             this.ballSize,
             this.ballSize * 0.8,
             this.game.EASINGS.SineOut,
@@ -306,7 +306,18 @@ export class Slider {
 
         this.reverseArrows.forEach((r) => {
             r.scale = this.reverseArrowPulse.currentValue;
+            //r.opacity = ((edgeSoundIndex) & i === 1) && (this.slides > 1) ? 1 : 0;
         });
+
+        if (this.slides > 1 && !this.endReached) {
+            let a = this.slides >= edgeSoundIndex;
+            let b = edgeSoundIndex & 1 === 1;
+            let c = a && b;
+            let d = this.slides > 2;
+
+            this.reverseArrows[0].opacity = c && d ? this.fading.currentValue : 0;
+            this.reverseArrows[1].opacity = c ? 0 : this.fading.currentValue;
+        }
 
         // When autoplay is enabled and the slider ball starts moving, move the cursor along with it
         // It is only possible because here we override the cursor position that the AutoplayController sets on updating

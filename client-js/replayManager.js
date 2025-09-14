@@ -101,7 +101,7 @@ export class ReplayManager {
                     if (this.game.deltaTime > 500) break;
                 }*/
 
-                let x = this.game.cursor.currentX;
+                /*let x = this.game.cursor.currentX;
                 let y = this.game.cursor.currentY;
 
                 this.movementXtoUpdate = this.movementX.filter((mx) => { return mx.startTime <= currentTime && mx.endTime >= currentTime });
@@ -115,23 +115,8 @@ export class ReplayManager {
                     y = n.currentValue;
                 });
 
-                let steppedCurrentTime = currentTime;
-                while (steppedCurrentTime < currentTime + this.game.deltaTime) {
-                    let currentInputEvent = [0, 0, 0];
-                    currentInputEvent = this.inputEvents.filter((ie) => {
-                        return ie.t <= steppedCurrentTime;
-                    }).at(-1);
-
-                    this.game.inputValidator.updateInputs(
-                        currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
-                    );
-
-                    steppedCurrentTime += 1;
-
-                    if (this.game.deltaTime > 500) break;
-                }
-
                 this.game.cursor.setPosition(x, y);
+                */
 
                 if (this.currentTime > this.sendChunkRequestAfterMs) {
                     this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs - this.game.deltaTime);
@@ -150,6 +135,40 @@ export class ReplayManager {
                 break;
         }
 
+    }
+
+    /**
+     * 
+     * @param {Number} t 
+     * @returns 
+     */
+    getTappingEvents(t) {
+        return this.inputEvents.filter((ie) => {
+            return ie.t <= t;
+        }).at(-1);
+    }
+
+    /**
+     * 
+     * @param {Number} t 
+     * @returns 
+     */
+    updateCursorPosition(t) {
+        let x = this.game.cursor.currentX;
+        let y = this.game.cursor.currentY;
+
+        this.movementXtoUpdate = this.movementX.filter((mx) => { return mx.startTime <= t && mx.endTime >= t });
+        this.movementXtoUpdate.forEach((m) => {
+            m.update(t);
+            x = m.currentValue;
+        });
+        this.movementYtoUpdate = this.movementY.filter((my) => { return my.startTime <= t && my.endTime >= t });
+        this.movementYtoUpdate.forEach((n) => {
+            n.update(t);
+            y = n.currentValue;
+        });
+
+        this.game.cursor.setPosition(x, y);
     }
 
     /**

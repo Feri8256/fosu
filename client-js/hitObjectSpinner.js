@@ -131,7 +131,7 @@ export class Spinner {
             this.tl.playing
         ) {
             if (this.game.autoplay.activated) {
-                this.currentAngle += this.autoplayRotateSpeed * (this.game.deltaTime / 16);
+                this.currentAngle += (this.autoplayRotateSpeed * (this.game.songDeltaTime / 16)) / this.game.deltaTime;
                 this.game.cursor.setPosition(
                     this.circle.x + Math.cos(this.currentAngle) * this.autoplayRotateRadius,
                     this.circle.y + Math.sin(this.currentAngle) * this.autoplayRotateRadius

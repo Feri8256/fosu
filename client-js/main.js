@@ -189,10 +189,11 @@ class Game {
         this.UI.spectate.playbackRatePitchPreservation.addEventListener("change", (evt) => {
             this.songAudioHandler.setPitchPreservation(evt.target.checked);
         });
-        
+
         this.clock = 0;
         this.deltaTime = 0;
         this.songClock = 0;
+        this.songDeltaTime = 0;
         // Game starts in the song selection menu
         this.currentState;
         this.setState(0);
@@ -201,12 +202,15 @@ class Game {
     update(timestamp) {
         this.deltaTime = timestamp - this.clock;
         this.clock = timestamp;
-        this.songClock = this.songAudioHandler.getCurrentTime();
+
+        let sc = this.songAudioHandler.getCurrentTime();
+        this.songDeltaTime = sc - this.songClock;
+        this.songClock = sc;
 
         this.cursor.update();
+        this.beatmapPlayer.update();
         this.replayManager.update(this.songClock);
         this.currentState.handleInput();
-        this.beatmapPlayer.update();
         this.songAudioHandler.update();
         this.backgroundManager.update();
         this.accuracyMeter.update();

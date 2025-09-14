@@ -11,7 +11,7 @@ export class songSelectionManager {
         this.currentSelectionIndex = 0;
         this.lastSelectionTimestamp = 0;
 
-        this.previousSelect = { audioSrc: "", id: -1, backgroundSrc: "", beatmapSrc: "", previewTime: 0 };
+        this.previousSelect = {};
         this.currentSelect = {};
     }
 
@@ -84,7 +84,7 @@ export class songSelectionManager {
 
     selectRandom() {
         if (this.listElements.length === 0) this.listElements = document.querySelectorAll(".songselect-card");
-        this.previousSelect.id = -1; // the same index twice in a row gonna start the beatmap right away, we not let it do that
+        //this.previousSelect.id = -1; // the same index twice in a row gonna start the beatmap right away, we not let it do that
         let randomElement = this.getRandomListItem();
         this.select(randomElement);
     }

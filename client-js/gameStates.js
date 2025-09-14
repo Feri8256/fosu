@@ -408,17 +408,36 @@ class Spectate extends GameState {
                 : this.game.UI.spectate.container.style.visibility = "hidden";
         }
 
-        let validatedInputStates = this.game.inputValidator.getInputStates()
+        let steppedCurrentTime = this.game.songClock - this.game.songDeltaTime;
+        while (steppedCurrentTime < this.game.songClock) {
+            let currentInputEvent = [0, 0, 0];
+            
+            currentInputEvent = this.game.replayManager.getTappingEvents(steppedCurrentTime);
+            this.game.replayManager.updateCursorPosition(steppedCurrentTime);
+            this.game.beatmapPlayer.update(steppedCurrentTime);
 
-        validatedInputStates.forEach((i) => {
-            if (i.down && i.valid) {
-                this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
-                i.valid = false;
-                return;
-            }
-        });
+            this.game.inputValidator.updateInputs(
+                currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
+            );
 
-        this.game.inputOverlay.updateInputState(validatedInputStates);
+            let validatedInputStates = this.game.inputValidator.getInputStates();
+
+            validatedInputStates.forEach((i) => {
+                if (i.down && i.valid) {
+                    this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
+                    i.valid = false;
+                    return;
+                }
+            });
+
+            this.game.inputOverlay.updateInputState(validatedInputStates);
+
+            steppedCurrentTime += 1;
+
+            if (this.game.songDeltaTime > 100) break;
+        }
+
+
     }
 
     leave() {
