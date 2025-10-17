@@ -208,7 +208,6 @@ class Game {
         this.songClock = sc;
 
         this.cursor.update();
-        this.beatmapPlayer.update();
         this.replayManager.update(this.songClock);
         this.currentState.handleInput();
         this.songAudioHandler.update();

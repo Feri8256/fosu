@@ -68,7 +68,7 @@ export function parseOsu(str) {
     out.Difficulty.HPDrainRate = parseFloat(rows.find(r => r.startsWith('HPDrainRate'))?.split(colonSeparator)[1] || 1);
     out.Difficulty.CircleSize = parseFloat(rows.find(r => r.startsWith('CircleSize'))?.split(colonSeparator)[1] || 1);
     out.Difficulty.OverallDifficulty = parseFloat(rows.find(r => r.startsWith('OverallDifficulty'))?.split(colonSeparator)[1] || 1);
-    out.Difficulty.ApproachRate = parseFloat(rows.find(r => r.startsWith('ApproachRate'))?.split(colonSeparator)[1] || 1);
+    out.Difficulty.ApproachRate = parseFloat(rows.find(r => r.startsWith('ApproachRate'))?.split(colonSeparator)[1] || out.Difficulty.OverallDifficulty);
     out.Difficulty.SliderMultiplier = parseFloat(rows.find(r => r.startsWith('SliderMultiplier'))?.split(colonSeparator)[1] || 1);
     out.Difficulty.SliderTickRate = parseFloat(rows.find(r => r.startsWith('SliderTickRate'))?.split(colonSeparator)[1] || 1);
 
@@ -77,6 +77,8 @@ export function parseOsu(str) {
     let eventLinesStart = rows.findIndex(r => r.startsWith('[Events]'));
     let eventLinesEnd = rows.findIndex((r, i) => r.startsWith('[') && i > eventLinesStart);
 
+    out.Events.Breaks = [];
+
     for (let i = eventLinesStart + 1; i < eventLinesEnd; i++) {
         let eventLine = rows[i];
         if (eventLine === '') break;
@@ -84,8 +86,8 @@ export function parseOsu(str) {
 
         let eventTokens = eventLine.split(commaSeparator);
 
-        // Only care about the background image for now
         if (eventTokens[0] === "0") out.Events.BackgroundImage = eventTokens[2].replaceAll(`"`, "");
+        if (eventTokens[0] === "2" || eventTokens[0] === "Break") out.Events.Breaks.push( { startTime: parseInt(eventTokens[1]), endTime: parseInt(eventTokens[2])});
     }
 
 
@@ -113,7 +115,7 @@ export function parseOsu(str) {
 
     // Find the row start and end of the HitObjects section
     let hitObjectLinesStart = rows.findIndex(r => r.startsWith('[HitObjects]'));
-    let hitObjectLinesEnd = rows.findIndex((r, i) => r === '' && i > hitObjectLinesStart);
+    let hitObjectLinesEnd = rows.findIndex((r, i) => (!r || r === '') && i > hitObjectLinesStart);
 
     for (let i = hitObjectLinesStart + 1; i < hitObjectLinesEnd; i++) {
         let hitObjectLine = rows[i];

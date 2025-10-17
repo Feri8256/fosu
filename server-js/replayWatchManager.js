@@ -18,7 +18,7 @@ class ReplayWatchManager {
      */
     getChunk(currentTimeMs, aheadMs) {
         return this.data.events.filter((ev) => {
-            return ev.t >= currentTimeMs && ev.t < currentTimeMs + aheadMs;
+            return ev.t >= currentTimeMs && ev.t <= currentTimeMs + aheadMs;
         });
     }
 }

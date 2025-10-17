@@ -131,6 +131,8 @@ class Playing extends GameState {
     }
 
     handleInput() {
+        this.game.beatmapPlayer.update(this.game.songClock);
+
         if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
 
         this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
@@ -409,9 +411,9 @@ class Spectate extends GameState {
         }
 
         let steppedCurrentTime = this.game.songClock - this.game.songDeltaTime;
-        while (steppedCurrentTime < this.game.songClock) {
+        while (steppedCurrentTime <= this.game.songClock) {
             let currentInputEvent = [0, 0, 0];
-            
+
             currentInputEvent = this.game.replayManager.getTappingEvents(steppedCurrentTime);
             this.game.replayManager.updateCursorPosition(steppedCurrentTime);
             this.game.beatmapPlayer.update(steppedCurrentTime);

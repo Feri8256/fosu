@@ -194,11 +194,10 @@ export class Slider {
             true
         );
 
-        this.reverseArrows[1].opacity = this.slides > 1 ? 1 : 0;
-        this.reverseArrows[0].opacity = this.slides > 2 ? 1 : 0;
+        this.reverseArrows[1].opacity = 0;
+        this.reverseArrows[0].opacity = 0;
 
         this.followCircleScale = new this.game.ANI();
-
         this.followCircleFade = new this.game.ANI();
 
         this.endReached = false;
@@ -285,19 +284,21 @@ export class Slider {
             );
 
             this.endReached = true;
-            this.game.comboMeter.addHit(true);
-            this.game.accuracyMeter.addHit(true, 0);
+
+            if (this.currentFollowState) {
+                this.game.comboMeter.addHit(true);
+                this.game.accuracyMeter.addHit(true, 0);
+                this.playEdgeSound(edgeSoundIndex + 1);
+                this.game.scoreMeter.add(4);
+            }
 
             this.setFollowState(false);
-
-            this.playEdgeSound(edgeSoundIndex + 1);
-            this.game.scoreMeter.add(4);
         }
 
         this.ballMovement.update(currentTime);
         this.ballSprite.x = this.ballMovement.getValueOf("X") || this.ballPath.at(-1)[0];
         this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.ballPath.at(-1)[1];
-        this.ballSprite.opacity = this.fading.currentValue;
+        this.ballSprite.opacity = currentTime < this.endTime ? this.fading.currentValue : 0;
 
         this.followSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.x;
         this.followSprite.y = this.ballMovement.getValueOf("Y") || this.ballSprite.y;
@@ -306,17 +307,16 @@ export class Slider {
 
         this.reverseArrows.forEach((r) => {
             r.scale = this.reverseArrowPulse.currentValue;
-            //r.opacity = ((edgeSoundIndex) & i === 1) && (this.slides > 1) ? 1 : 0;
         });
 
         if (this.slides > 1 && !this.endReached) {
-            let a = this.slides >= edgeSoundIndex;
-            let b = edgeSoundIndex & 1 === 1;
+            let a = (this.slides) > edgeSoundIndex + 1;
+            let b = (edgeSoundIndex & 1) === 1;
             let c = a && b;
             let d = this.slides > 2;
 
-            this.reverseArrows[0].opacity = c && d ? this.fading.currentValue : 0;
-            this.reverseArrows[1].opacity = c ? 0 : this.fading.currentValue;
+            this.reverseArrows[0].opacity = c && d ? this.fading.currentValue : 0; // start
+            this.reverseArrows[1].opacity = c ? 0 : this.fading.currentValue; // end
         }
 
         // When autoplay is enabled and the slider ball starts moving, move the cursor along with it

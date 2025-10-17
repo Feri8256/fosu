@@ -42,11 +42,14 @@ export class BeatmapPlayer {
         this.progressBarCurrentWidth = 0;
         this.lastHitObjectTime = 0;
 
-        this.parsedOSU = {};
+        this.parsedOSU = null;
 
         this.endedTimestamp = 0;
 
         this.isSpectating = false;
+
+        this.inBreak = false;
+        this.currentBreakPeriod = null;
     }
 
     getBitAtIndex(int, index) {
@@ -156,7 +159,7 @@ export class BeatmapPlayer {
                     )
                 )
             }
-            
+
         });
 
 
@@ -218,9 +221,13 @@ export class BeatmapPlayer {
         }, startDelay);
     }
 
-    update() {
-        this.currentTime = this.game.songAudioHandler.getCurrentTime();
+    update(currentTime) {
+        this.currentTime = currentTime;
         this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+
+        if (!this.playing) return;
+
+        this.watchForBreaks();
 
         if (this.playing) this.game.autoplay.update(this.currentTime);
 
@@ -437,6 +444,8 @@ export class BeatmapPlayer {
         this.playing = false;
         this.loading = false;
         this.ended = false;
+        this.inBreak = false;
+        this.currentBreakPeriod = null;
 
         this.introSkipable = false;
         this.introSkipped = false;
@@ -503,5 +512,24 @@ export class BeatmapPlayer {
         this.difficultyMultiplier = Math.round((this.parsedOSU.Difficulty.HPDrainRate + this.parsedOSU.Difficulty.CircleSize + this.parsedOSU.Difficulty.OverallDifficulty + this.game.utils.clamp(this.parsedOSU.HitObjects.length / (this.lastHitObjectTime / 1000) * 8, 0, 16)) / 38 * 5);
         console.log(`Difficulty multiplier for this beatmap is: ${this.difficultyMultiplier}`);
 
+    }
+
+    watchForBreaks() {
+
+        this.currentBreakPeriod = this.parsedOSU.Events.Breaks.find((bp) => { return bp.startTime < this.currentTime - 100 && bp.endTime > this.currentTime - 100 });
+        if (this.currentBreakPeriod) {
+            if (this.currentTime >= this.currentBreakPeriod.startTime && this.currentTime < this.currentBreakPeriod.endTime && !this.inBreak) this.setBreak(true);
+            if (this.currentTime >= this.currentBreakPeriod.endTime && this.inBreak) this.setBreak(false);
+        }
+
+    }
+
+    setBreak(isBreak) {
+        if (isBreak === this.inBreak) return;
+        this.inBreak = isBreak;
+
+        this.game.backgroundManager.changeOpacity(1 - (this.inBreak ? 0 : this.game.CONFIG.backgroundDim), 1000);
+
+        console.log("Break ", this.inBreak ? "started" : "ended");
     }
 }

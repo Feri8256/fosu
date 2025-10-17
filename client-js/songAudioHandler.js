@@ -11,6 +11,19 @@ export class SongAudioHandler {
         this.volumeAutomation = new this.game.ANI(0, 0, this.currentVolume, this.currentVolume);
         this.currentPreviewPoint = 0;
 
+        this.unknownPreviewPoint = false;
+    }
+
+    /**
+     * This method runs on every update until the duration parameter of the audio player is no longer NaN
+     */
+    setUnknownPreview() {
+        if (isNaN(this.audio.duration) && this.unknownPreviewPoint) return;
+
+        let fourtyPercentOfDuration = this.audio.duration * 0.4;
+        this.audio.currentTime = fourtyPercentOfDuration;
+        this.currentPreviewPoint = fourtyPercentOfDuration * 1000;
+        this.unknownPreviewPoint = false;
     }
 
     /**
@@ -25,6 +38,8 @@ export class SongAudioHandler {
     update() {
         this.volumeAutomation.update(this.game.clock);
         this.audio.volume = this.volumeAutomation.currentValue;
+
+        if (this.unknownPreviewPoint) this.setUnknownPreview();
     }
 
     /**
@@ -32,7 +47,12 @@ export class SongAudioHandler {
      * @param {Number} time ms
      */
     startPreview(time) {
-        if (!time || time === -1) time = 0;
+        if (!time || time === -1){ 
+            time = 0;
+            this.unknownPreviewPoint = true;
+        } else {
+            this.unknownPreviewPoint = false;
+        };
         this.currentPreviewPoint = time;
         this.audio.play();
         this.audio.currentTime = this.currentPreviewPoint / 1000; // HTML Audio counts in seconds!

@@ -144,7 +144,7 @@ export class ReplayManager {
      */
     getTappingEvents(t) {
         return this.inputEvents.filter((ie) => {
-            return ie.t <= t;
+            return Math.floor(ie.t) <= Math.ceil(t);
         }).at(-1);
     }
 
