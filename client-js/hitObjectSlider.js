@@ -33,6 +33,7 @@ export class Slider {
         // Put the start x and y coordinates to the begining of the curvePoints array then append the rest of them
         this.curvePoints = [[this.x, this.y], ...curvePoints];
         this.slides = slides;
+        this.slidesLeft = slides;
 
         this.currentSlide = 0;
         this.currentSoundPlayed = 0;
@@ -258,11 +259,13 @@ export class Slider {
             //console.log(`beatLength: ${this.beatLength}\npixelLength: ${this.pixelLength}\nvelocity: ${this.velocity}\nmultiplier: ${this.multiplier}\none slide t: ${this.oneSlideTime}`)
         }
 
+
+
         // add +1 to edgeSoundIndex because 0 should play when the slider head is clicked
         let edgeSoundIndex = Math.floor(this.ballMovement.timelineCurrentTime / this.oneSlideTime);
         if (edgeSoundIndex !== this.currentSoundPlayed && this.currentFollowState) {
 
-            this.playEdgeSound(edgeSoundIndex + 1);
+            this.playEdgeSound(edgeSoundIndex);
 
             this.game.comboMeter.addHit(true);
             this.game.accuracyMeter.addHit(true, 0);
@@ -270,6 +273,17 @@ export class Slider {
             this.currentSoundPlayed = edgeSoundIndex;
 
             this.game.scoreMeter.add(4);
+            this.slidesLeft--;
+        }
+
+        // Display only the reverse arrow sprite that has to be displayed at a given time
+        if (this.slidesLeft > 1 && !this.endReached) {
+            let a = (edgeSoundIndex & 1) === 1;
+            this.reverseArrows[0].opacity = a ? this.fading.currentValue : 0; // start
+            this.reverseArrows[1].opacity = a ? 0 : this.fading.currentValue; // end
+        } else {
+            this.reverseArrows[0].opacity = 0; // start
+            this.reverseArrows[1].opacity = 0; // end
         }
 
         // Fade out when reached endTime
@@ -309,15 +323,7 @@ export class Slider {
             r.scale = this.reverseArrowPulse.currentValue;
         });
 
-        if (this.slides > 1 && !this.endReached) {
-            let a = (this.slides) > edgeSoundIndex + 1;
-            let b = (edgeSoundIndex & 1) === 1;
-            let c = a && b;
-            let d = this.slides > 2;
 
-            this.reverseArrows[0].opacity = c && d ? this.fading.currentValue : 0; // start
-            this.reverseArrows[1].opacity = c ? 0 : this.fading.currentValue; // end
-        }
 
         // When autoplay is enabled and the slider ball starts moving, move the cursor along with it
         // It is only possible because here we override the cursor position that the AutoplayController sets on updating

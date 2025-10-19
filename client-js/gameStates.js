@@ -140,8 +140,7 @@ class Playing extends GameState {
         this.game.inputOverlay.update();
 
         if (this.game.inputHandler.includesKey("Space", true)
-            && this.game.beatmapPlayer.introSkipable
-            && !this.game.beatmapPlayer.introSkipped
+            && this.game.beatmapPlayer.introSkipable()
         ) {
             this.game.beatmapPlayer.skipIntro();
         }
@@ -411,8 +410,9 @@ class Spectate extends GameState {
         }
 
         let steppedCurrentTime = this.game.songClock - this.game.songDeltaTime;
+        let currentInputEvent = [0, 0, 0];
+
         while (steppedCurrentTime <= this.game.songClock) {
-            let currentInputEvent = [0, 0, 0];
 
             currentInputEvent = this.game.replayManager.getTappingEvents(steppedCurrentTime);
             this.game.replayManager.updateCursorPosition(steppedCurrentTime);

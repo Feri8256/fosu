@@ -1,5 +1,5 @@
 class Particle {
-    constructor(game, cur, x, y, sprite) {
+    constructor(game, cur, x, y, sprite, additiveMode = false) {
         this.game = game;
         this.cur = cur;
 
@@ -7,7 +7,7 @@ class Particle {
         this.sprite = sprite;
         this.sprite.x = x;
         this.sprite.y = y;
-        this.sprite.additiveColor = true;
+        this.sprite.additiveColor = additiveMode ? true : false;
         this.sprite.scale = cur.scale;
     }
 
@@ -39,6 +39,7 @@ export class Cursor {
         this.currentY = 0;
         this.prevX = 0;
         this.prevY = 0;
+        this.lastParticleCreatedAtMs = 0;
 
 
         this.cursorSprite.scale = this.scale;
@@ -74,7 +75,9 @@ export class Cursor {
                 break;
 
             case 1:
-                if (this.currentX != this.prevX || this.currentY != this.prevY) this.createTrail(this.currentX, this.currentY);
+                if (this.lastParticleCreatedAtMs + 33 > this.game.clock) return;
+                if (this.currentX != this.prevX || this.currentY != this.prevY) this.createTrail(this.currentX, this.currentY, false);
+                this.lastParticleCreatedAtMs = this.game.clock;
                 break;
 
             case 2:
@@ -95,9 +98,9 @@ export class Cursor {
         this.cursorMiddleSprite.render(this.game.ctx);
     }
 
-    createTrail(x, y) {
+    createTrail(x, y, a = false) {
         let s = new this.game.SPRITE(this.cursorTrailSpriteImage);
-        let trailParticle = new Particle(this.game, this, x, y, s);
+        let trailParticle = new Particle(this.game, this, x, y, s, a);
         this.trails.push(trailParticle);
         if (this.trails.length > 1000) this.trails.pop();
     }
@@ -124,7 +127,7 @@ export class Cursor {
         if (dy <= dx) {
             for (let i = 0; ; i++) {
                 if (i === k) {
-                    this.createTrail(x1, y1);
+                    this.createTrail(x1, y1, true);
                     i = 0;
                 }
                 if (x1 === x2)
@@ -139,7 +142,7 @@ export class Cursor {
         } else {
             for (let i = 0; ; i++) {
                 if (i === k) {
-                    this.createTrail(x1, y1);
+                    this.createTrail(x1, y1, true);
                     i = 0;
                 }
                 if (y1 === y2)

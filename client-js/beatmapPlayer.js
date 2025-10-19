@@ -479,6 +479,10 @@ export class BeatmapPlayer {
         this.game.auMgr.playAudioClip("menuhit");
     }
 
+    isIntroSkipable() {
+        return this.introSkipable && ! this.introSkipped;
+    }
+
     setSkipButtonVisibility(state) {
         this.game.UI.introSkipButton.style.display = state ? "block" : "none";
     }
@@ -528,7 +532,10 @@ export class BeatmapPlayer {
         if (isBreak === this.inBreak) return;
         this.inBreak = isBreak;
 
-        this.game.backgroundManager.changeOpacity(1 - (this.inBreak ? 0 : this.game.CONFIG.backgroundDim), 1000);
+        this.game.backgroundManager.changeOpacity(
+            1 - (this.inBreak ? 0 : this.game.CONFIG.backgroundDim), 
+            this.inBreak ? 1000 : 750
+        );
 
         console.log("Break ", this.inBreak ? "started" : "ended");
     }
