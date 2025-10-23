@@ -34,6 +34,8 @@ import { ScoreMeter } from "./scoreMeter.js";
 import { SpinnerJudge } from "./spinnerJudge.js";
 import { SpinnerBonusDisplay } from "./spinnerBonusDisplay.js";
 import { getElements } from "./UIelements.js";
+import { CircumscribedCircle } from "./circumscribedCircle.js";
+import { Bezier2 } from "./bezier2.js"
 
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 
@@ -88,6 +90,11 @@ class Game {
         this.EASINGS = EASING;
         this.ANI = Animation;
         this.TL = Timeline;
+
+        this.CURVE_TYPES = {
+            CircumscribedCircle,
+            Bezier2
+        }
 
         this.INPUTHANDLER = InputHandler;
         this.CURSOR = Cursor;

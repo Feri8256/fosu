@@ -267,7 +267,7 @@ class Result extends GameState {
     }
 
     enter() {
-
+        this.game.songAudioHandler.setPlaybackRate(1);
         this.game.backgroundManager.changeOpacity(0.5, 500);
         this.game.UI.spectate.container.style.display = "none";
 
@@ -448,6 +448,7 @@ class Spectate extends GameState {
         this.game.beatmapPlayer.cleanup();
         if (this.game.autoplay.activated) this.game.autoplay.reset();
         this.game.scoreMeter.reset();
+        this.game.songAudioHandler.setPlaybackRate(1);
     }
 }
 

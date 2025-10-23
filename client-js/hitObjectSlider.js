@@ -1,3 +1,10 @@
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 export class Slider {
     constructor(
         game,
@@ -16,7 +23,8 @@ export class Slider {
         edgeSounds,
         edgeSets,
         hitSound,
-        hitSample
+        hitSample,
+        curveType
     ) {
         this.game = game;
         this.x = x;
@@ -27,16 +35,36 @@ export class Slider {
         this.scale = scale;
         this.rad = (118 / cs) * scale;
         this.ballSize = scale / (cs * 0.5);
+        this.curveType = curveType;
+
 
         this.fadeOutMs = 150;
 
         // Put the start x and y coordinates to the begining of the curvePoints array then append the rest of them
-        this.curvePoints = [[this.x, this.y], ...curvePoints];
+        this.curvePoints = [new Point(this.x, this.y), ...curvePoints];
         this.slides = slides;
         this.slidesLeft = slides;
 
         this.currentSlide = 0;
         this.currentSoundPlayed = 0;
+
+        switch (this.curveType) {
+
+            case "P":
+                let cc = new this.game.CURVE_TYPES.CircumscribedCircle(this.curvePoints, pixelLength * this.scale);
+                this.curveSegments = cc.path;
+                break;
+
+            case "B":
+                let bz = new this.game.CURVE_TYPES.Bezier2(this.curvePoints, pixelLength * this.scale);
+                this.curveSegments = bz.path;
+                break;
+            
+            case "L":
+            case "C":    
+                this.curveSegments = this.curvePoints;
+                break;
+        }
 
         // This includes the points of the slider ball path with the repeats
         this.ballPath = [];
@@ -46,18 +74,18 @@ export class Slider {
 
             // Copy the curve points in normal or in reverse order
             for (
-                let i = rev ? (this.curvePoints.length - 1) : 0;
-                rev ? (i > 0) : (i < this.curvePoints.length);
+                let i = rev ? (this.curveSegments.length - 1) : 0;
+                rev ? (i > 0) : (i < this.curveSegments.length);
                 rev ? (i--) : (i++)
             ) {
-                const currentP = this.curvePoints.at(i);
-                if (prevP && currentP[0] === prevP[0] && currentP[1] === prevP[1]) continue;
+                const currentP = this.curveSegments.at(i);
+                if (prevP && currentP?.x === prevP?.x && currentP?.y === prevP?.y) continue;
                 this.ballPath.push(currentP);
                 prevP = currentP;
             }
 
             // If the last iteration is happened in reverse, put the first point at the end of the array
-            if (rev) this.ballPath.push(this.curvePoints.at(0));
+            if (rev) this.ballPath.push(this.curveSegments.at(0));
         }
 
         this.pixelLength = pixelLength;
@@ -67,9 +95,9 @@ export class Slider {
         // Create the visual shape of the slider
         // Ignore curveType for now, straight lines between the curve points is enough here
         this.sliderPath = new Path2D();
-        for (const cp of this.curvePoints) {
-            this.sliderPath.lineTo(cp[0], cp[1]);
-            this.sliderPath.moveTo(cp[0], cp[1]);
+        for (const cp of this.curveSegments) {
+            this.sliderPath.lineTo(cp.x, cp.y);
+            this.sliderPath.moveTo(cp.x, cp.y);
         }
         ///////////
         this.prerendered = null;
@@ -79,8 +107,8 @@ export class Slider {
 
         // The last set of coordinates in the ballPath array is the end position of the slider
         this.visualEndPos = {
-            x: this.curvePoints.at(-1)[0],
-            y: this.curvePoints.at(-1)[1],
+            x: this.curveSegments.at(-1)[0],
+            y: this.curveSegments.at(-1)[1],
         }
 
         //https://osu.ppy.sh/wiki/hu/Client/File_formats/osu_%28file_format%29
@@ -110,18 +138,18 @@ export class Slider {
         this.reverseArrows[0].y = this.y;
 
         // Set position for the slider end reverse
-        this.reverseArrows[1].x = this.visualEndPos.x;
-        this.reverseArrows[1].y = this.visualEndPos.y;
+        this.reverseArrows[1].x = this.curveSegments.at(-1).x;
+        this.reverseArrows[1].y = this.curveSegments.at(-1).y;
 
         // Rotate the sprites according to the line angle of the slider segment they are sitting at
         this.reverseArrows[0].rotation = this.game.utils.getLineAngle(
-            this.curvePoints.at(0)[0], this.curvePoints.at(0)[1],
-            this.curvePoints.at(1)[0], this.curvePoints.at(1)[1]
+            this.curveSegments.at(0).x, this.curveSegments.at(0).y,
+            this.curveSegments.at(1).x, this.curveSegments.at(1).y
         ) - (Math.PI * 0.5);
 
         this.reverseArrows[1].rotation = this.game.utils.getLineAngle(
-            this.curvePoints.at(-2)[0], this.curvePoints.at(-2)[1],
-            this.visualEndPos.x, this.visualEndPos.y
+            this.curveSegments.at(-2).x, this.curveSegments.at(-2).y,
+            this.curveSegments.at(-1).x, this.curveSegments.at(-1).y,
         ) + (Math.PI * 0.5);
 
         // The ball movement is controlled by a series of animation in a timeline
@@ -149,16 +177,17 @@ export class Slider {
 
             //if (i === 0) {
             segmentLengthPx = this.game.utils.getDistance(
-                curvePoint[0], curvePoint[1],
-                this.ballPath[i + 1][0], this.ballPath[i + 1][1]
+                curvePoint.x, curvePoint.y,
+                this.ballPath[i + 1].x, this.ballPath[i + 1].y
             ) / this.scale;
-            segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal * this.pathTimeScale;
+            //segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal * this.pathTimeScale;
+            segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.oneSlideTime * this.pathTimeScale;
             this.ballMovement.appendAnimation(
                 new this.game.ANI(
                     currentSegmentTime,
                     currentSegmentTime + segmentLengthMs,
-                    curvePoint[0],
-                    this.ballPath[i + 1][0],
+                    curvePoint.x,
+                    this.ballPath[i + 1].x,
                     this.game.EASINGS.Linear,
                     false,
                     "X"
@@ -168,8 +197,8 @@ export class Slider {
                 new this.game.ANI(
                     currentSegmentTime,
                     currentSegmentTime + segmentLengthMs,
-                    curvePoint[1],
-                    this.ballPath[i + 1][1],
+                    curvePoint.y,
+                    this.ballPath[i + 1].y,
                     this.game.EASINGS.Linear,
                     false,
                     "Y"
@@ -210,21 +239,22 @@ export class Slider {
 
         // Tell the AutoplayController about the end position, the ball following is done in the update method
         if (this.game.autoplay.activated) {
-            this.game.autoplay.add(this.endTime, curvePoint[0], curvePoint[1]);
+            this.game.autoplay.add(this.endTime, curvePoint.x, curvePoint.y);
         }
     }
 
     calculateTotalSegmentTime() {
         let currentSegmentTime = 0;
-        for (let i = 0; i < this.curvePoints.length; i++) {
-            const curvePoint = this.curvePoints[i];
-            if (!this.curvePoints[i + 1]) break;
+        for (let i = 0; i < this.curveSegments.length; i++) {
+            const curvePoint = this.curveSegments[i];
+            if (!this.curveSegments[i + 1]) break;
 
             let segmentLengthPx = this.game.utils.getDistance(
-                curvePoint[0], curvePoint[1],
-                this.curvePoints[i + 1][0], this.curvePoints[i + 1][1]
+                curvePoint.x, curvePoint.y,
+                this.curveSegments[i + 1].x, this.curveSegments[i + 1].y
             ) / this.scale;
-            let segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal;
+            //let segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.sliderTimeLengthTotal;
+            let segmentLengthMs = (segmentLengthPx / this.pixelLength) * this.oneSlideTime;
 
             currentSegmentTime += segmentLengthMs;
         };
@@ -310,8 +340,8 @@ export class Slider {
         }
 
         this.ballMovement.update(currentTime);
-        this.ballSprite.x = this.ballMovement.getValueOf("X") || this.ballPath.at(-1)[0];
-        this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.ballPath.at(-1)[1];
+        this.ballSprite.x = this.ballMovement.getValueOf("X") || this.ballPath.at(-1).x;
+        this.ballSprite.y = this.ballMovement.getValueOf("Y") || this.ballPath.at(-1).y;
         this.ballSprite.opacity = currentTime < this.endTime ? this.fading.currentValue : 0;
 
         this.followSprite.x = this.ballMovement.getValueOf("X") || this.ballSprite.x;

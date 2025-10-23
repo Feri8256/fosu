@@ -5,6 +5,13 @@ const TYPE_PARAM = {
     SPINNER: 3
 }
 
+class Point {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
 export class BeatmapPlayer {
     constructor(game) {
         this.game = game;
@@ -118,13 +125,13 @@ export class BeatmapPlayer {
                 let scaledCurvePoints = [];
                 element.curvePoints.forEach((cp) => {
                     scaledCurvePoints.push(
-                        [
+                        new Point(
                             this.game.utils.convertRange(cp[0], 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
                             this.game.utils.convertRange(cp[1], 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset)
-
-                        ]
+                        )
                     )
                 });
+
                 this.sliders.push(
                     new this.game.SLIDER(
                         this.game,
@@ -143,7 +150,8 @@ export class BeatmapPlayer {
                         element.edgeSounds,
                         element.edgeSets,
                         element.hitSound,
-                        element.hitSample
+                        element.hitSample,
+                        element.curveType
                     )
                 )
             }
@@ -480,7 +488,7 @@ export class BeatmapPlayer {
     }
 
     isIntroSkipable() {
-        return this.introSkipable && ! this.introSkipped;
+        return this.introSkipable && !this.introSkipped;
     }
 
     setSkipButtonVisibility(state) {
@@ -533,7 +541,7 @@ export class BeatmapPlayer {
         this.inBreak = isBreak;
 
         this.game.backgroundManager.changeOpacity(
-            1 - (this.inBreak ? 0 : this.game.CONFIG.backgroundDim), 
+            1 - (this.inBreak ? 0 : this.game.CONFIG.backgroundDim),
             this.inBreak ? 1000 : 750
         );
 
