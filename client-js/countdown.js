@@ -13,6 +13,7 @@ export class Countdown {
         this.lastCountSoundIndex = 0;
         this.disabled = this.firstHitObjectTime === -1;
 
+        this.ani = new this.game.ANI();
 
         if (this.disabled) return;
 
@@ -25,8 +26,13 @@ export class Countdown {
             new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("ready"))
         ];
 
+        // The "ready" sprite starts off as invisible until the animation touches its opacity value!
+        this.countSprites[4].opacity = 0;
+
         this.fourBeatsBehindAtMs = this.firstHitObjectTime - (this.beatLength * 4);
         this.sixBeatsBehindAtMs = this.firstHitObjectTime - (this.beatLength * 6);
+
+        this.currentCountIndex = 4;
     }
 
     /**
@@ -37,28 +43,53 @@ export class Countdown {
     update(currentTime) {
         if (this.disabled) return;
 
+        this.ani.update(currentTime);
+
         this.currentCountSoundIndex = Math.floor((this.firstHitObjectTime - currentTime) / this.beatLength);
-        if (
-            this.currentCountSoundIndex !== this.lastCountSoundIndex &&
-            currentTime >= this.fourBeatsBehindAtMs &&
-            currentTime <= this.firstHitObjectTime &&
-            this.currentCountSoundIndex < this.countSounds.length
-        ) {
-            this.game.auMgr.playAudioClip(this.countSounds[this.currentCountSoundIndex]);
-            this.lastCountSoundIndex = this.currentCountSoundIndex;
+
+        if (this.currentCountIndex !== this.currentCountSoundIndex && this.currentCountSoundIndex > -1) {
+
+            if (this.currentCountSoundIndex === 6) {
+                this.ani = new this.game.ANI(
+                    currentTime, currentTime + this.beatLength,
+                    0, 1,
+                    this.game.EASINGS.BackOut
+                );
+            }
+
+            if (this.currentCountSoundIndex === 5) {
+                this.game.auMgr.playAudioClip("readys");
+            }
+
+            if (this.currentCountSoundIndex < 4) {
+                this.game.auMgr.playAudioClip(this.countSounds[this.currentCountSoundIndex]);
+
+                this.ani = new this.game.ANI(
+                    currentTime, currentTime + 200,
+                    0, 1,
+                    this.game.EASINGS.BackOut
+                );
+            }
+
+            this.currentCountIndex = this.currentCountSoundIndex;
         }
 
-        if (this.currentCountSoundIndex === 6 && this.currentCountSoundIndex !== this.lastCountSoundIndex) {
-            this.game.auMgr.playAudioClip("readys");
-            this.lastCountSoundIndex = this.currentCountSoundIndex;
+        if (this.currentCountSoundIndex < 4) {
+            this.countSprites.forEach((s, i) => {
+                s.x = this.game.canvas.width * 0.5;
+                s.y = this.game.canvas.height * 0.5;
+                s.opacity = i === this.currentCountSoundIndex ? this.ani.amount : 0;
+                s.scale = this.ani.currentValue;
+            });
+
+        }
+        if (this.currentCountSoundIndex > 4) {
+            let readySprite = this.countSprites[4];
+            readySprite.opacity = this.game.utils.clamp(this.ani.currentValue, 0, 1);
+            readySprite.scale = 1;
+            readySprite.x = this.game.canvas.width * 0.5 * this.ani.currentValue;
         }
 
-        this.countSprites.forEach((s, i) => {
-            s.x = this.game.canvas.width * 0.5;
-            s.y = this.game.canvas.height * 0.5;
-            s.opacity = i === this.currentCountSoundIndex ? 1 : 0;
-            s.scale = 1;
-        });
 
     }
 

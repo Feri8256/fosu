@@ -32,10 +32,8 @@ export class InputOverlay {
     }
 
     update() {
-        this.x = this.game.canvas.width;
-        this.y = this.game.canvas.height * 0.5;
-        this.background.x = this.x;
-        this.background.y = this.y;
+        this.x = this.background.x = this.game.canvas.width;
+        this.y = this.background.y = this.game.canvas.height * 0.5;
 
         this.keySprites.forEach((s, i) => {
             s.x = this.x - this.keyWidth * 0.5;
