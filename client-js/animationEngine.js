@@ -44,13 +44,28 @@ export let EASING = {
     ExpoOut: (x) => {
         return x === 1 ? 1 : 1 - Math.pow(2, -10 * x);
     },
+    ExpoInOut: (x) => {
+        return x === 0
+            ? 0
+            : x === 1
+                ? 1
+                : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2
+                    : (2 - Math.pow(2, -20 * x + 10)) / 2;
+
+    },
+    QuartIn: (x) => {
+        return x * x * x * x;
+    },
     QuartOut: (x) => {
         return 1 - Math.pow(1 - x, 4);
+    },
+    QuartInOut: (x) => {
+        return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
     },
     CubicIn: (x) => {
         return x * x * x;
     },
-    BounceOut:(x) => {
+    BounceOut: (x) => {
         const n1 = 7.5625;
         const d1 = 2.75;
 
@@ -179,7 +194,7 @@ export class Timeline {
      * @param {String} id 
      */
     getValueOf(id) {
-        if(!this.playing) return;
+        if (!this.playing) return;
         let f = this.animations.findIndex((fa) => { return fa.id === id && fa.startTime <= this.timelineCurrentTime && fa.endTime >= this.timelineCurrentTime });
         if (f === -1) return;
         return this.animations[f].currentValue;

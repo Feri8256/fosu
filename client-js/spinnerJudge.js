@@ -43,6 +43,8 @@ export class SpinnerJudge {
 
     onEnd() {
         this.s.game.comboMeter.addHit(true);
+
+        this.s.playHitSound();
         console.log("it spind");
     }
 

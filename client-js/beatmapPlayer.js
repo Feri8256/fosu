@@ -1,3 +1,7 @@
+import { Circle } from "./objects/circle.js";
+import { Slider } from "./objects/slider.js";
+import { Spinner } from "./objects/spinner.js";
+
 const TYPE_PARAM = {
     CIRCLE: 0,
     SLIDER: 1,
@@ -57,6 +61,9 @@ export class BeatmapPlayer {
 
         this.inBreak = false;
         this.currentBreakPeriod = null;
+
+        this.currentComboNumber = 1;
+        this.currentComboColorIndex = 0;
     }
 
     getBitAtIndex(int, index) {
@@ -82,43 +89,48 @@ export class BeatmapPlayer {
 
             const timingPoint = this.getTimingPointAtTime(element.time);
 
+            const position = new Point(
+                this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
+            );
+
             // Using the timing points sample set setting instead of the hit objects hit sample setting
             element.hitSample.additionSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.additionSet
             element.hitSample.normalSet = timingPoint.inherited?.sampleSet || timingPoint.uninherited?.sampleSet || element.hitSample.normalSet
 
             let objectType = element.type;
 
+            if (this.getBitAtIndex(objectType, TYPE_PARAM.NEW_COMBO)) this.currentComboNumber = 1;
+
             if (this.getBitAtIndex(objectType, TYPE_PARAM.CIRCLE)) {
+
                 this.hitCircles.push(
-                    new this.game.HITCIRCLE(
+                    new Circle(
                         this.game,
-                        this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                        this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
-                        this.globalScale,
+                        position,
                         element.time,
+                        this.globalScale,
                         parsedOSU.Difficulty.CircleSize,
-                        this.timeWindow,
                         element.hitSample,
-                        element.hitSound
+                        element.hitSound,
+                        this.timeWindow,
+                        this.currentComboNumber
                     )
                 );
             };
 
             if (this.getBitAtIndex(objectType, TYPE_PARAM.SLIDER)) {
-                let objectX = this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset);
-                let objectY = this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset);
-
                 this.hitCircles.push(
-                    new this.game.HITCIRCLE(
+                    new Circle(
                         this.game,
-                        objectX,
-                        objectY,
-                        this.globalScale,
+                        position,
                         element.time,
+                        this.globalScale,
                         parsedOSU.Difficulty.CircleSize,
-                        this.timeWindow,
                         element.hitSample,
-                        element.hitSound
+                        element.hitSound,
+                        this.timeWindow,
+                        this.currentComboNumber
                     )
                 );
 
@@ -133,57 +145,57 @@ export class BeatmapPlayer {
                 });
 
                 this.sliders.push(
-                    new this.game.SLIDER(
+                    new Slider(
                         this.game,
-                        objectX,
-                        objectY,
-                        this.globalScale,
+                        position,
                         element.time,
+                        this.globalScale,
                         parsedOSU.Difficulty.CircleSize,
-                        this.timeWindow,
+                        element.hitSample,
+                        element.hitSound,
                         scaledCurvePoints,
+                        element.curveType,
                         element.slides,
                         element.length,
                         this.parsedOSU.Difficulty.SliderMultiplier,
-                        timingPoint.inherited?.beatLength, // Inherited `beatLength` actually holds `sliderVelocity` value! (i think i was lazy)
+                        timingPoint.inherited?.beatLength,
                         timingPoint.uninherited?.beatLength,
                         element.edgeSounds,
                         element.edgeSets,
-                        element.hitSound,
-                        element.hitSample,
-                        element.curveType
+                        this.timeWindow
                     )
-                )
+                );
             }
 
             if (this.getBitAtIndex(objectType, TYPE_PARAM.SPINNER)) {
+
                 this.spinners.push(
-                    new this.game.SPINNER(
-                        this.game,
-                        this.globalScale,
-                        element.time,
-                        parseInt(element.objectParams),
+                    new Spinner(
+                        this.game, 
+                        position, 
+                        element.time, 
+                        this.globalScale, 
+                        element.hitSample, 
+                        element.hitSound, 
+                        parseInt(element.objectParams), 
                         this.parsedOSU.Difficulty.OverallDifficulty
                     )
-                )
+                );
             }
 
-        });
+            this.currentComboNumber++;
 
-
-        this.sliders.forEach((s) => {
-            if (s.t < 5000) s.createRender();
         });
 
         // Needs fix for instances where a hit objects time is too close to 0 (the first hit object spawn immediately)
         // Possible solution is to start a timer, that can go negative if needed and then switching back to the audio playback time (stutter may occur when the swiching happens)
         this.firsthitObjectTime = Math.min(
-            this.hitCircles.at(0)?.t ?? Infinity,
+            this.hitCircles.at(0)?.time ?? Infinity,
             this.sliders.at(0)?.t ?? Infinity,
-            this.spinners.at(0)?.startTime ?? Infinity
+            this.spinners.at(0)?.time ?? Infinity
         );
         this.lastHitObjectTime = Math.max(
-            this.hitCircles.at(-1)?.t ?? -Infinity,
+            this.hitCircles.at(-1)?.time ?? -Infinity,
             this.sliders.at(-1)?.endTime ?? -Infinity,
             this.spinners.at(-1)?.endTime ?? -Infinity
         );
@@ -244,15 +256,15 @@ export class BeatmapPlayer {
 
         // Select the hit objects that needs to be rendered and updated at currentTime
         this.slidersToRender = this.sliders.filter((s) => {
-            return s.t < this.currentTime + this.timeWindow && s.endTime > this.currentTime - 200 && this.playing
+            return s.time < this.currentTime + this.timeWindow && s.endTime > this.currentTime - 200 && this.playing
         });
 
         this.hitCirclesToRender = this.hitCircles.filter((o) => {
-            return o.t < this.currentTime + this.timeWindow && o.t > this.currentTime - this.timeWindow && this.playing
+            return o.time < this.currentTime + this.timeWindow && o.time > this.currentTime - this.timeWindow && this.playing
         });
 
         this.spinnersToRender = this.spinners.filter((o) => {
-            return o.startTime < this.currentTime + 200 && o.endTime > this.currentTime - 200 && this.playing
+            return o.time < this.currentTime + 200 && o.endTime > this.currentTime - 200 && this.playing
         });
 
         // Loop through the hit objects that needs to be rendered and updated before rendering happens        
@@ -260,16 +272,14 @@ export class BeatmapPlayer {
             u.update(this.currentTime);
 
             // Autoplay can click circles to the beat
-            if (this.game.autoplay.activated && !u.hitCheck && this.currentTime >= u.t) {
-
-                this.game.hitSoundPlayer.playHitSound(u.hitSample.normalSet, u.hitSample.additionSet, u.hitSound);
+            if (this.game.autoplay.activated && !u.hitCheck && this.currentTime >= u.time) {
 
                 this.accJudgments.push(
                     new this.game.ACCJUDGMENT(
                         this.game,
-                        u.x,
-                        u.y,
-                        u.scale,
+                        u.position.x,
+                        u.position.y,
+                        u.scaling,
                         this.game.CONFIG.hide300Points ? -1 : 3
                     )
                 );
@@ -280,17 +290,16 @@ export class BeatmapPlayer {
 
                 // Start the hit animation of the hit object
                 u.tap();
-                u.hitCheck = true;
             }
 
             // When its too late to click and no hit registered on the hit object it counts as a miss
-            if (u.hittedAt === 0 && !u.hitCheck && u.t < this.currentTime - 300) {
+            if (!u.hitCheck && u.time < this.currentTime - 300) {
                 this.accJudgments.push(
                     new this.game.ACCJUDGMENT(
                         this.game,
-                        u.x,
-                        u.y,
-                        u.scale,
+                        u.position.x,
+                        u.position.y,
+                        u.scaling,
                         0
                     )
                 );
@@ -387,13 +396,13 @@ export class BeatmapPlayer {
         // Finds the hit object that is close in time and in distance
         // No notelocking :)
         let obj = this.hitCirclesToRender.find((ho) => {
-            let distance = this.game.utils.getDistance(ho.x, ho.y, mouse.x, mouse.y);
-            return ho.t - 200 < hitTimestamp && ho.t + 200 > hitTimestamp && !ho.hitCheck && distance <= ho.rad
+            let distance = this.game.utils.getDistance(ho.position.x, ho.position.y, mouse.x, mouse.y);
+            return ho.time - 200 < hitTimestamp && ho.time + 200 > hitTimestamp && !ho.hitCheck && distance <= ho.rad
         });
 
         // In case we have not found the hit object we wanted
         if (!obj) return;
-        let hitDeltaTime = Math.abs(obj.t - hitTimestamp);
+        let hitDeltaTime = Math.abs(obj.time - hitTimestamp);
 
         // Register the hit to the accuracy meter that returns a number for judgment
         // When the result is not a miss (0) do not break combo
@@ -403,25 +412,21 @@ export class BeatmapPlayer {
             this.game.scoreMeter.add(hitResult);
         }
 
-        // Play a hitsound
-        this.game.hitSoundPlayer.playHitSound(obj.hitSample.normalSet, obj.hitSample.additionSet, obj.hitSound);
-
         // Check if the configuration enables the 300s to be invisible
         // Add the accuracy judgment to their array
         if (hitResult === 3 && this.game.CONFIG.hide300Points) hitResult = -1;
         this.accJudgments.push(
             new this.game.ACCJUDGMENT(
                 this.game,
-                obj.x,
-                obj.y,
-                obj.scale,
+                obj.position.x,
+                obj.position.y,
+                obj.scaling,
                 hitResult
             )
         );
 
         // Start the hit animation of the hit object
         obj.tap();
-        obj.hitCheck = true;
     }
 
     /**
@@ -438,7 +443,7 @@ export class BeatmapPlayer {
         this.hitCircles.length = 0;
         this.hitCirclesToRender.length = 0;
 
-        this.sliders.forEach((sl) => { sl.destroyRender(); });
+        //this.sliders.forEach((sl) => { sl.destroyRender(); });
         this.sliders.length = 0;
         this.slidersToRender.length = 0;
         this.spinners.length = 0;

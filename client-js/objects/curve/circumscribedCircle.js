@@ -17,6 +17,11 @@ class Point {
 }
 
 export class CircumscribedCircle {
+    /**
+     * 
+     * @param {[Point]} points 
+     * @param {Number} pixelLength 
+     */
     constructor(points, pixelLength) {
         var a = points[0].x - points[1].x, b = points[0].y - points[1].y,
             c = points[1].x - points[2].x, d = points[1].y - points[2].y,
@@ -58,4 +63,8 @@ export class CircumscribedCircle {
         return new Point(this.circle.x + Math.cos(angle) * this.circle.radius,
             this.circle.y + Math.sin(angle) * this.circle.radius);
     };
+
+    getPath() {
+        return this.path;
+    }
 }

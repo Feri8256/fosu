@@ -6,7 +6,7 @@ export class SkinResourceManager {
 
         this.skinConfig = {
             general: {},
-            colours: {
+            colors: {
                 combo: ["255,128,0", "0,123,255", "222,255,0", "0,255,111"]
             }
         }
@@ -74,7 +74,8 @@ export class SkinResourceManager {
                 "count3s.wav",
                 "gos.wav",
                 "readys.wav",
-                "spinnerbonus.wav"
+                "spinnerbonus.wav",
+                "pause-loop.wav"
             ]
         }
 
@@ -123,6 +124,17 @@ export class SkinResourceManager {
             .then((resp) => resp.json())
             .then((d) => {
 
+                if (d.config?.Colours.Combo1) {
+                    this.skinConfig.colors.combo.length = 0;
+
+                    for (let colorIndex = 1; colorIndex < 16; colorIndex++) {
+                        const c = d.config.Colours[`Combo${colorIndex}`];
+                        if (!c) break;
+                        this.skinConfig.colors.combo.push(c);
+                    }
+                    //console.log(this.skinConfig)
+                }
+
                 // Load sprites
                 this.filesNeeded.sprites.forEach((fileName) => {
                     if (d.files.includes(fileName)) {
@@ -150,9 +162,7 @@ export class SkinResourceManager {
             })
     }
 
-    unload() {
 
-    }
 
 
 }

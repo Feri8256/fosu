@@ -8,9 +8,6 @@ import { BackgrondImageManager } from "./backgroundImage.js";
 import { BeatmapLoader } from "./beatmapLoader.js";
 import { BeatmapPlayer } from "./beatmapPlayer.js";
 import { SkinResourceManager } from "./skinResourceManager.js";
-import { HitCircle } from "./hitObjectCircle.js";
-import { Slider } from "./hitObjectSlider.js";
-import { Spinner } from "./hitObjectSpinner.js";
 import { AccuracyJudgment } from "./accuracyJudgment.js";
 import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./gameStates.js";
 import { InputHandler } from "./InputHandler.js";
@@ -34,9 +31,6 @@ import { ScoreMeter } from "./scoreMeter.js";
 import { SpinnerJudge } from "./spinnerJudge.js";
 import { SpinnerBonusDisplay } from "./spinnerBonusDisplay.js";
 import { getElements } from "./UIelements.js";
-import { CircumscribedCircle } from "./circumscribedCircle.js";
-import { Bezier2 } from "./bezier2.js"
-
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 
 class Game {
@@ -98,8 +92,7 @@ class Game {
 
         this.INPUTHANDLER = InputHandler;
         this.CURSOR = Cursor;
-        this.HITCIRCLE = HitCircle;
-        this.SLIDER = Slider;
+
         this.SPINNER = Spinner;
         this.SPINNERJUDGE = SpinnerJudge;
         this.INPUTOVERLAY = InputOverlay;
@@ -252,8 +245,6 @@ class Game {
             this.spinnerBonusDisplay.render();
             this.cursor.render();
         }
-
-
     }
 
     setState(stateEnum) {

@@ -173,6 +173,13 @@ class Paused extends GameState {
                 fill: "forwards"
             }
         );
+
+        this.game.auMgr.playAudioClip("pause-loop", true);
+    }
+
+    leave() {
+        this.game.auMgr.stopAudioClip("pause-loop");
+
     }
 
     handleInput() {

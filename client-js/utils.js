@@ -14,9 +14,22 @@ const utils = {
         return - Math.atan2(diffX, diffY);
     },
 
+    getLineAngleP: (point_A, point_B) => {
+        let diffX = point_A.x - point_B.x;
+        let diffY = point_A.y - point_B.y;
+        return - Math.atan2(diffX, diffY);
+    },
+
     getDistance: (ax, ay, bx, by) => {
         let distX = Math.abs(ax - bx);
         let distY = Math.abs(ay - by);
+        let dist = Math.sqrt((distX * distX) + (distY * distY));
+        return dist;
+    },
+
+    getDistanceP: (point_A, point_B) => {
+        let distX = Math.abs(point_A.x - point_B.x);
+        let distY = Math.abs(point_A.y - point_B.y);
         let dist = Math.sqrt((distX * distX) + (distY * distY));
         return dist;
     }

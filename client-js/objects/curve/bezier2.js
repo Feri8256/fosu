@@ -6,6 +6,11 @@ class Point {
 }
 
 export class Bezier2 {
+    /**
+     * 
+     * @param {[Point]} points 
+     * @param {Number} pixelLength 
+     */
     constructor(points, pixelLength) {
         // https://github.com/itdelatrisu/opsu/blob/master/src/itdelatrisu/opsu/objects/curves/Bezier2.java
         if (points.length < 2) {
@@ -35,4 +40,8 @@ export class Bezier2 {
         }
         return point;
     };
+
+    getPath() {
+        return this.path;
+    }
 }
