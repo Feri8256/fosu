@@ -1,6 +1,6 @@
-import { Circle } from "./objects/circle.js";
-import { Slider } from "./objects/slider.js";
-import { Spinner } from "./objects/spinner.js";
+import { Circle } from "../objects/circle.js";
+import { Slider } from "../objects/slider.js";
+import { Spinner } from "../objects/spinner.js";
 
 const TYPE_PARAM = {
     CIRCLE: 0,
@@ -75,7 +75,7 @@ export class BeatmapPlayer {
         this.isSpectating = spectating
 
         this.timeWindow = this.calculateApproachRate(parsedOSU.Difficulty.ApproachRate);
-        this.globalScale = (this.game.canvas.height / this.playFieldHeight) * 0.8;
+        this.globalScale = (this.game.canvas.height / this.playFieldHeight) * 0.85;
         this.xScale = this.game.canvas.width / this.playFieldWidth;
         this.yScale = this.game.canvas.height / this.playFieldHeight;
         this.xOffset = (this.game.canvas.width - (this.playFieldWidth * this.globalScale)) * 0.5;

@@ -1,36 +1,35 @@
 import { utils } from "./utils.js";
-import { SongSelectionBuilder } from "./songSelectionBuilder.js";
+import { SongSelectionBuilder } from "./UI/songSelectionBuilder.js";
 import { songSelectionManager } from "./songSelectionManager.js";
-import { Sprite, SpriteImage } from "./sprite.js";
+import { Sprite, SpriteImage } from "./graphics/sprite.js";
 import { Animation, Timeline, EASING } from "./animationEngine.js";
-import { SongAudioHandler } from "./songAudioHandler.js";
-import { BackgrondImageManager } from "./backgroundImage.js";
-import { BeatmapLoader } from "./beatmapLoader.js";
-import { BeatmapPlayer } from "./beatmapPlayer.js";
+import { SongAudioHandler } from "./audio/songAudioHandler.js";
+import { BackgrondImageManager } from "./UI/backgroundImage.js";
+import { BeatmapLoader } from "./beatmap/beatmapLoader.js";
+import { BeatmapPlayer } from "./beatmap/beatmapPlayer.js";
 import { SkinResourceManager } from "./skinResourceManager.js";
 import { AccuracyJudgment } from "./accuracyJudgment.js";
 import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./gameStates.js";
-import { InputHandler } from "./InputHandler.js";
-import { Cursor } from "./cursor.js";
-import { AccuracyMeter } from "./accuracyMeter.js";
-import { ComboMeter } from "./comboMeter.js";
-import { AudioManager } from "./audioManager.js";
-import { InputOverlay } from "./inputOverlay.js";
-import { InputValidator } from "./inputValidator.js";
-import { ResultScreenUpdater } from "./resultScreenUpdate.js";
-import { HitSoundPlayer } from "./hitSoundPlayer.js";
-import { SpriteFontRenderer } from "./fontRenderer.js";
-import { SettingsManager } from "./settingsManager.js";
+import { InputHandler } from "./input/InputHandler.js";
+import { Cursor } from "./gameUI/cursor.js";
+import { AccuracyMeter } from "./gameUI/accuracyMeter.js";
+import { ComboMeter } from "./gameUI/comboMeter.js";
+import { AudioManager } from "./audio/audioManager.js";
+import { InputOverlay } from "./gameUI/inputOverlay.js";
+import { InputValidator } from "./input/inputValidator.js";
+import { ResultScreenUpdater } from "./UI/resultScreenUpdate.js";
+import { HitSoundPlayer } from "./beatmap/hitSoundPlayer.js";
+import { SpriteFontRenderer } from "./graphics/fontRenderer.js";
+import { SettingsManager } from "./UI/settingsManager.js";
 import { AutoplayController } from "./autoplay.js";
-import { createSkinList } from "./skinListBuilder.js";
-import { ScoreBoardManager } from "./scoreBoard.js";
-import { ReplayManager } from "./replayManager.js";
-import { ReplayWatchStartHandler } from "./startReplayWatch.js";
-import { Countdown } from "./countdown.js";
-import { ScoreMeter } from "./scoreMeter.js";
-import { SpinnerJudge } from "./spinnerJudge.js";
-import { SpinnerBonusDisplay } from "./spinnerBonusDisplay.js";
-import { getElements } from "./UIelements.js";
+import { createSkinList } from "./UI/skinListBuilder.js";
+import { ScoreBoardManager } from "./UI/scoreBoard.js";
+import { ReplayManager } from "./replay/replayManager.js";
+import { ReplayWatchStartHandler } from "./replay/startReplayWatch.js";
+import { Countdown } from "./gameUI/countdown.js";
+import { ScoreMeter } from "./gameUI/scoreMeter.js";
+import { SpinnerBonusDisplay } from "./gameUI/spinnerBonusDisplay.js";
+import { getElements } from "./UI/UIelements.js";
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 
 class Game {
@@ -85,16 +84,8 @@ class Game {
         this.ANI = Animation;
         this.TL = Timeline;
 
-        this.CURVE_TYPES = {
-            CircumscribedCircle,
-            Bezier2
-        }
-
         this.INPUTHANDLER = InputHandler;
         this.CURSOR = Cursor;
-
-        this.SPINNER = Spinner;
-        this.SPINNERJUDGE = SpinnerJudge;
         this.INPUTOVERLAY = InputOverlay;
         this.COUNTDOWN = Countdown;
 
