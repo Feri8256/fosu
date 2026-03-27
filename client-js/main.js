@@ -39,7 +39,7 @@ class Game {
         this.canvas = document.querySelector("canvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.ctx = this.canvas.getContext("2d");
+        this.ctx = this.canvas.getContext("2d", {alpha: false, desynchronized: true });
 
         this.offscreenCanvas = new OffscreenCanvas(window.innerWidth, window.innerHeight);
         this.offscreenCtx = this.offscreenCanvas.getContext("2d", { willReadFrequently: true });

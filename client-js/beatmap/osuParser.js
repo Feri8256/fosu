@@ -1,5 +1,5 @@
 function createHitSample(t) {
-    let hitSampleTokens = t ? t.split(":") : ["0","0","0","0"];
+    let hitSampleTokens = t ? t.split(":") : ["0", "0", "0", "0"];
     return {
         normalSet: parseInt(hitSampleTokens[0] ?? 0),
         additionSet: parseInt(hitSampleTokens[1] ?? 0),
@@ -87,7 +87,7 @@ export function parseOsu(str) {
         let eventTokens = eventLine.split(commaSeparator);
 
         if (eventTokens[0] === "0") out.Events.BackgroundImage = eventTokens[2].replaceAll(`"`, "");
-        if (eventTokens[0] === "2" || eventTokens[0] === "Break") out.Events.Breaks.push( { startTime: parseInt(eventTokens[1]), endTime: parseInt(eventTokens[2])});
+        if (eventTokens[0] === "2" || eventTokens[0] === "Break") out.Events.Breaks.push({ startTime: parseInt(eventTokens[1]), endTime: parseInt(eventTokens[2]) });
     }
 
 
@@ -116,6 +116,7 @@ export function parseOsu(str) {
     // Find the row start and end of the HitObjects section
     let hitObjectLinesStart = rows.findIndex(r => r.startsWith('[HitObjects]'));
     let hitObjectLinesEnd = rows.findIndex((r, i) => (!r || r === '') && i > hitObjectLinesStart);
+    if (hitObjectLinesEnd === -1) hitObjectLinesEnd = rows.length;
 
     for (let i = hitObjectLinesStart + 1; i < hitObjectLinesEnd; i++) {
         let hitObjectLine = rows[i];
