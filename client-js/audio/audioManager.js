@@ -27,6 +27,7 @@ class AudioClip {
     }
 
     stop(stop_delay_s) {
+        if (!this.playable) return;
         this.source.stop(stop_delay_s);
     }
 }

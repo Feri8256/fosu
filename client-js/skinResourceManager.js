@@ -124,11 +124,11 @@ export class SkinResourceManager {
             .then((resp) => resp.json())
             .then((d) => {
 
-                if (d.config?.Colours.Combo1) {
+                if (d.config?.Colours?.Combo1) {
                     this.skinConfig.colors.combo.length = 0;
 
                     for (let colorIndex = 1; colorIndex < 16; colorIndex++) {
-                        const c = d.config.Colours[`Combo${colorIndex}`];
+                        const c = d?.config?.Colours[`Combo${colorIndex}`];
                         if (!c) break;
                         this.skinConfig.colors.combo.push(c);
                     }

@@ -17,7 +17,7 @@ export class Circle extends HitObject {
         this.timeWindow = timeWindow;
 
         this.circleScale = this.scaling / (this.circleSize * 0.5);
-        this.approachSize = this.circleScale * 4;
+        this.approachSize = this.circleScale * 3.5;
 
         this.hitEffectDurationMs = 200;
 
