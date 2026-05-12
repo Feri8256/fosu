@@ -11,6 +11,8 @@ export class ResultScreenUpdater {
             this.game.currentState.replayWatch();
             this.game.replayWatchStartHandler.sendLoadRequest(this.replayId);
         });
+
+        this.game.events.on("UI:ResultScreen:Update", (o) => { this.update(o); });
     }
 
     update({

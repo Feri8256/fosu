@@ -36,8 +36,6 @@ export class BeatmapPlayer {
         this.spinners = [];
         this.spinnersToRender = [];
 
-        this.accJudgments = [];
-
         this.currentTime = 0;
         this.timeWindow = 0;
 
@@ -171,13 +169,13 @@ export class BeatmapPlayer {
 
                 this.spinners.push(
                     new Spinner(
-                        this.game, 
-                        position, 
-                        element.time, 
-                        this.globalScale, 
-                        element.hitSample, 
-                        element.hitSound, 
-                        parseInt(element.objectParams), 
+                        this.game,
+                        position,
+                        element.time,
+                        this.globalScale,
+                        element.hitSample,
+                        element.hitSound,
+                        parseInt(element.objectParams),
                         this.parsedOSU.Difficulty.OverallDifficulty
                     )
                 );
@@ -274,15 +272,7 @@ export class BeatmapPlayer {
             // Autoplay can click circles to the beat
             if (this.game.autoplay.activated && !u.hitCheck && this.currentTime >= u.time) {
 
-                this.accJudgments.push(
-                    new this.game.ACCJUDGMENT(
-                        this.game,
-                        u.position.x,
-                        u.position.y,
-                        u.scaling,
-                        this.game.CONFIG.hide300Points ? -1 : 3
-                    )
-                );
+                this.game.events.emit("game:hit", u.position, 3, u.scaling);
 
                 this.game.accuracyMeter.addHit(true, 0);
                 this.game.comboMeter.addHit(true);
@@ -294,15 +284,9 @@ export class BeatmapPlayer {
 
             // When its too late to click and no hit registered on the hit object it counts as a miss
             if (!u.hitCheck && u.time < this.currentTime - 300) {
-                this.accJudgments.push(
-                    new this.game.ACCJUDGMENT(
-                        this.game,
-                        u.position.x,
-                        u.position.y,
-                        u.scaling,
-                        0
-                    )
-                );
+               
+                this.game.events.emit("game:hit", u.position, 0, u.scaling);
+
                 // Register a not successful hit to the accuracy meter and combo meter
                 this.game.accuracyMeter.addHit(false, -1);
                 this.game.comboMeter.addHit(false);
@@ -315,11 +299,6 @@ export class BeatmapPlayer {
         this.slidersToRender.forEach((s) => { s.update(this.currentTime); });
 
         this.spinnersToRender.forEach((s) => { s.update(this.currentTime); });
-
-        this.accJudgments.forEach((a) => { a.update(); });
-
-        // Remove the accuracy judgments that has the `markedForDeletion` property set to true
-        this.accJudgments = this.accJudgments.filter((a) => { return !a.markedForDeletion });
 
         if (this.currentTime > this.skipToTime && !this.introSkipped && this.playing) {
             this.setSkipButtonVisibility(false);
@@ -343,7 +322,6 @@ export class BeatmapPlayer {
         this.spinnersToRender.forEach((o) => { o.render() });
         this.slidersToRender.forEach((s) => { s.render() });
         this.hitCirclesToRender.forEach((o) => { o.render() });
-        this.accJudgments.forEach((a) => { a.render() });
 
         // Beatmap time progress bar on the bottom
         if (!this.playing) return;
@@ -390,8 +368,8 @@ export class BeatmapPlayer {
      * @param {*} mouse mouse coordinates
      * @returns 
      */
-    hit(mouse) {
-        let hitTimestamp = this.game.songAudioHandler.getCurrentTime();
+    hit(mouse, currentTime) {
+        let hitTimestamp = currentTime || this.game.songAudioHandler.getCurrentTime();
 
         // Finds the hit object that is close in time and in distance
         // No notelocking :)
@@ -412,18 +390,7 @@ export class BeatmapPlayer {
             this.game.scoreMeter.add(hitResult);
         }
 
-        // Check if the configuration enables the 300s to be invisible
-        // Add the accuracy judgment to their array
-        if (hitResult === 3 && this.game.CONFIG.hide300Points) hitResult = -1;
-        this.accJudgments.push(
-            new this.game.ACCJUDGMENT(
-                this.game,
-                obj.position.x,
-                obj.position.y,
-                obj.scaling,
-                hitResult
-            )
-        );
+        this.game.events.emit("game:hit", obj.position, hitResult, obj.scaling);
 
         // Start the hit animation of the hit object
         obj.tap();
@@ -448,8 +415,6 @@ export class BeatmapPlayer {
         this.slidersToRender.length = 0;
         this.spinners.length = 0;
         this.spinnersToRender.length = 0;
-
-        this.accJudgments.length = 0;
 
         this.currentTime = 0;
         this.timeWindow = 0;
@@ -502,7 +467,8 @@ export class BeatmapPlayer {
 
     end() {
         this.playing = false;
-        this.game.resultScreenUpdater.update({
+
+        this.game.events.emit("UI:ResultScreen:Update", {
             playerName: this.game.CONFIG.playerName,
             mapTitle: this.parsedOSU.Metadata.Title,
             mapCreator: this.parsedOSU.Metadata.Creator,

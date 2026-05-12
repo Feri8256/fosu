@@ -58,8 +58,9 @@ export class ScoreBoardManager {
     select(replayId, beatmapHash, playerName) {
         if (!beatmapHash) return;
         let mapMeta = this.game.songSelectBuilder.getMetadataOfBeatmap(beatmapHash);
-        let score = this.currentScoreList.find((s) => { return s.replayId === replayId; })
-        this.game.resultScreenUpdater.update({
+        let score = this.currentScoreList.find((s) => { return s.replayId === replayId; });
+
+        let o = {
             playerName,
             mapArtist: mapMeta.artist,
             mapTitle: mapMeta.title,
@@ -74,7 +75,9 @@ export class ScoreBoardManager {
             replayId,
             date: score.date,
             score: score.score
-        });
+        };
+
+        this.game.events.emit("UI:ResultScreen:Update", o);
         this.game.setState(this.game.STATE_ENUM.RESULT);
     }
 }

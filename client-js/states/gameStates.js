@@ -433,7 +433,7 @@ class Spectate extends GameState {
 
             validatedInputStates.forEach((i) => {
                 if (i.down && i.valid) {
-                    this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
+                    this.game.beatmapPlayer.hit(this.game.cursor.getPosition(), steppedCurrentTime);
                     i.valid = false;
                     return;
                 }

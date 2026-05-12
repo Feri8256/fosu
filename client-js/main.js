@@ -8,8 +8,8 @@ import { BackgrondImageManager } from "./UI/backgroundImage.js";
 import { BeatmapLoader } from "./beatmap/beatmapLoader.js";
 import { BeatmapPlayer } from "./beatmap/beatmapPlayer.js";
 import { SkinResourceManager } from "./skinResourceManager.js";
-import { AccuracyJudgment } from "./accuracyJudgment.js";
-import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./gameStates.js";
+import { AccuracyJudgment } from "./gameUI/accuracyJudgment.js";
+import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./states/gameStates.js";
 import { InputHandler } from "./input/InputHandler.js";
 import { Cursor } from "./gameUI/cursor.js";
 import { AccuracyMeter } from "./gameUI/accuracyMeter.js";
@@ -30,11 +30,14 @@ import { Countdown } from "./gameUI/countdown.js";
 import { ScoreMeter } from "./gameUI/scoreMeter.js";
 import { SpinnerBonusDisplay } from "./gameUI/spinnerBonusDisplay.js";
 import { getElements } from "./UI/UIelements.js";
+import { HitJudgementManager } from "./gameUI/hitJudgementManager.js";
+import { EventSystem } from "./eventSystem.js";
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 
 class Game {
     constructor() {
         this.utils = utils;
+        this.events = new EventSystem();
 
         this.canvas = document.querySelector("canvas");
         this.canvas.width = window.innerWidth;
@@ -101,7 +104,9 @@ class Game {
         this.loading = false;
         this.loadingAnimation = new Animation(0, 1000, 0, 6.28, this.EASINGS.Linear, true);
 
-        this.ACCJUDGMENT = AccuracyJudgment;
+        //this.ACCJUDGMENT = AccuracyJudgment;
+        this.hitJudgeMgr = new HitJudgementManager(this);
+
         this.autoplay = new AutoplayController(this);
 
         this.spinnerBonusDisplay = new SpinnerBonusDisplay(this);
@@ -208,6 +213,7 @@ class Game {
         this.countdown.update(this.songClock);
         this.scoreMeter.update();
         this.spinnerBonusDisplay.update();
+        this.hitJudgeMgr.update();
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);
@@ -234,6 +240,7 @@ class Game {
             this.countdown.render();
             this.scoreMeter.render();
             this.spinnerBonusDisplay.render();
+            this.hitJudgeMgr.render();
             this.cursor.render();
         }
     }

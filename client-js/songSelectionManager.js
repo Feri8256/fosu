@@ -15,6 +15,11 @@ export class songSelectionManager {
         this.currentSelect = {};
     }
 
+    /**
+     * 
+     * @param {HTMLElement} element 
+     * @returns 
+     */
     select(element) {
         if (!element.dataset.uid) return;
 
@@ -33,13 +38,14 @@ export class songSelectionManager {
         }
 
         if (this.previousSelect.id === this.currentSelect.id) {
+            this.scroll = window.scrollY;
+
             this.startMapLoading(this.currentSelect.beatmapSrc);
             this.game.auMgr.playAudioClip("menuhit");
         }
 
         this.previousSelect = this.currentSelect;
 
-        this.scroll = window.scrollY;
     }
 
     changeAudioSource(newURL, time) {
