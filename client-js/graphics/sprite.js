@@ -55,6 +55,20 @@ export class Sprite {
         this.flip_h = flip_h;
         this.flip_v = flip_v;
         this.additiveColor = additiveColor ?? false;
+        
+        this.oSet = false;
+        this.o = { x: 0, y: 0 };
+    }
+
+    setOrigin() {
+        if (!this.spriteImage?.w || !this.spriteImage?.h) return;
+        this.w = this.spriteImage.w;
+        this.h = this.spriteImage.h;
+
+        this.o.x = -this.spriteImage.w * this.origin_x;
+        this.o.y = -this.spriteImage.h * this.origin_y;
+
+        this.oSet = true;
     }
 
     /**
@@ -63,25 +77,28 @@ export class Sprite {
      */
     render(ctx) {
         if (!this.spriteImage?.loaded) return;
+        if (!this.oSet) this.setOrigin();
+        if (this.opacity === 0) return;
+
         ctx.save();
 
         // Additive color compositing
         if (this.additiveColor) ctx.globalCompositeOperation = "lighter";
 
         // Opacity
-        ctx.globalAlpha = this.opacity;
+        if (this.opacity !== 1) ctx.globalAlpha = this.opacity;
 
         // Move
         ctx.translate(this.x, this.y);
 
         // Uniform scaling
-        ctx.scale(this.scale, this.scale);
+        if (this.scale !== 1) ctx.scale(this.scale, this.scale);
 
         // Rotation
-        ctx.rotate(this.rotation);
+        if (this.rotation !== 0) ctx.rotate(this.rotation);
 
         // Vector scaling
-        ctx.scale(this.scale_x, this.scale_y);
+        if (this.scale_x !== 1 || this.scale_y !== 1) ctx.scale(this.scale_x, this.scale_y);
 
         // Horizontal & vertival flip
         ctx.scale(
@@ -90,7 +107,7 @@ export class Sprite {
         );
 
         // Sprite
-        ctx.drawImage(this.spriteImage.img, (-this.spriteImage.w * this.origin_x), (-this.spriteImage.h * this.origin_y));
+        ctx.drawImage(this.spriteImage.img, this.o.x, this.o.y);
 
         ctx.resetTransform();
 

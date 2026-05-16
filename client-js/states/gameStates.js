@@ -31,6 +31,8 @@ class SongSelecting extends GameState {
         this.game.UI.songSelectActions.container.style.display = "block";
         this.game.songSelectManager.scrollToLastPosition();
 
+        this.game.events.emit("GameUI:InputOverlayReset");
+
         this.game.accuracyMeter.reset();
         this.game.comboMeter.reset();
         this.game.scoreMeter.reset();
@@ -90,6 +92,10 @@ class Playing extends GameState {
     constructor(game) {
         super("PLAYING");
         this.game = game;
+
+        this.game.inputValidator.onInputChange = (a) => {
+            this.game.replayManager.addInputEvents(a, this.game.songAudioHandler.getCurrentTime());
+        }
     }
 
     enter() {
@@ -97,7 +103,6 @@ class Playing extends GameState {
 
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
         this.game.cursor = new this.game.CURSOR(this.game, true);
-        this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
 
         this.game.inputHandler.onMousemove = (m) => {
             this.game.cursor.setPosition(m.x, m.y);
@@ -125,17 +130,13 @@ class Playing extends GameState {
             });
         }
 
-        this.game.inputValidator.onInputChange = (a) => {
-            this.game.replayManager.addInputEvents(a, this.game.songAudioHandler.getCurrentTime());
-        }
+        
     }
 
     handleInput() {
         this.game.beatmapPlayer.update(this.game.songClock);
 
         if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
-
-        this.game.inputOverlay.updateInputState(this.game.inputValidator.getInputStates());
 
         this.game.inputOverlay.update();
 
@@ -150,7 +151,7 @@ class Playing extends GameState {
         this.game.inputHandler.onMousemove = () => { }
         this.game.inputHandler.onKeydown = () => { }
         this.game.inputHandler.onKeyup = () => { }
-        this.game.inputValidator.onInputChange = () => { }
+        this.game.inputValidator.onInputChange = () => {};
         this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
     }
 }
@@ -401,7 +402,6 @@ class Spectate extends GameState {
 
         // Dont ask me why we recreate the cursor here but this is how it works correctly...
         this.game.cursor = new this.game.CURSOR(this.game, true);
-        this.game.inputOverlay = new this.game.INPUTOVERLAY(this.game);
     }
 
     handleInput() {
@@ -417,16 +417,16 @@ class Spectate extends GameState {
         }
 
         let steppedCurrentTime = this.game.songClock - this.game.songDeltaTime;
-        let currentInputEvent = [0, 0, 0];
+        let currentInputEvent = [false, false, false];
 
-        while (steppedCurrentTime <= this.game.songClock) {
+        while (steppedCurrentTime < this.game.songClock) {
 
             currentInputEvent = this.game.replayManager.getTappingEvents(steppedCurrentTime);
             this.game.replayManager.updateCursorPosition(steppedCurrentTime);
             this.game.beatmapPlayer.update(steppedCurrentTime);
 
             this.game.inputValidator.updateInputs(
-                currentInputEvent?.k.map((i) => { return i === 1 ? true : false })
+                currentInputEvent?.k.map((i) => { return i; })
             );
 
             let validatedInputStates = this.game.inputValidator.getInputStates();
@@ -438,8 +438,6 @@ class Spectate extends GameState {
                     return;
                 }
             });
-
-            this.game.inputOverlay.updateInputState(validatedInputStates);
 
             steppedCurrentTime += 1;
 
@@ -456,6 +454,7 @@ class Spectate extends GameState {
         if (this.game.autoplay.activated) this.game.autoplay.reset();
         this.game.scoreMeter.reset();
         this.game.songAudioHandler.setPlaybackRate(1);
+        this.game.events.emit("GameUI:InputOverlayReset");
     }
 }
 

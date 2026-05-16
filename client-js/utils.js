@@ -32,6 +32,19 @@ const utils = {
         let distY = Math.abs(point_A.y - point_B.y);
         let dist = Math.sqrt((distX * distX) + (distY * distY));
         return dist;
+    },
+
+    formatNumberString: (n, separator = " ") => {
+        let s = String(n);
+        let out = "";
+
+        for (let ii = s.length; ii > 0; ii--) {
+            let i = s.length - ii;
+            if ((ii % 3) === 0) out += separator;
+            out += s.charAt(i);
+        }
+
+        return out;
     }
 }
 

@@ -22,35 +22,6 @@ export class ScoreMeter {
     constructor(game) {
         this.game = game;
         this.currentScore = 0;
-        this.displayedValue = 0;
-
-        let initialValue = "0",
-            fontSet = this.game.skinResourceManager.scoreFontSet,
-            defaultSpacing = 32,
-            positionX = this.game.canvas.width,
-            positionY = this.game.canvas.height - 8,
-            scaling = 1 * window.devicePixelRatio,
-            opacity = 1,
-            originX = 1,
-            originY = 1;
-
-        this.scoreNumberRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
-
-        this.scoreRolling = new this.game.ANI();
-    }
-
-    update() {
-        this.scoreRolling.update(this.game.clock);
-
-        this.scoreNumberRenderer.x = this.game.canvas.width;
-        this.scoreNumberRenderer.y = this.game.canvas.height - 8;
-
-        this.displayedValue = Math.floor(this.scoreRolling.currentValue);
-        this.scoreNumberRenderer.updateText(String(this.displayedValue));
-    }
-
-    render() {
-        this.scoreNumberRenderer.render(this.game.ctx);
     }
 
     add(hit) {
@@ -92,7 +63,6 @@ export class ScoreMeter {
      */
     calculate(pointValue, comboDependent) {
         // Score = Hit value * (1 + (Combo multiplier * Difficulty multiplier * Mod multiplier / 25))
-        let previousScoreValue = this.currentScore;
 
         if (comboDependent) {
             this.currentScore += pointValue * (1 + (this.game.comboMeter.currentCombo * this.game.beatmapPlayer.difficultyMultiplier * 1 / 25));
@@ -100,19 +70,11 @@ export class ScoreMeter {
             this.currentScore += pointValue;
         }
 
-        this.scoreRolling = new this.game.ANI(
-            this.game.clock,
-            this.game.clock + 400,
-            previousScoreValue,
-            this.currentScore,
-            this.game.EASINGS.SineOut
-        );
-
+        this.game.events.emit("GameUI:ScoreUpdate", this.currentScore);
     }
 
     reset() {
         this.currentScore = 0;
-        this.scoreNumberRenderer.updateText("0");
-        this.scoreRolling = new this.game.ANI();
+        this.game.events.emit("GameUI:ScoreUpdate", 0);
     }
 }

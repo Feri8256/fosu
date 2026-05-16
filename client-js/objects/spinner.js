@@ -1,5 +1,5 @@
 import { HitObject } from "./hitObject.js";
-import { SpinnerJudge } from "../spinnerJudge.js";
+import { SpinnerJudge } from "../judgement/spinnerJudge.js";
 
 export class Spinner extends HitObject {
     constructor(game, position, time, scaling, hitSample, hitSound, endTime, od) {
@@ -28,7 +28,7 @@ export class Spinner extends HitObject {
         this.angleCheck = 0;
 
         this.autoplayRotateRadius = 80;
-        this.autoplayRotateSpeed = 0.85;
+        this.autoplayRotateSpeed = 0.65;
     }
 
     update(currentTime) {

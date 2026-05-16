@@ -83,41 +83,6 @@ export class ReplayManager {
 
             case 1:
 
-
-                //let currentInputEvent = this.inputEvents.find((ie) => {
-                //    return ie.t <= currentTime;
-                //})//.at(-1);
-
-                /*let currentInputEvent = [0, 0, 0];
-                let steppedCurrentTime = currentTime;
-                while (steppedCurrentTime < currentTime + this.game.deltaTime) {
-
-                    currentInputEvent = this.inputEvents.filter((ie) => {
-                        return ie.t <= steppedCurrentTime;
-                    }).at(-1);
-
-                    steppedCurrentTime += 1;
-
-                    if (this.game.deltaTime > 500) break;
-                }*/
-
-                /*let x = this.game.cursor.currentX;
-                let y = this.game.cursor.currentY;
-
-                this.movementXtoUpdate = this.movementX.filter((mx) => { return mx.startTime <= currentTime && mx.endTime >= currentTime });
-                this.movementXtoUpdate.forEach((m) => {
-                    m.update(currentTime);
-                    x = m.currentValue;
-                });
-                this.movementYtoUpdate = this.movementY.filter((my) => { return my.startTime <= currentTime && my.endTime >= currentTime });
-                this.movementYtoUpdate.forEach((n) => {
-                    n.update(currentTime);
-                    y = n.currentValue;
-                });
-
-                this.game.cursor.setPosition(x, y);
-                */
-
                 if (this.currentTime > this.sendChunkRequestAfterMs) {
                     this.game.socket.emit("getReplayChunk", this.currentTime, this.chunkRequestIntervalMs - this.game.deltaTime);
                     this.sendChunkRequestAfterMs = this.currentTime + this.chunkRequestIntervalMs;
@@ -241,8 +206,8 @@ export class ReplayManager {
             { t, k: arr.map((i) => { return i ? 1 : 0 }) },
             { t, x: this.convertedCursorX, y: this.convertedCursorY }
         );
-        this.lastCursorX = this.game.cursor.currentX;
-        this.lastCursorY = this.game.cursor.currentY;
+        //this.lastCursorX = this.game.cursor.currentX;
+        //this.lastCursorY = this.game.cursor.currentY;
     }
 
     onReplayChunkReceive(arr) {
@@ -250,7 +215,12 @@ export class ReplayManager {
 
         arr.forEach((ev) => {
             if (ev.k) {
-                this.inputEvents.push(ev);
+                this.inputEvents.push(
+                    { 
+                        t: ev.t, 
+                        k: ev.k.map(k => k === 1) 
+                    }
+                );
             } else {
                 let calcX = this.game.utils.convertRange(ev.x, 0, 512, this.xOffset, (512 * this.xScale) - this.xOffset);
                 let calcY = this.game.utils.convertRange(ev.y, 0, 384, this.yOffset, (384 * this.yScale) - this.yOffset);

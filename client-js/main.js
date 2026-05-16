@@ -12,8 +12,17 @@ import { AccuracyJudgment } from "./gameUI/accuracyJudgment.js";
 import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./states/gameStates.js";
 import { InputHandler } from "./input/InputHandler.js";
 import { Cursor } from "./gameUI/cursor.js";
-import { AccuracyMeter } from "./gameUI/accuracyMeter.js";
-import { ComboMeter } from "./gameUI/comboMeter.js";
+
+import { AccuracyDisplay } from "./gameUI/accuracyDisplay.js";
+import { AccuracyMeter } from "./judgement/accuracyMeter.js";
+
+import { ComboDisplay } from "./gameUI/comboDisplay.js";
+import { ComboMeter } from "./judgement/comboMeter.js";
+
+import { ScoreDisplay } from "./gameUI/scoreDisplay.js";
+import { ScoreMeter } from "./judgement/scoreMeter.js";
+
+
 import { AudioManager } from "./audio/audioManager.js";
 import { InputOverlay } from "./gameUI/inputOverlay.js";
 import { InputValidator } from "./input/inputValidator.js";
@@ -27,7 +36,6 @@ import { ScoreBoardManager } from "./UI/scoreBoard.js";
 import { ReplayManager } from "./replay/replayManager.js";
 import { ReplayWatchStartHandler } from "./replay/startReplayWatch.js";
 import { Countdown } from "./gameUI/countdown.js";
-import { ScoreMeter } from "./gameUI/scoreMeter.js";
 import { SpinnerBonusDisplay } from "./gameUI/spinnerBonusDisplay.js";
 import { getElements } from "./UI/UIelements.js";
 import { HitJudgementManager } from "./gameUI/hitJudgementManager.js";
@@ -67,7 +75,7 @@ class Game {
         this.socket = io("ws://localhost:7271");
 
         this.inputHandler = new InputHandler();
-        this.inputValidator = new InputValidator();
+        this.inputValidator = new InputValidator(this);
 
         this.UI = getElements();
         this.settingsManager = new SettingsManager(this);
@@ -76,7 +84,7 @@ class Game {
         createSkinList(this);
 
         this.STATE_ENUM = states
-        this.STATES = [SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate];
+        this.STATES = [new SongSelecting(this), new Playing(this), new Paused(this), new Failed(this), new Loading(this), new Result(this), new Spectate(this)];
 
         this.SPRITEIMG = SpriteImage;
         this.SPRITE = Sprite;
@@ -112,7 +120,14 @@ class Game {
         this.spinnerBonusDisplay = new SpinnerBonusDisplay(this);
 
         this.accuracyMeter = new AccuracyMeter(this);
+        this.accuracyDisplay = new AccuracyDisplay(this);
+
         this.comboMeter = new ComboMeter(this);
+        this.comboDisplay = new ComboDisplay(this);
+
+        this.scoreMeter = new ScoreMeter(this);
+        this.scoreDisplay = new ScoreDisplay(this);
+
         this.songAudioHandler = new SongAudioHandler(this);
 
         this.replayManager = new ReplayManager(this);
@@ -133,7 +148,6 @@ class Game {
         this.resultScreenUpdater = new ResultScreenUpdater(this);
         this.scoreBoardManager = new ScoreBoardManager(this);
 
-        this.scoreMeter = new ScoreMeter(this);
 
 
         // A set of functions that are executed when change happens on the settings option elements
@@ -206,12 +220,13 @@ class Game {
         this.cursor.update();
         this.replayManager.update(this.songClock);
         this.currentState.handleInput();
+        this.inputOverlay.update();
         this.songAudioHandler.update();
         this.backgroundManager.update();
-        this.accuracyMeter.update();
-        this.comboMeter.update();
+        this.accuracyDisplay.update();
+        this.comboDisplay.update();
         this.countdown.update(this.songClock);
-        this.scoreMeter.update();
+        this.scoreDisplay.update();
         this.spinnerBonusDisplay.update();
         this.hitJudgeMgr.update();
 
@@ -234,11 +249,11 @@ class Game {
         }
 
         if (this.beatmapPlayer.playing) {
-            this.accuracyMeter.render();
-            this.comboMeter.render();
+            this.accuracyDisplay.render();
+            this.comboDisplay.render();
             this.inputOverlay.render();
             this.countdown.render();
-            this.scoreMeter.render();
+            this.scoreDisplay.render();
             this.spinnerBonusDisplay.render();
             this.hitJudgeMgr.render();
             this.cursor.render();
@@ -247,7 +262,7 @@ class Game {
 
     setState(stateEnum) {
         this.currentState?.leave();
-        this.currentState = new this.STATES[stateEnum](this);
+        this.currentState = this.STATES[stateEnum];
         console.log(`game state changed to: ${this.currentState.stateName}`)
 
         this.currentState.enter();
@@ -280,6 +295,8 @@ class Game {
         this.accuracyMeter.reset();
         this.scoreMeter.reset();
         this.songAudioHandler.reset();
+        this.events.emit("GameUI:InputOverlayReset");
+
         this.beatmapPlayer.retry();
         setTimeout(() => {
             this.UI.pauseOverlay.style.display = "none";
@@ -312,6 +329,7 @@ class Game {
         this.setState(states.SONGSELECT);
         this.comboMeter.reset();
         this.accuracyMeter.reset();
+        this.events.emit("GameUI:InputOverlayReset");
         this.songAudioHandler.play();
         this.UI.pauseOverlay.animate([
             { filter: "opacity(100%)" },

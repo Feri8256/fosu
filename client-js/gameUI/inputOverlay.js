@@ -12,8 +12,8 @@ export class InputOverlay {
         this.background.origin_y = 0;
         this.background.flip_v = false;
 
-        this.x = this.game.canvas.width;
-        this.y = this.game.canvas.height * 0.5;
+        this.x = 0;
+        this.y = 0;
 
         this.background.x = this.x;
         this.background.y = this.y;
@@ -29,6 +29,9 @@ export class InputOverlay {
             s.x = this.x - this.keyWidth * 0.5;
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
         });
+
+        this.game.events.on("GameUI:InputOverlayUpdate", this.updateInputState.bind(this));
+        this.game.events.on("GameUI:InputOverlayReset", this.reset.bind(this));
     }
 
     update() {
@@ -36,14 +39,14 @@ export class InputOverlay {
         this.y = this.background.y = this.game.canvas.height * 0.5;
 
         this.keySprites.forEach((s, i) => {
-            s.x = this.x - this.keyWidth * 0.5;
-            s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
+            s.x = this.x - s.w * 0.5;
+            s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * s.h);
         });
     }
 
     updateInputState(arr = [false, false, false]) {
         for (let i = 0; i < arr.length; i++) {
-            let d = arr[i].down;
+            let d = arr[i];
 
             if (d !== this.inputStates[i] && d) {
                 this.inputCounts[i]++;
@@ -58,7 +61,7 @@ export class InputOverlay {
         this.background.render(this.game.ctx);
         this.keySprites.forEach((k, i) => {
             k.render(this.game.ctx);
-            this.renderNumber(this.inputCounts[i], this.game.canvas.width - (this.keyWidth * 0.5), k.y, k.scale);
+            this.renderNumber(this.inputCounts[i], this.game.canvas.width - (this.keySpriteImg?.w * 0.5), k.y, k.scale);
         });
     }
 
@@ -72,5 +75,10 @@ export class InputOverlay {
         this.game.ctx.textBaseline = "middle";
         this.game.ctx.fillText(n, 0, 0);
         this.game.ctx.restore();
+    }
+
+    reset() {
+        this.inputStates = [false, false, false];
+        this.inputCounts = [0, 0, 0];
     }
 }

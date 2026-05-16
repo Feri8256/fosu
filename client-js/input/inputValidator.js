@@ -1,12 +1,13 @@
 export class InputValidator {
-    constructor() {
+    constructor(game) {
+        this.game = game;
         this.inputStates = [
             { down: false, valid: false },
             { down: false, valid: false },
             { down: false, valid: false }
         ];
 
-        this.onInputChange = () => {}
+        this.onInputChange = () => { }
     }
 
     updateInputs(arr = [false, false, false]) {
@@ -15,8 +16,12 @@ export class InputValidator {
             if (arr[i] === k.down) return;
             if (arr[i]) k.valid = true;
             k.down = arr[i];
-            
-            if (typeof this.onInputChange === "function") this.onInputChange(this.inputStates.map((s) => { return s = s.down }));
+
+            if (typeof this.onInputChange === "function") {
+                let a = this.inputStates.map((s) => { return s = s.down; });
+                this.onInputChange(a);
+                this.game.events.emit("GameUI:InputOverlayUpdate", a);
+            };
         });
     }
 

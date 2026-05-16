@@ -1,9 +1,8 @@
-export class ComboMeter {
+export class ComboDisplay {
     constructor(game) {
         this.game = game;
         this.currentCombo = 0;
         this.previousCombo = 0;
-        this.maxCombo = 0;
 
         this.defaultScaling = 1 * window.devicePixelRatio;
 
@@ -69,6 +68,8 @@ export class ComboMeter {
                 "S"
             )
         );
+
+        this.game.events.on("GameUI:ComboUpdate", this.addHit.bind(this));
     }
 
     update() {
@@ -89,20 +90,16 @@ export class ComboMeter {
      * 
      * @param {Boolean} success 
      */
-    addHit(success) {
+    addHit(value) {
+        this.currentCombo = value;
         this.change = true;
-        if (success) {
-            this.currentCombo++;
-            if (this.currentCombo > this.maxCombo) this.maxCombo = this.currentCombo;
+        if (value !== 0) {
             this.fontRenderer.updateText(`${this.previousCombo}x`);
             this.fontRendererBack.updateText(`${this.currentCombo}x`);
             this.tl.play();
         } else {
-            if (this.currentCombo > this.maxCombo) this.maxCombo = this.currentCombo;
-            if (this.currentCombo >= 20) this.game.auMgr.playAudioClip("combobreak");
             this.fontRenderer.updateText(`0x`);
             this.fontRendererBack.updateText(`0x`);
-            this.currentCombo = 0;
         }
         this.previousCombo = this.currentCombo;
     }
@@ -112,20 +109,4 @@ export class ComboMeter {
         this.fontRenderer.render(this.game.ctx);
     }
 
-    reset() {
-        this.currentCombo = 0;
-        this.maxCombo = 0;
-        this.previousCombo = 0;
-        this.change = false;
-        this.fontRenderer.updateText("0x");
-        this.fontRendererBack.updateText(`0x`);
-
-    }
-
-    getResults() {
-        return {
-            max: this.maxCombo,
-            finished: this.currentCombo
-        }
-    }
 }

@@ -1,10 +1,10 @@
 export class SpinnerJudge {
-/**
- * 
- * @param {Spinner} spinner 
- * @param {Number} od 
- * @param {Number} duration 
- */
+    /**
+     * 
+     * @param {Spinner} spinner 
+     * @param {Number} od 
+     * @param {Number} duration 
+     */
     constructor(spinner, od, duration) {
         this.s = spinner;
         this.od = od;
@@ -34,7 +34,9 @@ export class SpinnerJudge {
             this.bonusCount += 1;
 
             this.s.game.scoreMeter.add(7);
-            this.s.game.spinnerBonusDisplay.bonus(this.bonusCount);
+            this.s.game.auMgr.playAudioClip("spinnerbonus");
+
+            this.s.game.events.emit("GameUI:SpinnerBonusUpdate", this.bonusCount);
 
         } else {
             this.s.game.scoreMeter.add(6);

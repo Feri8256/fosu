@@ -26,7 +26,7 @@ export class ScoreBoardManager {
                     this.game.UI.scoreBoard.container.innerHTML += `
                     <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}">
                     <p class="scoreentry-playername">${s.playerName}</p>
-                    <p class="scoreentry-score">${s.results.score} (${s.results.combo}x)</p>
+                    <p class="scoreentry-score">${this.game.utils.formatNumberString(s.results.score)} (${s.results.combo}x)</p>
                     <p class="scoreentry-date">${scoreDate}</p>
                     </div>
                     `;
@@ -34,7 +34,7 @@ export class ScoreBoardManager {
                     this.game.UI.scoreBoard.container.innerHTML += `
                     <div class="scoreentry" data-replayid="${s.replayId}" data-beatmaphash="${s.beatmapHash}" data-playername="${s.playerName}" style="--scoreentry-index: ${i};">
                     <p class="scoreentry-playername">${s.playerName}</p>
-                    <p class="scoreentry-score">${s.results.score} (${s.results.combo}x)</p>
+                    <p class="scoreentry-score">${this.game.utils.formatNumberString(s.results.score)} (${s.results.combo}x)</p>
                     <p class="scoreentry-date">${scoreDate}</p>
                     </div>
                     `;
@@ -47,7 +47,7 @@ export class ScoreBoardManager {
     getScoresForMap(beatmapHash) {
         this.currentBeatmapHash = beatmapHash;
         this.game.socket.emit("getScores", beatmapHash ?? "0");
-        this.game.UI.scoreBoard.container.innerHTML = `<p class="scoreentry-date">wait..</p>`;
+        this.game.UI.scoreBoard.container.innerHTML = `<p class="scoreentry">wait..</p>`;
     }
 
     setBoardVisibility(state) {

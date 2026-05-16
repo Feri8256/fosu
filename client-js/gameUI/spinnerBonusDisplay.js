@@ -17,6 +17,8 @@ export class SpinnerBonusDisplay {
         );
 
         this.animation = new this.game.ANI();
+
+        this.game.events.on("GameUI:SpinnerBonusUpdate", this.bonus.bind(this));
     }
 
     bonus(count = 0) {
@@ -27,9 +29,7 @@ export class SpinnerBonusDisplay {
             2,
             1.25,
             this.game.EASINGS.SineOut
-        );
-        
-        this.game.auMgr.playAudioClip("spinnerbonus");
+        );        
     }
 
     update() {
