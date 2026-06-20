@@ -1,3 +1,5 @@
+import { utils } from "../utils.js";
+
 export class ReplayManager {
     constructor(game) {
         this.game = game;
@@ -110,7 +112,7 @@ export class ReplayManager {
     getTappingEvents(t) {
         return this.inputEvents.filter((ie) => {
             return Math.floor(ie.t) <= Math.ceil(t);
-        }).at(-1);
+        }).at(-1)?.k ?? [false, false, false];
     }
 
     /**
@@ -132,6 +134,9 @@ export class ReplayManager {
             n.update(t);
             y = n.currentValue;
         });
+
+        x = Number(utils.clamp(x, -100, this.game.canvas.width + 100));
+        y = Number(utils.clamp(y, -100, this.game.canvas.height + 100));
 
         this.game.cursor.setPosition(x, y);
     }
@@ -202,25 +207,25 @@ export class ReplayManager {
     }
 
     addInputEvents(arr = [false, false, false], t = 0) {
+
+        let int = 0 + (arr[0] ? 1 : 0) + (arr[1] ? 2 : 0) + (arr[2] ? 4 : 0);
+
         this.eventAccumulator.push(
-            { t, k: arr.map((i) => { return i ? 1 : 0 }) },
-            { t, x: this.convertedCursorX, y: this.convertedCursorY }
+            { t, k: int }
         );
-        //this.lastCursorX = this.game.cursor.currentX;
-        //this.lastCursorY = this.game.cursor.currentY;
+
     }
 
     onReplayChunkReceive(arr) {
         this.lastChunkReceivedAtMs = this.currentTime;
 
         arr.forEach((ev) => {
-            if (ev.k) {
-                this.inputEvents.push(
-                    { 
-                        t: ev.t, 
-                        k: ev.k.map(k => k === 1) 
-                    }
-                );
+            if (!isNaN(ev.k)) {
+                let o = {
+                    t: ev.t,
+                    k: [false, false, false].map((b, i) => utils.getBitAtIndex(ev.k, i))
+                };
+                this.inputEvents.push(o);
             } else {
                 let calcX = this.game.utils.convertRange(ev.x, 0, 512, this.xOffset, (512 * this.xScale) - this.xOffset);
                 let calcY = this.game.utils.convertRange(ev.y, 0, 384, this.yOffset, (384 * this.yScale) - this.yOffset);

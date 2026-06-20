@@ -43,8 +43,8 @@ export class Sprite {
         this.spriteImage = spriteImage;
         this.x = x ?? 0;
         this.y = y ?? 0;
-        this.w = w;
-        this.h = h;
+        this.w = w ?? 0;
+        this.h = h ?? 0;
         this.origin_x = origin_x ?? 0.5;
         this.origin_y = origin_y ?? 0.5;
         this.scale = scale ?? 1;

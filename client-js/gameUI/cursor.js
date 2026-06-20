@@ -45,7 +45,7 @@ export class Cursor {
         this.cursorSprite.scale = this.scale;
     }
 
-    setPosition(x, y) {
+    setPosition(x = 0, y = 0) {
         this.currentX = Math.floor(x);
         this.currentY = Math.floor(y);
         this.cursorSprite.x = this.cursorMiddleSprite.x = this.currentX;

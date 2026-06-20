@@ -32,16 +32,23 @@ export class InputOverlay {
 
         this.game.events.on("GameUI:InputOverlayUpdate", this.updateInputState.bind(this));
         this.game.events.on("GameUI:InputOverlayReset", this.reset.bind(this));
+
+        console.log(this.background)
     }
 
     update() {
-        this.x = this.background.x = this.game.canvas.width;
-        this.y = this.background.y = this.game.canvas.height * 0.5;
+        this.x = this.game.canvas.width;
+        this.y = this.game.canvas.height * 0.5;
+
+
+        this.background.x = this.x;
+        this.background.y = this.y;
 
         this.keySprites.forEach((s, i) => {
             s.x = this.x - s.w * 0.5;
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * s.h);
         });
+
     }
 
     updateInputState(arr = [false, false, false]) {

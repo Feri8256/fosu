@@ -45,6 +45,10 @@ const utils = {
         }
 
         return out;
+    },
+
+    getBitAtIndex: (int, index) => {
+        return (int & (1 << index)) !== 0;
     }
 }
 

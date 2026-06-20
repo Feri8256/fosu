@@ -422,11 +422,12 @@ class Spectate extends GameState {
         while (steppedCurrentTime < this.game.songClock) {
 
             currentInputEvent = this.game.replayManager.getTappingEvents(steppedCurrentTime);
+            //console.log(currentInputEvent)
             this.game.replayManager.updateCursorPosition(steppedCurrentTime);
             this.game.beatmapPlayer.update(steppedCurrentTime);
 
             this.game.inputValidator.updateInputs(
-                currentInputEvent?.k.map((i) => { return i; })
+                currentInputEvent
             );
 
             let validatedInputStates = this.game.inputValidator.getInputStates();
