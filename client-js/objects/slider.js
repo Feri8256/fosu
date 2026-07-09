@@ -2,10 +2,11 @@ import { HitObject } from "./hitObject.js";
 import { Curve } from "./curve/curve.js";
 import { SliderBallController } from "./sliderBallMovement.js";
 import { utils } from "../utils.js";
+import { Animation, EASING } from "../animationEngine.js";
 
 export class Slider extends HitObject {
     constructor(game, position, time, scaling, circleSize, hitSample, hitSound, curvePoints, curveType, slides = 1, pixelLength = 0, multiplier = 1, velocity = -100, beatLength = 0, edgeSounds, edgeSets, timeWindow) {
-        super(game, position, time, scaling, circleSize, hitSample, hitSound);
+        super(game, position, time, scaling, circleSize, hitSample, hitSound, timeWindow);
 
         this.curvePoints = [position, ...curvePoints];
         this.curveType = curveType;
@@ -37,16 +38,17 @@ export class Slider extends HitObject {
         this.sliderTimeLengthTotal = this.oneSlideTime * slides;
         this.endTime = this.time + this.sliderTimeLengthTotal;
 
-        this.fading = new this.game.ANI(
-            this.time - timeWindow, this.time,
-            0, 1
+        this.fadeOutAnimation = new Animation(
+            0, 0,
+            0, 0
         );
+        this.fadingValue = 0;
 
-        this.followCircleAnimation = new this.game.ANI();
-        this.pulseAnimation = new this.game.ANI(
+        this.followCircleAnimation = new Animation();
+        this.pulseAnimation = new Animation(
             0, this.beatLength / this.v,
             this.ballScale, this.ballScale * 0.8,
-            this.game.EASINGS.SineOut,
+            EASING.SineOut,
             true
         );
 
@@ -111,9 +113,12 @@ export class Slider extends HitObject {
             this.firstUpdate = false;
         }
 
-        this.fading.update(currentTime);
+        this.fadeOutAnimation.update(currentTime);
         this.followCircleAnimation.update(this.game.clock);
         this.pulseAnimation.update(currentTime);
+        this.updateApproachAnimation(currentTime);
+        this.fadingValue = this.endReached ? this.fadeOutAnimation.currentValue : this.getApproachFadingValue();
+
 
         let p = this.ballController.getPositionAtTime(currentTime);
 
@@ -138,14 +143,14 @@ export class Slider extends HitObject {
             this.currentSlide = edgeIndex;
             if (this.currentFollowState) {
                 this.playEdgeSound(edgeIndex);
-                this.reverseArrowPopAni = new this.game.ANI(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, this.game.EASINGS.SineOut);
+                this.reverseArrowPopAni = new Animation(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, this.game.EASINGS.SineOut);
             }
         }
 
         if (this.slidesLeft > 1 && !this.endReached) {
             let a = (this.currentSlide & 1) === 1;
-            this.reverseArrows[0].opacity = a ? this.fading.currentValue : 0; // start
-            this.reverseArrows[1].opacity = a ? 0 : this.fading.currentValue; // end
+            this.reverseArrows[0].opacity = a ? this.fadingValue : 0; // start
+            this.reverseArrows[1].opacity = a ? 0 : this.fadingValue; // end
 
             this.reverseArrows[0].scale = this.pulseAnimation.currentValue;
             this.reverseArrows[1].scale = this.pulseAnimation.currentValue;
@@ -158,7 +163,7 @@ export class Slider extends HitObject {
         if (!this.endReached) this.checkFollowing();
 
         if (currentTime >= this.endTime && !this.endReached) {
-            this.fading = new this.game.ANI(
+            this.fadeOutAnimation = new Animation(
                 currentTime,
                 currentTime + this.fadeOutMs,
                 1, 0
@@ -175,7 +180,7 @@ export class Slider extends HitObject {
     render() {
         this.game.ctx.save();
 
-        this.game.ctx.globalAlpha = this.fading.currentValue;
+        this.game.ctx.globalAlpha = this.fadingValue;
 
         if (this.curve.prerendered) {
             this.game.ctx.drawImage(this.curve.prerendered, 0, 0);
@@ -246,21 +251,21 @@ export class Slider extends HitObject {
         this.currentFollowState = state;
 
         if (state) {
-            this.followCircleAnimation = new this.game.ANI(
+            this.followCircleAnimation = new Animation(
                 this.game.clock,
                 this.game.clock + 150,
                 this.ballScale * 0.75,
                 this.ballScale,
-                this.game.EASINGS.SineOut
+                EASING.SineOut
             );
 
         } else {
-            this.followCircleAnimation = new this.game.ANI(
+            this.followCircleAnimation = new Animation(
                 this.game.clock,
                 this.game.clock + 150,
                 this.ballScale,
                 this.ballScale * 0.75,
-                this.game.EASINGS.SineIn
+                EASING.SineIn
             );
 
         }

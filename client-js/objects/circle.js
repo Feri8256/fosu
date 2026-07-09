@@ -13,11 +13,11 @@ export class Circle extends HitObject {
      * @param {Number} comboNumber
      */
     constructor(game, position, time, scaling, circleSize, hitSample, hitSound, timeWindow, comboNumber) {
-        super(game, position, time, scaling, circleSize, hitSample, hitSound);
+        super(game, position, time, scaling, circleSize, hitSample, hitSound, timeWindow);
         this.timeWindow = timeWindow;
 
         this.circleScale = this.scaling / (this.circleSize * 0.5);
-        this.approachSize = this.circleScale * 3.5;
+        this.approachStartScale = this.circleScale * 3.5;
 
         this.hitEffectDurationMs = 200;
 
@@ -36,15 +36,10 @@ export class Circle extends HitObject {
         this.approachCircle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("approachcircle"));
         this.approachCircle.x = this.position.x;
         this.approachCircle.y = this.position.y;
-        this.approachCircle.scale = this.approachSize;
+        this.approachCircle.scale = this.approachStartScale;
 
 
-        this.ani = new this.game.ANI(
-            this.time - this.timeWindow,
-            this.time,
-            this.approachSize,
-            this.circleScale,
-        );
+        this.tapAnimation = new this.game.ANI();
 
         this.comboNumber = comboNumber;
 
@@ -56,16 +51,17 @@ export class Circle extends HitObject {
 
     update(currentTime) {
         this.currentTime = currentTime;
-        this.ani.update(currentTime);
+        this.tapAnimation.update(currentTime);
+        this.updateApproachAnimation(currentTime);
 
-        this.hitCircle.opacity = this.hitCheck ? 1 - this.ani.amount : this.ani.amount;
-        this.hitCircle.scale = this.hitCheck ? this.ani.currentValue : this.circleScale;
+        this.hitCircle.opacity = this.hitCheck ? 1 - this.tapAnimation.amount : this.getApproachFadingValue();
+        this.hitCircle.scale = this.hitCheck ? this.tapAnimation.currentValue : this.circleScale;
 
         this.overlay.opacity = this.hitCircle.opacity;
         this.overlay.scale = this.hitCircle.scale;
 
-        this.approachCircle.opacity = this.hitCheck ? 0 : this.ani.amount;
-        this.approachCircle.scale = this.ani.currentValue;
+        this.approachCircle.opacity = this.hitCheck ? 0 : this.hitCircle.opacity;
+        this.approachCircle.scale = this.approachStartScale * (1 - this.getApproachScalingValue()) + this.circleScale;
     }
 
     render() {
@@ -79,7 +75,7 @@ export class Circle extends HitObject {
     tap() {
         if (this.hitCheck) return;
 
-        this.ani = new this.game.ANI(
+        this.tapAnimation = new this.game.ANI(
             this.currentTime,
             this.currentTime + this.hitEffectDurationMs,
             this.circleScale,
