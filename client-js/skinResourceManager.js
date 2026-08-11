@@ -1,3 +1,5 @@
+import { Sprite, SpriteImage } from "./graphics/sprite.js";
+
 export class SkinResourceManager {
     constructor(game) {
         this.game = game;
@@ -89,17 +91,17 @@ export class SkinResourceManager {
 
     setupScoreFont() {
         for (let n = 0; n < 10; n++) {
-            this.scoreFontSet.set(String(n), new this.game.SPRITE(this.spriteImages[`score-${n}`], 0, 0, 0, 0, 0, 0));
+            this.scoreFontSet.set(String(n), new Sprite(this.spriteImages[`score-${n}`], 0, 0, 0, 0, 0, 0));
         }
-        this.scoreFontSet.set(".", new this.game.SPRITE(this.spriteImages["score-dot"], 0, 0, 0, 0, 0, 0));
-        this.scoreFontSet.set(",", new this.game.SPRITE(this.spriteImages["score-comma"], 0, 0, 0, 0, 0, 0));
-        this.scoreFontSet.set("%", new this.game.SPRITE(this.spriteImages["score-percent"], 0, 0, 0, 0, 0, 0));
-        this.scoreFontSet.set("x", new this.game.SPRITE(this.spriteImages["score-x"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set(".", new Sprite(this.spriteImages["score-dot"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set(",", new Sprite(this.spriteImages["score-comma"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set("%", new Sprite(this.spriteImages["score-percent"], 0, 0, 0, 0, 0, 0));
+        this.scoreFontSet.set("x", new Sprite(this.spriteImages["score-x"], 0, 0, 0, 0, 0, 0));
     }
 
     loadDefault() {
         this.filesNeeded.sprites.forEach((fileName) => {
-            this.spriteImages[fileName.split(".").at(0)] = new this.game.SPRITEIMG(`${this.defaultPath}/${fileName}`);
+            this.spriteImages[fileName.split(".").at(0)] = new SpriteImage(`${this.defaultPath}/${fileName}`);
         });
 
         this.setupScoreFont();
@@ -138,9 +140,9 @@ export class SkinResourceManager {
                 // Load sprites
                 this.filesNeeded.sprites.forEach((fileName) => {
                     if (d.files.includes(fileName)) {
-                        this.spriteImages[fileName.split(".").at(0)] = new this.game.SPRITEIMG(`${folderName}${fileName}`);
+                        this.spriteImages[fileName.split(".").at(0)] = new SpriteImage(`${folderName}${fileName}`);
                     } else {
-                        this.spriteImages[fileName.split(".").at(0)] = new this.game.SPRITEIMG(`${this.defaultPath}/${fileName}`);
+                        this.spriteImages[fileName.split(".").at(0)] = new SpriteImage(`${this.defaultPath}/${fileName}`);
                     }
                 });
 

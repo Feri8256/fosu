@@ -1,10 +1,13 @@
+import { Animation } from "../animationEngine.js";
+import { Sprite, SpriteImage } from "../graphics/sprite.js";
+
 export class BackgrondImageManager {
     constructor(game) {
         this.game = game;
         this.fadeInDurationMs = 300;
         this.images = [];
-        this.defaultImage = new this.game.SPRITEIMG("./client-files/default-background.jpg");
-        this.fading = new this.game.ANI();
+        this.defaultImage = new SpriteImage("./client-files/default-background.jpg");
+        this.fading = new Animation();
         this.setImage();
     }
 
@@ -16,22 +19,22 @@ export class BackgrondImageManager {
     setImage(url) {
         let s;
         if (!url || url.endsWith("undefined")) {
-            s = new this.game.SPRITE(this.defaultImage);
+            s = new Sprite(this.defaultImage);
             s.x = this.game.canvas.width * 0.5;
             s.y = this.game.canvas.height * 0.5;
             s.opacity = 1;
             this.images.push(s);
-            this.fading = new this.game.ANI(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1);
+            this.fading = new Animation(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1);
             return;
         }
-        let im = new this.game.SPRITEIMG(url);
-        s = new this.game.SPRITE(im);
+        let im = new SpriteImage(url);
+        s = new Sprite(im);
         s.x = this.game.canvas.width * 0.5;
         s.y = this.game.canvas.height * 0.5;
         s.opacity = 0;
 
         this.images.push(s);
-        this.fading = new this.game.ANI(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1);
+        this.fading = new Animation(this.game.clock, this.game.clock + this.fadeInDurationMs, 0, 1);
 
     }
 
@@ -74,7 +77,7 @@ export class BackgrondImageManager {
      * @param {Number} duration ms
      */
     changeOpacity(value, duration = 200) {
-        this.fading = new this.game.ANI(
+        this.fading = new Animation(
             this.game.clock,
             this.game.clock + duration,
             this.fading.currentValue, // Start and end values inverted because of the fading logic in the update method
