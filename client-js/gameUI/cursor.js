@@ -1,9 +1,12 @@
+import { Sprite } from "../graphics/sprite.js";
+import { Animation } from "../animationEngine.js";
+
 class Particle {
     constructor(game, cur, x, y, sprite, additiveMode = false) {
         this.game = game;
         this.cur = cur;
 
-        this.fadeOutAni = new this.game.ANI(this.game.clock, this.game.clock + 250, 1, 0);
+        this.fadeOutAni = new Animation(this.game.clock, this.game.clock + 250, 1, 0);
         this.sprite = sprite;
         this.sprite.x = x;
         this.sprite.y = y;
@@ -31,8 +34,8 @@ export class Cursor {
         this.scale = this.game.CONFIG.cursorScale;
 
         this.trails = [];
-        this.cursorSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("cursor"));
-        this.cursorMiddleSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("cursormiddle"));
+        this.cursorSprite = new Sprite(this.game.skinResourceManager.getSpriteImage("cursor"));
+        this.cursorMiddleSprite = new Sprite(this.game.skinResourceManager.getSpriteImage("cursormiddle"));
         this.cursorTrailSpriteImage = this.game.skinResourceManager.getSpriteImage("cursortrail");
 
         this.currentX = 0;
@@ -61,7 +64,7 @@ export class Cursor {
         this.cursorMiddleSprite.scale = this.scale;
         this.trailType = this.game.CONFIG.cursortrailType;
 
-        
+
         if (this.isRotatingEnabled) this.cursorSprite.rotation += this.rotationConstant * (this.game.deltaTime / 16);
 
         switch (this.trailType) {
@@ -99,7 +102,7 @@ export class Cursor {
     }
 
     createTrail(x, y, a = false) {
-        let s = new this.game.SPRITE(this.cursorTrailSpriteImage);
+        let s = new Sprite(this.cursorTrailSpriteImage);
         let trailParticle = new Particle(this.game, this, x, y, s, a);
         this.trails.push(trailParticle);
         if (this.trails.length > 1000) this.trails.pop();

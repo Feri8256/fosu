@@ -1,3 +1,7 @@
+import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
+import { Sprite } from "../graphics/sprite.js";
+import { Animation, EASING, Timeline } from "../animationEngine.js";
+
 export class AccuracyJudgment {
     /**
      * Visual feedback of the players hit accuracy
@@ -23,51 +27,51 @@ export class AccuracyJudgment {
             return;
         }
 
-        this.timeline = new this.game.TL();
+        this.timeline = new Timeline();
 
         // Creating the animation for the timeline of the `hit0` judgment
         if (this.type === 0) {
-            this.sprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hit0"));
+            this.sprite = new Sprite(this.game.skinResourceManager.getSpriteImage("hit0"));
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock, this.game.clock + 200, this.s * 1.25, this.s * 0.5, this.game.EASINGS.Linear, false, "S")
+                new Animation(this.game.clock, this.game.clock + 200, this.s * 1.25, this.s * 0.5, EASING.Linear, false, "S")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 200, this.game.clock + this.duration, this.s * 0.5, this.s * 0.5, this.game.EASINGS.Linear, false, "S")
+                new Animation(this.game.clock + 200, this.game.clock + this.duration, this.s * 0.5, this.s * 0.5, EASING.Linear, false, "S")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock, this.game.clock + 200, 0, 1, this.game.EASINGS.Linear, false, "F")
+                new Animation(this.game.clock, this.game.clock + 200, 0, 1, EASING.Linear, false, "F")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 200, this.game.clock + this.duration, 1, 0, this.game.EASINGS.Linear, false, "F")
+                new Animation(this.game.clock + 200, this.game.clock + this.duration, 1, 0, EASING.Linear, false, "F")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 200, this.game.clock + this.duration, this.y, this.y + 100, this.game.EASINGS.SineIn, false, "MY")
+                new Animation(this.game.clock + 200, this.game.clock + this.duration, this.y, this.y + 100, EASING.SineIn, false, "MY")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 200, this.game.clock + this.duration, 0, (Math.random() * (Math.PI * 0.5)) - (Math.PI * 0.25), this.game.EASINGS.Linear, false, "R")
+                new Animation(this.game.clock + 200, this.game.clock + this.duration, 0, (Math.random() * (Math.PI * 0.5)) - (Math.PI * 0.25), EASING.Linear, false, "R")
             );
         } else {
             // Animations of the rest of the judgments are identical
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 300, this.game.clock + this.duration, 1, 0, this.game.EASINGS.Linear, false, "F")
+                new Animation(this.game.clock + 300, this.game.clock + this.duration, 1, 0, EASING.Linear, false, "F")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock, this.game.clock + 300, this.s * 0.5, this.s * 0.75, this.game.EASINGS.BounceOut, false, "S")
+                new Animation(this.game.clock, this.game.clock + 300, this.s * 0.5, this.s * 0.75, EASING.BounceOut, false, "S")
             );
             this.timeline.appendAnimation(
-                new this.game.ANI(this.game.clock + 300, this.game.clock + this.duration, this.s * 0.75, this.s * 0.85, this.game.EASINGS.Linear, false, "S")
+                new Animation(this.game.clock + 300, this.game.clock + this.duration, this.s * 0.75, this.s * 0.85, EASING.Linear, false, "S")
             );
 
             // Selecting the sprite based on type
             switch (this.type) {
                 case 1:
-                    this.sprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hit50"));
+                    this.sprite = new Sprite(this.game.skinResourceManager.getSpriteImage("hit50"));
                     break;
                 case 2:
-                    this.sprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hit100"));
+                    this.sprite = new Sprite(this.game.skinResourceManager.getSpriteImage("hit100"));
                     break;
                 case 3:
-                    this.sprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hit300"));
+                    this.sprite = new Sprite(this.game.skinResourceManager.getSpriteImage("hit300"));
                     break;
             }
         }

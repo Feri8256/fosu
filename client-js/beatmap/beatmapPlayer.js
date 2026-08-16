@@ -1,6 +1,7 @@
 import { Circle } from "../objects/circle.js";
 import { Slider } from "../objects/slider.js";
 import { Spinner } from "../objects/spinner.js";
+import { utils } from "../utils.js";
 
 const TYPE_PARAM = {
     CIRCLE: 0,
@@ -88,8 +89,8 @@ export class BeatmapPlayer {
             const timingPoint = this.getTimingPointAtTime(element.time);
 
             const position = new Point(
-                this.game.utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                this.game.utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
+                utils.convertRange(element.x, 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                utils.convertRange(element.y, 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset),
             );
 
             // Using the timing points sample set setting instead of the hit objects hit sample setting
@@ -136,8 +137,8 @@ export class BeatmapPlayer {
                 element.curvePoints.forEach((cp) => {
                     scaledCurvePoints.push(
                         new Point(
-                            this.game.utils.convertRange(cp[0], 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
-                            this.game.utils.convertRange(cp[1], 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset)
+                            utils.convertRange(cp[0], 0, 512, this.xOffset, (this.playFieldWidth * this.xScale) - this.xOffset),
+                            utils.convertRange(cp[1], 0, 384, this.yOffset, (this.playFieldHeight * this.yScale) - this.yOffset)
                         )
                     )
                 });
@@ -241,7 +242,7 @@ export class BeatmapPlayer {
 
     update(currentTime) {
         this.currentTime = currentTime;
-        this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+        this.progressBarCurrentWidth = utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
 
         if (!this.playing) return;
 
@@ -249,8 +250,8 @@ export class BeatmapPlayer {
 
         if (this.playing) this.game.autoplay.update(this.currentTime);
 
-        if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
-        else this.progressBarCurrentWidth = this.game.utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
+        if (this.currentTime < this.skipToTime && this.introSkipable) this.progressBarCurrentWidth = utils.convertRange(this.currentTime, 0, this.firsthitObjectTime, this.game.canvas.width, 0);
+        else this.progressBarCurrentWidth = utils.convertRange(this.currentTime, this.firsthitObjectTime, this.lastHitObjectTime, 0, this.game.canvas.width);
 
         // Select the hit objects that needs to be rendered and updated at currentTime
         this.slidersToRender = this.sliders.filter((s) => {
@@ -374,7 +375,7 @@ export class BeatmapPlayer {
         // Finds the hit object that is close in time and in distance
         // No notelocking :)
         let obj = this.hitCirclesToRender.find((ho) => {
-            let distance = this.game.utils.getDistance(ho.position.x, ho.position.y, mouse.x, mouse.y);
+            let distance = utils.getDistance(ho.position.x, ho.position.y, mouse.x, mouse.y);
             return ho.time - 200 < hitTimestamp && ho.time + 200 > hitTimestamp && !ho.hitCheck && distance <= ho.rad
         });
 
@@ -492,7 +493,7 @@ export class BeatmapPlayer {
 
     calculateDifficultyMultiplier() {
         // The lastHitObjectTime as "drain time" is not really correct for this formula...
-        this.difficultyMultiplier = Math.round((this.parsedOSU.Difficulty.HPDrainRate + this.parsedOSU.Difficulty.CircleSize + this.parsedOSU.Difficulty.OverallDifficulty + this.game.utils.clamp(this.parsedOSU.HitObjects.length / (this.lastHitObjectTime / 1000) * 8, 0, 16)) / 38 * 5);
+        this.difficultyMultiplier = Math.round((this.parsedOSU.Difficulty.HPDrainRate + this.parsedOSU.Difficulty.CircleSize + this.parsedOSU.Difficulty.OverallDifficulty + utils.clamp(this.parsedOSU.HitObjects.length / (this.lastHitObjectTime / 1000) * 8, 0, 16)) / 38 * 5);
         console.log(`Difficulty multiplier for this beatmap is: ${this.difficultyMultiplier}`);
 
     }

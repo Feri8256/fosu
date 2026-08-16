@@ -1,3 +1,6 @@
+import { Sprite } from "../graphics/sprite.js";
+import { Animation, EASING } from "../animationEngine.js";
+
 export class Countdown {
     /**
      * *"Are You ready?... 3-2-1-GO!"*
@@ -13,17 +16,17 @@ export class Countdown {
         this.lastCountSoundIndex = 0;
         this.disabled = this.firstHitObjectTime === -1;
 
-        this.ani = new this.game.ANI();
+        this.ani = new Animation();
 
         if (this.disabled) return;
 
         this.countSounds = ["gos", "count1s", "count2s", "count3s"];
         this.countSprites = [
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("go")),
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("count1")),
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("count2")),
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("count3")),
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("ready"))
+            new Sprite(this.game.skinResourceManager.getSpriteImage("go")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("count1")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("count2")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("count3")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("ready"))
         ];
 
         // The "ready" sprite starts off as invisible until the animation touches its opacity value!
@@ -50,10 +53,10 @@ export class Countdown {
         if (this.currentCountIndex !== this.currentCountSoundIndex && this.currentCountSoundIndex > -1) {
 
             if (this.currentCountSoundIndex === 6) {
-                this.ani = new this.game.ANI(
+                this.ani = new Animation(
                     currentTime, currentTime + this.beatLength,
                     0, 1,
-                    this.game.EASINGS.BackOut
+                    EASING.BackOut
                 );
             }
 
@@ -64,10 +67,10 @@ export class Countdown {
             if (this.currentCountSoundIndex < 4) {
                 this.game.auMgr.playAudioClip(this.countSounds[this.currentCountSoundIndex]);
 
-                this.ani = new this.game.ANI(
+                this.ani = new Animation(
                     currentTime, currentTime + 200,
                     0, 1,
-                    this.game.EASINGS.BackOut
+                    EASING.BackOut
                 );
             }
 

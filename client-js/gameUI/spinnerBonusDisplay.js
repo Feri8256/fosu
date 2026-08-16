@@ -1,10 +1,13 @@
+import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
+import { Animation, EASING } from "../animationEngine.js";
+
 export class SpinnerBonusDisplay {
     constructor(game) {
         this.game = game;
 
         this.maxScale = 2;
 
-        this.fontRenderer = new this.game.SPRITEFONTRENDERER(
+        this.fontRenderer = new SpriteFontRenderer(
             "1000",
             this.game.skinResourceManager.scoreFontSet,
             -1,
@@ -16,19 +19,19 @@ export class SpinnerBonusDisplay {
             0.25
         );
 
-        this.animation = new this.game.ANI();
+        this.animation = new Animation();
 
         this.game.events.on("GameUI:SpinnerBonusUpdate", this.bonus.bind(this));
     }
 
     bonus(count = 0) {
         this.fontRenderer.updateText(String(`${count}000`));
-        this.animation = new this.game.ANI(
+        this.animation = new Animation(
             this.game.clock,
             this.game.clock + 800,
             2,
             1.25,
-            this.game.EASINGS.SineOut
+            EASING.SineOut
         );        
     }
 

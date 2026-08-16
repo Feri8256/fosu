@@ -1,3 +1,5 @@
+import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
+import { Animation, EASING } from "../animationEngine.js";
 
 export class ScoreDisplay {
     constructor(game) {
@@ -15,9 +17,9 @@ export class ScoreDisplay {
             originX = 1,
             originY = 1;
 
-        this.scoreNumberRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
+        this.scoreNumberRenderer = new SpriteFontRenderer(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
 
-        this.scoreRolling = new this.game.ANI();
+        this.scoreRolling = new Animation();
 
         this.game.events.on("GameUI:ScoreUpdate", this.updateValue.bind(this));
     }
@@ -44,12 +46,12 @@ export class ScoreDisplay {
         let previousScoreValue = this.currentScore;
         this.currentScore = value;
 
-        this.scoreRolling = new this.game.ANI(
+        this.scoreRolling = new Animation(
             this.game.clock,
             this.game.clock + 400,
             previousScoreValue,
             value,
-            this.game.EASINGS.SineOut
+            EASING.SineOut
         );
 
     }
@@ -57,6 +59,6 @@ export class ScoreDisplay {
     reset() {
         this.currentScore = 0;
         this.scoreNumberRenderer.updateText("0");
-        this.scoreRolling = new this.game.ANI();
+        this.scoreRolling = new Animation();
     }
 }

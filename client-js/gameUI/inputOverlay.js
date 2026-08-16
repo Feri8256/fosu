@@ -1,12 +1,14 @@
+import { Sprite } from "../graphics/sprite.js";
+
 export class InputOverlay {
     constructor(game) {
         this.game = game;
-        this.background = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("inputoverlay-background"));
+        this.background = new Sprite(this.game.skinResourceManager.getSpriteImage("inputoverlay-background"));
         this.keySpriteImg = this.game.skinResourceManager.getSpriteImage("inputoverlay-key");
         this.keySprites = [
-            new this.game.SPRITE(this.keySpriteImg),
-            new this.game.SPRITE(this.keySpriteImg),
-            new this.game.SPRITE(this.keySpriteImg)
+            new Sprite(this.keySpriteImg),
+            new Sprite(this.keySpriteImg),
+            new Sprite(this.keySpriteImg)
         ]
         this.background.rotation = Math.PI * 0.5; // 90 deg
         this.background.origin_y = 0;

@@ -1,3 +1,6 @@
+import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
+import { Animation, EASING, Timeline } from "../animationEngine.js";
+
 export class ComboDisplay {
     constructor(game) {
         this.game = game;
@@ -18,52 +21,52 @@ export class ComboDisplay {
             originX = 0,
             originY = 1;
 
-        this.fontRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
-        this.fontRendererBack = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
+        this.fontRenderer = new SpriteFontRenderer(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
+        this.fontRendererBack = new SpriteFontRenderer(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
 
-        this.tl = new this.game.TL();
+        this.tl = new Timeline();
         this.tl.appendAnimation(
-            new this.game.ANI(
+            new Animation(
                 0,
                 250,
                 this.defaultScaling * 1.5,
                 this.defaultScaling,
-                this.game.EASINGS.Linear,
+                EASING.Linear,
                 false,
                 "SA"
             )
         );
 
         this.tl.appendAnimation(
-            new this.game.ANI(
+            new Animation(
                 0,
                 200,
                 0.5,
                 0,
-                this.game.EASINGS.Linear,
+                EASING.Linear,
                 false,
                 "FA"
             )
         );
 
         this.tl.appendAnimation(
-            new this.game.ANI(
+            new Animation(
                 70,
                 120,
                 this.defaultScaling,
                 this.defaultScaling * 1.1,
-                this.game.EASINGS.SineIn,
+                EASING.SineIn,
                 false,
                 "S"
             )
         );
         this.tl.appendAnimation(
-            new this.game.ANI(
+            new Animation(
                 120,
                 220,
                 this.defaultScaling * 1.1,
                 this.defaultScaling,
-                this.game.EASINGS.Linear,
+                EASING.Linear,
                 false,
                 "S"
             )

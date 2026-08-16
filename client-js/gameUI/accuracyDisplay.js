@@ -1,3 +1,5 @@
+import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
+
 export class AccuracyDisplay {
     constructor(game) {
         this.game = game;
@@ -12,7 +14,7 @@ export class AccuracyDisplay {
             originX = 0.5,
             originY = 0;
 
-        this.fontRenderer = new this.game.SPRITEFONTRENDERER(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
+        this.fontRenderer = new SpriteFontRenderer(initialValue, fontSet, defaultSpacing, positionX, positionY, scaling, opacity, originX, originY);
 
         this.game.events.on("GameUI:AccuracyUpdate", (value) => {
             this.fontRenderer.updateText(`${value}%`);
