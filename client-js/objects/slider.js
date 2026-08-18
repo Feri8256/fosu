@@ -3,6 +3,8 @@ import { Curve } from "./curve/curve.js";
 import { SliderBallController } from "./sliderBallMovement.js";
 import { utils } from "../utils.js";
 import { Animation, EASING } from "../animationEngine.js";
+import { Sprite } from "../graphics/sprite.js";
+
 
 export class Slider extends HitObject {
     constructor(game, position, time, scaling, circleSize, hitSample, hitSound, curvePoints, curveType, slides = 1, pixelLength = 0, multiplier = 1, velocity = -100, beatLength = 0, edgeSounds, edgeSets, timeWindow) {
@@ -61,19 +63,19 @@ export class Slider extends HitObject {
         this.endPoint = this.curvePath.at(-1);
 
 
-        this.ballSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("sliderb"));
+        this.ballSprite = new Sprite(this.game.skinResourceManager.getSpriteImage("sliderb"));
         this.ballSprite.scale = this.ballScale;
         this.ballSprite.x = this.startPoint.x
         this.ballSprite.y = this.startPoint.y
 
-        this.followSprite = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("sliderfollowcircle"));
+        this.followSprite = new Sprite(this.game.skinResourceManager.getSpriteImage("sliderfollowcircle"));
         this.followSprite.scale = this.ballScale;
         this.followSprite.x = this.startPoint.x;
         this.followSprite.y = this.startPoint.y;
 
         this.reverseArrows = [
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("reversearrow")),
-            new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("reversearrow"))
+            new Sprite(this.game.skinResourceManager.getSpriteImage("reversearrow")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("reversearrow"))
         ];
 
         this.reverseArrows[1].opacity = 0;

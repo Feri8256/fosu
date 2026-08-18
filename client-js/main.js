@@ -8,7 +8,6 @@ import { BackgrondImageManager } from "./UI/backgroundImage.js";
 import { BeatmapLoader } from "./beatmap/beatmapLoader.js";
 import { BeatmapPlayer } from "./beatmap/beatmapPlayer.js";
 import { SkinResourceManager } from "./skinResourceManager.js";
-import { AccuracyJudgment } from "./gameUI/accuracyJudgment.js";
 import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./states/gameStates.js";
 import { InputHandler } from "./input/InputHandler.js";
 import { Cursor } from "./gameUI/cursor.js";
@@ -86,11 +85,6 @@ class Game {
         this.STATE_ENUM = states
         this.STATES = [new SongSelecting(this), new Playing(this), new Paused(this), new Failed(this), new Loading(this), new Result(this), new Spectate(this)];
 
-        this.SPRITEIMG = SpriteImage;
-        this.SPRITE = Sprite;
-
-        this.SPRITEFONTRENDERER = SpriteFontRenderer;
-
         this.EASINGS = EASING;
         this.ANI = Animation;
         this.TL = Timeline;
@@ -110,7 +104,7 @@ class Game {
         this.loadingImg = new SpriteImage("client-files/loading.png");
         this.loadingSprite = new Sprite(this.loadingImg);
         this.loading = false;
-        this.loadingAnimation = new Animation(0, 1000, 0, 6.28, this.EASINGS.Linear, true);
+        this.loadingAnimation = new Animation(0, 1000, 0, 6.28, EASING.Linear, true);
 
         //this.ACCJUDGMENT = AccuracyJudgment;
         this.hitJudgeMgr = new HitJudgementManager(this);

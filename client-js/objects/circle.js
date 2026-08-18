@@ -1,4 +1,6 @@
 import { HitObject } from "./hitObject.js";
+import { Sprite } from "../graphics/sprite.js";
+import { Animation } from "../animationEngine.js";
 
 export class Circle extends HitObject {
     /**
@@ -23,23 +25,23 @@ export class Circle extends HitObject {
 
         this.rad = (118 / this.circleSize) * this.scaling;
 
-        this.overlay = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hitcircleoverlay"));
+        this.overlay = new Sprite(this.game.skinResourceManager.getSpriteImage("hitcircleoverlay"));
         this.overlay.x = this.position.x;
         this.overlay.y = this.position.y;
         this.overlay.scale = this.circleScale;
 
-        this.hitCircle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("hitcircle"));
+        this.hitCircle = new Sprite(this.game.skinResourceManager.getSpriteImage("hitcircle"));
         this.hitCircle.x = this.position.x;
         this.hitCircle.y = this.position.y;
         this.hitCircle.scale = this.circleScale;
 
-        this.approachCircle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("approachcircle"));
+        this.approachCircle = new Sprite(this.game.skinResourceManager.getSpriteImage("approachcircle"));
         this.approachCircle.x = this.position.x;
         this.approachCircle.y = this.position.y;
         this.approachCircle.scale = this.approachStartScale;
 
 
-        this.tapAnimation = new this.game.ANI();
+        this.tapAnimation = new Animation();
 
         this.comboNumber = comboNumber;
 

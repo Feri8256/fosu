@@ -1,5 +1,9 @@
 import { HitObject } from "./hitObject.js";
 import { SpinnerJudge } from "../judgement/spinnerJudge.js";
+import { Sprite } from "../graphics/sprite.js";
+import { Animation } from "../animationEngine.js";
+
+
 
 export class Spinner extends HitObject {
     constructor(game, position, time, scaling, hitSample, hitSound, endTime, od) {
@@ -11,15 +15,15 @@ export class Spinner extends HitObject {
 
         this.judge = new SpinnerJudge(this, od, duration);
 
-        this.circle = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-circle"));
-        this.approach = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-approachcircle"));
-        this.cleared = new this.game.SPRITE(this.game.skinResourceManager.getSpriteImage("spinner-clear"));
+        this.circle = new Sprite(this.game.skinResourceManager.getSpriteImage("spinner-circle"));
+        this.approach = new Sprite(this.game.skinResourceManager.getSpriteImage("spinner-approachcircle"));
+        this.cleared = new Sprite(this.game.skinResourceManager.getSpriteImage("spinner-clear"));
 
         this.circle.scale = (384 / (this.circle.spriteImage.h ?? 666)) * this.scaling;
         this.approach.scale = (384 / (this.approach.spriteImage.h ?? 333)) * this.scaling;
 
-        this.fadingAni = new this.game.ANI(this.time - 200, this.time, 0, 1);
-        this.approachAni = new this.game.ANI(this.time, this.endTime, this.approach.scale, 0.1);
+        this.fadingAni = new Animation(this.time - 200, this.time, 0, 1);
+        this.approachAni = new Animation(this.time, this.endTime, this.approach.scale, 0.1);
 
         this.ended = false;
 
@@ -79,7 +83,7 @@ export class Spinner extends HitObject {
         if (!this.ended && currentTime > this.endTime) {
             this.ended = true;
             this.judge.onEnd();
-            this.fadingAni = new this.game.ANI(currentTime, currentTime + 200, 1, 0);
+            this.fadingAni = new Animation(currentTime, currentTime + 200, 1, 0);
         }
 
 
