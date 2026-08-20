@@ -1,14 +1,16 @@
+import { Animation, Timeline, EASING } from "./animationEngine.js";
+
 export class AutoplayController {
     constructor(game) {
         this.game = game;
-        this.tl = new this.game.TL();
+        this.tl = new Timeline();
         this.activated = false;
 
         this.previousT = 0;
         this.previousX = 0;
         this.previousY = 0;
 
-        this.cursorEasing = this.game.EASINGS.SineInOut;
+        this.cursorEasing = EASING.SineInOut;
 
     }
     activate() {
@@ -17,7 +19,7 @@ export class AutoplayController {
 
     add(t, x, y) {
         this.tl.appendAnimation(
-            new this.game.ANI(
+            new Animation(
                 this.previousT,
                 t,
                 this.previousX,
@@ -29,7 +31,7 @@ export class AutoplayController {
         );
 
         this.tl.appendAnimation(
-            new this.game.ANI(
+            new Animation(
                 this.previousT,
                 t,
                 this.previousY,
@@ -57,7 +59,7 @@ export class AutoplayController {
     }
 
     reset() {
-        this.tl = new this.game.TL();
+        this.tl = new Timeline();
         this.activated = false;
     }
 

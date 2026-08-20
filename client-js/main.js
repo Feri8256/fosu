@@ -8,7 +8,16 @@ import { BackgrondImageManager } from "./UI/backgroundImage.js";
 import { BeatmapLoader } from "./beatmap/beatmapLoader.js";
 import { BeatmapPlayer } from "./beatmap/beatmapPlayer.js";
 import { SkinResourceManager } from "./skinResourceManager.js";
-import { states, SongSelecting, Playing, Paused, Failed, Loading, Result, Spectate } from "./states/gameStates.js";
+
+import { states } from "./states/gameStates.js";
+import { SongSelecting } from "./states/songselect.js";
+import { Playing } from "./states/playing.js";
+import { Paused } from "./states/paused.js";
+import { Failed } from "./states/failed.js";
+import { Loading } from "./states/loading.js";
+import { Result } from "./states/result.js";
+import { Spectate } from "./states/spectate.js";
+
 import { InputHandler } from "./input/InputHandler.js";
 import { Cursor } from "./gameUI/cursor.js";
 
@@ -27,7 +36,6 @@ import { InputOverlay } from "./gameUI/inputOverlay.js";
 import { InputValidator } from "./input/inputValidator.js";
 import { ResultScreenUpdater } from "./UI/resultScreenUpdate.js";
 import { HitSoundPlayer } from "./beatmap/hitSoundPlayer.js";
-import { SpriteFontRenderer } from "./graphics/fontRenderer.js";
 import { SettingsManager } from "./UI/settingsManager.js";
 import { AutoplayController } from "./autoplay.js";
 import { createSkinList } from "./UI/skinListBuilder.js";
@@ -49,7 +57,7 @@ class Game {
         this.canvas = document.querySelector("canvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.ctx = this.canvas.getContext("2d", {alpha: false, desynchronized: true });
+        this.ctx = this.canvas.getContext("2d", { alpha: false, desynchronized: true });
 
         this.offscreenCanvas = new OffscreenCanvas(window.innerWidth, window.innerHeight);
         this.offscreenCtx = this.offscreenCanvas.getContext("2d", { willReadFrequently: true });
@@ -83,11 +91,15 @@ class Game {
         createSkinList(this);
 
         this.STATE_ENUM = states
-        this.STATES = [new SongSelecting(this), new Playing(this), new Paused(this), new Failed(this), new Loading(this), new Result(this), new Spectate(this)];
-
-        this.EASINGS = EASING;
-        this.ANI = Animation;
-        this.TL = Timeline;
+        this.STATES = [
+            new SongSelecting(this), 
+            new Playing(this), 
+            new Paused(this), 
+            new Failed(this), 
+            new Loading(this), 
+            new Result(this), 
+            new Spectate(this)
+        ];
 
         this.INPUTHANDLER = InputHandler;
         this.CURSOR = Cursor;
@@ -106,7 +118,6 @@ class Game {
         this.loading = false;
         this.loadingAnimation = new Animation(0, 1000, 0, 6.28, EASING.Linear, true);
 
-        //this.ACCJUDGMENT = AccuracyJudgment;
         this.hitJudgeMgr = new HitJudgementManager(this);
 
         this.autoplay = new AutoplayController(this);

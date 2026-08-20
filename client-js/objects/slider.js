@@ -145,7 +145,7 @@ export class Slider extends HitObject {
             this.currentSlide = edgeIndex;
             if (this.currentFollowState) {
                 this.playEdgeSound(edgeIndex);
-                this.reverseArrowPopAni = new Animation(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, this.game.EASINGS.SineOut);
+                this.reverseArrowPopAni = new Animation(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, EASING.SineOut);
             }
         }
 

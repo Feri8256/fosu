@@ -1,6 +1,6 @@
 import { HitObject } from "./hitObject.js";
 import { Sprite } from "../graphics/sprite.js";
-import { Animation } from "../animationEngine.js";
+import { Animation, EASING } from "../animationEngine.js";
 
 export class Circle extends HitObject {
     /**
@@ -77,12 +77,12 @@ export class Circle extends HitObject {
     tap() {
         if (this.hitCheck) return;
 
-        this.tapAnimation = new this.game.ANI(
+        this.tapAnimation = new Animation(
             this.currentTime,
             this.currentTime + this.hitEffectDurationMs,
             this.circleScale,
             this.circleScale * 1.35,
-            this.game.EASINGS.SineOut
+            EASING.SineOut
         );
         this.hitCheck = true;
 
