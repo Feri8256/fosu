@@ -1,25 +1,54 @@
 import { Sprite } from "../graphics/sprite.js";
 import { Animation } from "../animationEngine.js";
+import { ObjectPooler } from "../objectPooler.js";
 
 class Particle {
     constructor(game, cur, x, y, sprite, additiveMode = false) {
         this.game = game;
         this.cur = cur;
 
-        this.fadeOutAni = new Animation(this.game.clock, this.game.clock + 250, 1, 0);
+        this.fadeOutAni = new Animation();
         this.sprite = sprite;
         this.sprite.x = x;
         this.sprite.y = y;
         this.sprite.additiveColor = additiveMode ? true : false;
         this.sprite.scale = cur.scale;
+
+        this.x = 0;
+        this.y = 0;
+        this.a = false;
+
+        this.active = false;
+
+        this.firstUpdate = true;
     }
 
     update() {
+        if (!this.active) return;
+        //this.sprite = sprite;
+        if (this.firstUpdate) {
+            this.fadeOutAni = new Animation(this.game.clock, this.game.clock + 250, 1, 0);
+            this.firstUpdate = false;
+        }
+        this.sprite.x = this.x;
+        this.sprite.y = this.y;
+        this.sprite.additiveColor = this.a;
+
         this.fadeOutAni.update(this.game.clock);
         this.sprite.opacity = this.fadeOutAni.currentValue;
+        if (this.fadeOutAni.amount === 1) this.active = false;
     }
 
-    render(c) {
+    reset() {
+        this.x = -100;
+        this.y = -100;
+        this.a = false;
+        
+        this.firstUpdate = true;
+        this.active = false;
+    }
+
+    render() {
         this.sprite.render(this.game.ctx);
     }
 }
@@ -33,7 +62,6 @@ export class Cursor {
         this.trailType = this.game.CONFIG.cursortrailType;
         this.scale = this.game.CONFIG.cursorScale;
 
-        this.trails = [];
         this.cursorSprite = new Sprite(this.game.skinResourceManager.getSpriteImage("cursor"));
         this.cursorMiddleSprite = new Sprite(this.game.skinResourceManager.getSpriteImage("cursormiddle"));
         this.cursorTrailSpriteImage = this.game.skinResourceManager.getSpriteImage("cursortrail");
@@ -43,6 +71,13 @@ export class Cursor {
         this.prevX = 0;
         this.prevY = 0;
         this.lastParticleCreatedAtMs = 0;
+
+        this.particles = new ObjectPooler(
+            () => {
+                return new Particle(this.game, this, -100, -100, new Sprite(this.cursorTrailSpriteImage), true);
+            },
+            200
+        );
 
 
         this.cursorSprite.scale = this.scale;
@@ -79,7 +114,7 @@ export class Cursor {
 
             case 1:
                 if (this.lastParticleCreatedAtMs + 33 > this.game.clock) return;
-                if (this.currentX != this.prevX || this.currentY != this.prevY) this.createTrail(this.currentX, this.currentY, false);
+                this.spawnTrail(this.currentX, this.currentY, false);
                 this.lastParticleCreatedAtMs = this.game.clock;
                 break;
 
@@ -90,22 +125,21 @@ export class Cursor {
         this.prevX = this.currentX;
         this.prevY = this.currentY;
 
-        this.trails.forEach((t) => { t.update(this.game.clock) });
-
-        this.trails = this.trails.filter((p) => { return p.fadeOutAni.amount < 1 })
+        this.particles.updateAllActive(this.game.clock);
     }
 
     render() {
-        this.trails.forEach((t) => { t.render() });
+        this.particles.active.forEach((t) => { t.render() });
         this.cursorSprite.render(this.game.ctx);
         this.cursorMiddleSprite.render(this.game.ctx);
     }
 
-    createTrail(x, y, a = false) {
-        let s = new Sprite(this.cursorTrailSpriteImage);
-        let trailParticle = new Particle(this.game, this, x, y, s, a);
-        this.trails.push(trailParticle);
-        if (this.trails.length > 1000) this.trails.pop();
+    spawnTrail(x, y, a = false) {
+        let p = this.particles.get();
+        p.x = x;
+        p.y = y;
+        p.a = a;
+        p.active = true;
     }
 
     /**
@@ -126,11 +160,12 @@ export class Cursor {
         let ix = x1 < x2 ? 1 : -1;  // increment direction
         let iy = y1 < y2 ? 1 : -1;
 
-        let k = 5;  // sample size
+        let k = 3;  // sample size
         if (dy <= dx) {
             for (let i = 0; ; i++) {
                 if (i === k) {
-                    this.createTrail(x1, y1, true);
+                    //this.createTrail(x1, y1, true);
+                    this.spawnTrail(x1, y1, true);
                     i = 0;
                 }
                 if (x1 === x2)
@@ -145,7 +180,8 @@ export class Cursor {
         } else {
             for (let i = 0; ; i++) {
                 if (i === k) {
-                    this.createTrail(x1, y1, true);
+                    //this.createTrail(x1, y1, true);
+                    this.spawnTrail(x1, y1, true);
                     i = 0;
                 }
                 if (y1 === y2)

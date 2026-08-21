@@ -1,4 +1,4 @@
-import { GameState } from "./gameStates.js";
+import { GameState, states } from "./gameStates.js";
 
 export class Result extends GameState {
     constructor(game) {

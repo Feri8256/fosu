@@ -1,4 +1,5 @@
 import { utils } from "../utils.js";
+import { Animation, Timeline, EASING } from "../animationEngine.js";
 
 export class ReplayManager {
     constructor(game) {
@@ -230,22 +231,22 @@ export class ReplayManager {
                 let calcX = this.game.utils.convertRange(ev.x, 0, 512, this.xOffset, (512 * this.xScale) - this.xOffset);
                 let calcY = this.game.utils.convertRange(ev.y, 0, 384, this.yOffset, (384 * this.yScale) - this.yOffset);
                 this.movementX.push(
-                    new this.game.ANI(
+                    new Animation(
                         this.lastCursorT,
                         ev.t,
                         this.lastCursorX,
                         calcX,
-                        this.game.EASINGS.Linear
+                        EASING.Linear
                     )
                 );
 
                 this.movementY.push(
-                    new this.game.ANI(
+                    new Animation(
                         this.lastCursorT,
                         ev.t,
                         this.lastCursorY,
                         calcY,
-                        this.game.EASINGS.Linear
+                        EASING.Linear
                     )
                 );
 
