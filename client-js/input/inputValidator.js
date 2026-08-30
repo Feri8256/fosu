@@ -11,14 +11,13 @@ export class InputValidator {
     }
 
     updateInputs(arr = [false, false, false]) {
-        this.inputStates.forEach((k, i) => {
+        this.inputStates.forEach((k, i, a) => {
 
             if (arr[i] === k.down) return;
             if (arr[i]) k.valid = true;
             k.down = arr[i];
 
             if (typeof this.onInputChange === "function") {
-                let a = this.inputStates.map((s) => { return s = s.down; });
                 this.onInputChange(a);
                 this.game.events.emit("GameUI:InputOverlayUpdate", a);
             };

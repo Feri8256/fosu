@@ -512,7 +512,7 @@ export class BeatmapPlayer {
         if (isBreak === this.inBreak) return;
         this.inBreak = isBreak;
 
-        this.game.backgroundManager.changeOpacity(
+        if (this.game.CONFIG.backgroundDimChange) this.game.backgroundManager.changeOpacity(
             1 - (this.inBreak ? 0 : this.game.CONFIG.backgroundDim),
             this.inBreak ? 1000 : 750
         );

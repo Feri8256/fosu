@@ -60,6 +60,7 @@ export function getElements() {
                 $("#cursortrailType"),
                 $("#playerName"),
                 $("#backgroundDim"),
+                $("#backgroundDimChange"),
                 $("#betterLookingSliders"),
                 $("#hide300Points")
             ]

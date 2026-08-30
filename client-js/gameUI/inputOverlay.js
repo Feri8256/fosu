@@ -53,9 +53,9 @@ export class InputOverlay {
 
     }
 
-    updateInputState(arr = [false, false, false]) {
+    updateInputState(arr) {
         for (let i = 0; i < arr.length; i++) {
-            let d = arr[i];
+            let d = arr[i].down;
 
             if (d !== this.inputStates[i] && d) {
                 this.inputCounts[i]++;

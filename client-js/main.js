@@ -71,15 +71,17 @@ class Game {
             skin: "",
             cursorScale: 1.5,
             cursortrailType: 0,
-            mouseButtonsInGame: false,
+            mouseButtonsInGame: true,
             hide300Points: true,
             backgroundDim: 0.75,
+            backgroundDimChange: true,
             hitKeyA: "KeyX",
             hitKeyB: "KeyC",
             betterLookingSliders: true
         };
+        
 
-        this.socket = io("ws://localhost:7271");
+        this.socket = io(`ws://${window.location.hostname}:7271`);
 
         this.inputHandler = new InputHandler();
         this.inputValidator = new InputValidator(this);
@@ -183,6 +185,9 @@ class Game {
             },
             setBackgroundDim: (v) => {
                 this.CONFIG.backgroundDim = v;
+            },
+            setBackgroundDimChange: (v) => {
+                this.CONFIG.backgroundDimChange = v;
             },
             setSlidersLook: (v) => {
                 this.CONFIG.betterLookingSliders = v;

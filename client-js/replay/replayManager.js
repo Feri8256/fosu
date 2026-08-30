@@ -59,8 +59,8 @@ export class ReplayManager {
 
         switch (this.currentMode) {
             case 0:
-                this.convertedCursorX = this.game.utils.convertRange(this.game.cursor.currentX, this.xOffset, (512 * this.xScale) - this.xOffset, 0, 512);
-                this.convertedCursorY = this.game.utils.convertRange(this.game.cursor.currentY, this.yOffset, (384 * this.yScale) - this.yOffset, 0, 384);
+                this.convertedCursorX = utils.convertRange(this.game.cursor.currentX, this.xOffset, (512 * this.xScale) - this.xOffset, 0, 512);
+                this.convertedCursorY = utils.convertRange(this.game.cursor.currentY, this.yOffset, (384 * this.yScale) - this.yOffset, 0, 384);
                 // this means the map paused
                 if (currentTime === this.lastTimestamp) break;
 
@@ -228,8 +228,8 @@ export class ReplayManager {
                 };
                 this.inputEvents.push(o);
             } else {
-                let calcX = this.game.utils.convertRange(ev.x, 0, 512, this.xOffset, (512 * this.xScale) - this.xOffset);
-                let calcY = this.game.utils.convertRange(ev.y, 0, 384, this.yOffset, (384 * this.yScale) - this.yOffset);
+                let calcX = utils.convertRange(ev.x, 0, 512, this.xOffset, (512 * this.xScale) - this.xOffset);
+                let calcY = utils.convertRange(ev.y, 0, 384, this.yOffset, (384 * this.yScale) - this.yOffset);
                 this.movementX.push(
                     new Animation(
                         this.lastCursorT,

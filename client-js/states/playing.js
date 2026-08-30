@@ -20,20 +20,32 @@ export class Playing extends GameState {
             this.game.cursor.setPosition(m.x, m.y);
         }
 
-        this.game.inputHandler.onKeyup = () => {
-            let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
-            let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
-            let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
-            this.game.inputValidator.updateInputs([ia, ib, ic]);
-        }
+        //let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
 
-        this.game.inputHandler.onKeydown = () => {
-            let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
-            let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
-            let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
-            this.game.inputValidator.updateInputs([ia, ib, ic]);
+        //this.game.inputHandler.onKeyup = () => {
+        //    let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
+        //    let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
+        //let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
+        //    this.game.inputValidator.updateInputs([ia, ib, ic]);
+        //}
 
-            this.game.inputValidator.getInputStates().forEach((i) => {
+        //this.game.inputHandler.onKeydown = () => {
+        //    let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
+        //    let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
+        //let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
+        //    this.game.inputValidator.updateInputs([ia, ib, ic]);
+
+        //    this.game.inputValidator.getInputStates().forEach((i) => {
+        //        if (i.down && i.valid) {
+        //            this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
+        //            i.valid = false;
+        //            return;
+        //        }
+        //    });
+        //}
+
+        this.game.inputValidator.onInputChange = (inputList) => {
+            inputList.forEach((i) => {
                 if (i.down && i.valid) {
                     this.game.beatmapPlayer.hit(this.game.cursor.getPosition());
                     i.valid = false;
@@ -41,11 +53,18 @@ export class Playing extends GameState {
                 }
             });
         }
-
-        
     }
 
+
+
+
     handleInput() {
+        let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
+        let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
+        let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
+        this.game.inputValidator.updateInputs([ia, ib, ic]);
+
+
         this.game.beatmapPlayer.update(this.game.songClock);
 
         if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
@@ -63,7 +82,7 @@ export class Playing extends GameState {
         this.game.inputHandler.onMousemove = () => { }
         this.game.inputHandler.onKeydown = () => { }
         this.game.inputHandler.onKeyup = () => { }
-        this.game.inputValidator.onInputChange = () => {};
+        this.game.inputValidator.onInputChange = () => { };
         this.game.countdown = new this.game.COUNTDOWN(this.game, -1);
     }
 }

@@ -1,5 +1,4 @@
 import { Animation } from "../animationEngine.js";
-import { utils } from "../utils.js";
 
 export class HitObject {
     constructor(game, position, time, scaling, circleSize, hitSample, hitSound, approachTime) {
