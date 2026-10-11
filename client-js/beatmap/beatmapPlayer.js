@@ -99,9 +99,9 @@ export class BeatmapPlayer {
 
             let objectType = element.type;
 
-            if (this.getBitAtIndex(objectType, TYPE_PARAM.NEW_COMBO)) this.currentComboNumber = 1;
+            if (utils.getBitAtIndex(objectType, TYPE_PARAM.NEW_COMBO)) this.currentComboNumber = 1;
 
-            if (this.getBitAtIndex(objectType, TYPE_PARAM.CIRCLE)) {
+            if (utils.getBitAtIndex(objectType, TYPE_PARAM.CIRCLE)) {
 
                 this.hitCircles.push(
                     new Circle(
@@ -118,7 +118,7 @@ export class BeatmapPlayer {
                 );
             };
 
-            if (this.getBitAtIndex(objectType, TYPE_PARAM.SLIDER)) {
+            if (utils.getBitAtIndex(objectType, TYPE_PARAM.SLIDER)) {
                 this.hitCircles.push(
                     new Circle(
                         this.game,
@@ -166,7 +166,7 @@ export class BeatmapPlayer {
                 );
             }
 
-            if (this.getBitAtIndex(objectType, TYPE_PARAM.SPINNER)) {
+            if (utils.getBitAtIndex(objectType, TYPE_PARAM.SPINNER)) {
 
                 this.spinners.push(
                     new Spinner(

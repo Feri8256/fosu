@@ -10,6 +10,8 @@ export class SliderBallController {
         this.pixelLength = pixelLength;
         this.oneSlideTime = oneSlideLengthMs;
 
+        this.currentAngle = 0;
+
         this.moving = false;
 
         this.lastPosition = { x: 0, y: 0 };
@@ -80,6 +82,19 @@ export class SliderBallController {
                     "Y"
                 )
             )
+
+            let segmentAngle = utils.getLineAngle(curvePoint.x, curvePoint.y, this.ballPathPoints[i + 1].x, this.ballPathPoints[i + 1].y);
+            this.ballMovement.appendAnimation(
+                new Animation(
+                    currentSegmentTime,
+                    currentSegmentTime + segmentLengthMs,
+                    segmentAngle,
+                    segmentAngle,
+                    EASING.Linear,
+                    false,
+                    "R"
+                )
+            )
             currentSegmentTime += segmentLengthMs;
         };
     }
@@ -102,6 +117,10 @@ export class SliderBallController {
         return currentSegmentTime;
     }
 
+    getCurrentAngle() {
+        return this.currentAngle;
+    }
+
     /**
      * 
      * @param {Number} t 
@@ -122,6 +141,7 @@ export class SliderBallController {
         let checkY = this.ballMovement.getValueOf("Y");
 
         if (checkX != undefined && checkY != undefined) {
+            this.currentAngle = this.ballMovement.getValueOf("R");
             this.lastPosition.x = checkX;
             this.lastPosition.y = checkY;
         }

@@ -35,6 +35,8 @@ export class songSelectionManager {
             this.changeMetadata();
             this.game.auMgr.playAudioClip("select-difficulty");
             this.game.scoreBoardManager.getScoresForMap(this.currentSelect.beatmapHash);
+            this.game.beatmapLoader.load(this.currentSelect.beatmapSrc);
+
         }
 
         if (this.previousSelect.id === this.currentSelect.id) {
@@ -76,7 +78,8 @@ export class songSelectionManager {
     startMapLoading(url) {
         if (!url) return;
         this.game.setState(this.game.STATE_ENUM.LOADING);
-        this.game.beatmapLoader.load(url);
+        //this.game.beatmapLoader.load(url);
+        this.game.beatmapPlayer.createHitObjects(this.game.beatmapLoader.getParsedBeatmap());
     }
 
     scrollToLastPosition() {

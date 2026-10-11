@@ -16,19 +16,23 @@ export class Curve {
 
         this.curve = null;
 
-        switch (this.curveType) {
-            case "P":
-                this.curve = new CircumscribedCircle(this.curvePoints, pixelLength);
-                break;
-
-            case "B":
-                this.curve = new Bezier2(this.curvePoints, pixelLength);
-                break;
-            
-            case "L":
-            case "C":    
-                this.curve = new Linear(this.curvePoints);
-                break;
+        try {
+            switch (this.curveType) {
+                case "P":
+                    this.curve = new CircumscribedCircle(this.curvePoints, pixelLength);
+                    break;
+        
+                case "B":
+                    this.curve = new Bezier2(this.curvePoints, pixelLength);
+                    break;
+        
+                case "L":
+                case "C":
+                    this.curve = new Linear(this.curvePoints);
+                    break;
+            }
+        } catch (error) {
+            this.curve = new Linear(this.curvePoints);
         }
 
         this.canvasPath = new Path2D();

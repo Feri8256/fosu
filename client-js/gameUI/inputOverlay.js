@@ -25,8 +25,8 @@ export class InputOverlay {
 
         this.bgWidth = 55;
         this.bgHeight = 193;
-        this.keyWidth = this.keySpriteImg?.w ?? 1;
-        this.keyHeight = this.keySpriteImg?.h ?? 1;
+        this.keyWidth = 43;
+        this.keyHeight = 46;
         this.keySprites.forEach((s, i) => {
             s.x = this.x - this.keyWidth * 0.5;
             s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
@@ -35,7 +35,6 @@ export class InputOverlay {
         this.game.events.on("GameUI:InputOverlayUpdate", this.updateInputState.bind(this));
         this.game.events.on("GameUI:InputOverlayReset", this.reset.bind(this));
 
-        console.log(this.background)
     }
 
     update() {
@@ -47,8 +46,8 @@ export class InputOverlay {
         this.background.y = this.y;
 
         this.keySprites.forEach((s, i) => {
-            s.x = this.x - s.w * 0.5;
-            s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * s.h);
+            s.x = this.x - this.keyWidth * 0.5;
+            s.y = (this.y - this.bgHeight * 0.5) + ((i + 1) * this.keyHeight);
         });
 
     }
@@ -70,7 +69,7 @@ export class InputOverlay {
         this.background.render(this.game.ctx);
         this.keySprites.forEach((k, i) => {
             k.render(this.game.ctx);
-            this.renderNumber(this.inputCounts[i], this.game.canvas.width - (this.keySpriteImg?.w * 0.5), k.y, k.scale);
+            this.renderNumber(this.inputCounts[i], this.game.canvas.width - (this.keyWidth * 0.5), k.y, k.scale);
         });
     }
 

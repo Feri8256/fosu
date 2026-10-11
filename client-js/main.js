@@ -17,6 +17,7 @@ import { Failed } from "./states/failed.js";
 import { Loading } from "./states/loading.js";
 import { Result } from "./states/result.js";
 import { Spectate } from "./states/spectate.js";
+import { Home } from "./states/home.js";
 
 import { InputHandler } from "./input/InputHandler.js";
 import { Cursor } from "./gameUI/cursor.js";
@@ -29,6 +30,8 @@ import { ComboMeter } from "./judgement/comboMeter.js";
 
 import { ScoreDisplay } from "./gameUI/scoreDisplay.js";
 import { ScoreMeter } from "./judgement/scoreMeter.js";
+
+import { LogoCookie } from "./UI/logoCookie.js";
 
 
 import { AudioManager } from "./audio/audioManager.js";
@@ -54,7 +57,7 @@ class Game {
         this.utils = utils;
         this.events = new EventSystem();
 
-        this.canvas = document.querySelector("canvas");
+        this.canvas = document.querySelector("#mainCanvas");
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.ctx = this.canvas.getContext("2d", { alpha: false, desynchronized: true });
@@ -79,7 +82,7 @@ class Game {
             hitKeyB: "KeyC",
             betterLookingSliders: true
         };
-        
+
 
         this.socket = io(`ws://${window.location.hostname}:7271`);
 
@@ -88,19 +91,24 @@ class Game {
 
         this.UI = getElements();
         this.settingsManager = new SettingsManager(this);
-
+        this.auMgr = new AudioManager();
+        this.auMgr.setMasterVolume(this.CONFIG.effectVolume);
 
         createSkinList(this);
+        
+        this.skinResourceManager = new SkinResourceManager(this);
+        this.skinResourceManager.loadSkin(this.CONFIG.skin);
 
         this.STATE_ENUM = states
         this.STATES = [
-            new SongSelecting(this), 
-            new Playing(this), 
-            new Paused(this), 
-            new Failed(this), 
-            new Loading(this), 
-            new Result(this), 
-            new Spectate(this)
+            new SongSelecting(this),
+            new Playing(this),
+            new Paused(this),
+            new Failed(this),
+            new Loading(this),
+            new Result(this),
+            new Spectate(this),
+            new Home(this)
         ];
 
         this.INPUTHANDLER = InputHandler;
@@ -109,11 +117,8 @@ class Game {
         this.COUNTDOWN = Countdown;
 
 
-        this.auMgr = new AudioManager();
-        this.auMgr.setMasterVolume(this.CONFIG.effectVolume);
 
-        this.skinResourceManager = new SkinResourceManager(this);
-        this.skinResourceManager.loadSkin(this.CONFIG.skin);
+
 
         this.loadingImg = new SpriteImage("client-files/loading.png");
         this.loadingSprite = new Sprite(this.loadingImg);
@@ -154,6 +159,8 @@ class Game {
         this.hitSoundPlayer = new HitSoundPlayer(this);
         this.resultScreenUpdater = new ResultScreenUpdater(this);
         this.scoreBoardManager = new ScoreBoardManager(this);
+
+        this.logo = new LogoCookie(this);
 
 
 
@@ -216,7 +223,7 @@ class Game {
         this.songDeltaTime = 0;
         // Game starts in the song selection menu
         this.currentState;
-        this.setState(0);
+        this.setState(states.HOME);
     }
 
     update(timestamp) {
@@ -227,18 +234,9 @@ class Game {
         this.songDeltaTime = sc - this.songClock;
         this.songClock = sc;
 
-        this.cursor.update();
-        this.replayManager.update(this.songClock);
-        this.currentState.handleInput();
-        this.inputOverlay.update();
+        this.currentState.update();
         this.songAudioHandler.update();
         this.backgroundManager.update();
-        this.accuracyDisplay.update();
-        this.comboDisplay.update();
-        this.countdown.update(this.songClock);
-        this.scoreDisplay.update();
-        this.spinnerBonusDisplay.update();
-        this.hitJudgeMgr.update();
 
         if (this.loading) {
             this.loadingAnimation.update(this.clock);
@@ -252,22 +250,12 @@ class Game {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         this.backgroundManager.render();
-        this.beatmapPlayer.render();
-
+        
         if (this.loading) {
             this.loadingSprite.render(this.ctx);
         }
 
-        if (this.beatmapPlayer.playing) {
-            this.accuracyDisplay.render();
-            this.comboDisplay.render();
-            this.inputOverlay.render();
-            this.countdown.render();
-            this.scoreDisplay.render();
-            this.spinnerBonusDisplay.render();
-            this.hitJudgeMgr.render();
-            this.cursor.render();
-        }
+        this.currentState.render();
     }
 
     setState(stateEnum) {

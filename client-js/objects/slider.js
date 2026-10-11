@@ -75,26 +75,34 @@ export class Slider extends HitObject {
 
         this.reverseArrows = [
             new Sprite(this.game.skinResourceManager.getSpriteImage("reversearrow")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("reversearrow")),
+            new Sprite(this.game.skinResourceManager.getSpriteImage("reversearrow")),
             new Sprite(this.game.skinResourceManager.getSpriteImage("reversearrow"))
         ];
 
-        this.reverseArrows[1].opacity = 0;
-        this.reverseArrows[0].opacity = 0;
+        //this.reverseArrows[0].opacity = 0;
+        //this.reverseArrows[1].opacity = 0;
 
         // Scaling all reverse arrows
-        this.reverseArrows[0].scale = this.ballScale;
-        this.reverseArrows[1].scale = this.ballScale;
+        //this.reverseArrows[0].scale = this.ballScale;
+        //this.reverseArrows[1].scale = this.ballScale;
 
         // Set position for the slider start reverse
-        this.reverseArrows[0].x = position.x;
-        this.reverseArrows[0].y = position.y;
+        this.reverseArrows[0].x = this.reverseArrows[2].x = position.x;
+        this.reverseArrows[0].y = this.reverseArrows[2].y = position.y;
 
         // Set position for the slider end reverse
-        this.reverseArrows[1].x = this.endPoint.x;
-        this.reverseArrows[1].y = this.endPoint.y;
+        this.reverseArrows[1].x = this.reverseArrows[3].x = this.endPoint.x;
+        this.reverseArrows[1].y = this.reverseArrows[3].y = this.endPoint.y;
 
-        this.reverseArrows[0].rotation = utils.getLineAngleP(this.startPoint, this.curvePath.at(1)) - (Math.PI * 0.5);
-        this.reverseArrows[1].rotation = utils.getLineAngleP(this.curvePath.at(-2), this.endPoint) + (Math.PI * 0.5);
+        this.reverseArrows[0].rotation = this.reverseArrows[2].rotation = utils.getLineAngleP(this.startPoint, this.curvePath.at(1)) - (Math.PI * 0.5);
+        this.reverseArrows[1].rotation = this.reverseArrows[3].rotation = utils.getLineAngleP(this.curvePath.at(-2), this.endPoint) + (Math.PI * 0.5);
+
+        this.reverseArrows.forEach((ra) => {
+            ra.ani = new Animation();
+            ra.opacity = 0;
+            ra.scale = this.ballScale;
+        });
 
         if (this.game.autoplay.activated) {
             let lastBallPosition = this.ballController.ballPathPoints.at(-1);
@@ -124,7 +132,8 @@ export class Slider extends HitObject {
 
         let p = this.ballController.getPositionAtTime(currentTime);
 
-        this.ballSprite.rotation = utils.getLineAngle(this.ballSprite.x, this.ballSprite.y, p.x, p.y) - (Math.PI * 0.5);
+        this.ballSprite.rotation = this.ballController.getCurrentAngle() - (Math.PI * 0.5);
+
         this.ballSprite.x = p.x;
         this.ballSprite.y = p.y;
         this.ballSprite.opacity = this.ballController.isMoving() ? 1 : 0;
@@ -145,7 +154,9 @@ export class Slider extends HitObject {
             this.currentSlide = edgeIndex;
             if (this.currentFollowState) {
                 this.playEdgeSound(edgeIndex);
-                this.reverseArrowPopAni = new Animation(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, EASING.SineOut);
+                let whatEnd = (this.currentSlide & 1) === 1;
+
+                if (this.slidesLeft > 0) this.reverseArrows[2 + whatEnd].ani = new Animation(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, EASING.SineOut);
             }
         }
 
@@ -156,6 +167,8 @@ export class Slider extends HitObject {
 
             this.reverseArrows[0].scale = this.pulseAnimation.currentValue;
             this.reverseArrows[1].scale = this.pulseAnimation.currentValue;
+
+            //this.reverseArrows[2 + a].ani = new Animation(currentTime, currentTime + 200, this.ballScale, this.ballScale * 1.2, EASING.SineOut);
 
         } else {
             this.reverseArrows[0].opacity = 0; // start
@@ -173,6 +186,14 @@ export class Slider extends HitObject {
             this.endReached = true;
             if (this.currentFollowState) this.setFollowState(false);
         }
+
+        this.reverseArrows.forEach((ra, i) => {
+            ra.ani.update(currentTime);
+            if (i > 1) {
+                ra.opacity = 1 - ra.ani.amount;
+                ra.scale = ra.ani.currentValue;
+            }
+        });
 
         if (currentTime > this.endTime + this.fadeOutMs) {
             this.curve.destroyRender();

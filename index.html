@@ -9,12 +9,12 @@
 </head>
 
 <body>
-    <canvas></canvas>
+    <canvas id="mainCanvas"></canvas>
     <button id="play-skip-btn" class="ontop">
         <img src="client-files/play-skip.png" alt="a">
     </button>
-    <div id="songselect-container" class="ontop"></div>
-    <div id="songselect-metadata" class="ontop">
+    <div id="songselect-container" class="ontop hidden"></div>
+    <div id="songselect-metadata" class="ontop hidden">
         <p><span id="meta-artist"></span> - <span id="meta-title"></span>[<span id="meta-diffname"></span>]</p>
         <p>Mapped by <span id="meta-creator">-</span></p>
         <p><b>AR:</b><span id="meta-ar">-</span> <b>CS:</b><span id="meta-cs">-</span> <b>OD:</b><span
@@ -28,6 +28,10 @@
             <button id="pause-back">Back</button>
         </div>
 
+    </div>
+
+    <div id="home-overlay" class="ontop">
+       
     </div>
 
     <div id="result" class="ontop">
@@ -89,7 +93,7 @@
         <input type="checkbox" checked id="spectate-playback-rate-pitch">
     </div>
 
-    <div id="scores" class="ontop">
+    <div id="scores" class="ontop hidden">
 
     </div>
 
@@ -185,7 +189,7 @@
         </div>
     </div>
 
-    <div id="songselect-actions" class="ontop">
+    <div id="songselect-actions" class="ontop hidden">
         <button id="settings-btn">
             <img src="client-files/settings.png" alt="">
         </button>
@@ -194,7 +198,6 @@
             Random
         </button>
     </div>
-
 
     <audio src="" preload="auto"></audio>
 

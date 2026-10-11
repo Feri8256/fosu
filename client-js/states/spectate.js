@@ -16,7 +16,7 @@ export class Spectate extends GameState {
         this.game.cursor = new this.game.CURSOR(this.game, true);
     }
 
-    handleInput() {
+    update() {
         if (this.game.inputHandler.includesKey("Escape", true)) {
             this.game.setState(states.SONGSELECT);
             this.game.auMgr.playAudioClip("menuback");
@@ -29,7 +29,7 @@ export class Spectate extends GameState {
         }
 
         let steppedCurrentTime = this.game.songClock - this.game.songDeltaTime;
-        let currentInputEvent = [false, false, false];
+        let currentInputEvent = 0;
 
         while (steppedCurrentTime < this.game.songClock) {
 

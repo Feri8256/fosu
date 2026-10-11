@@ -1,3 +1,5 @@
+import { utils } from "../utils.js";
+
 export class InputValidator {
     constructor(game) {
         this.game = game;
@@ -10,7 +12,18 @@ export class InputValidator {
         this.onInputChange = () => { }
     }
 
-    updateInputs(arr = [false, false, false]) {
+    /**
+     * 
+     * @param {Number} n input bit flags as integer (make it -1 to use the array thing)
+     * @param {boolean[]} a input list array
+     */
+    updateInputs(n = -1, a = []) {
+        let arr = a.length > 0 ? a : [false, false, false];
+        
+        if (n !== -1) arr.forEach((v, i) => { 
+            v = utils.getBitAtIndex(n, i);
+        });
+
         this.inputStates.forEach((k, i, a) => {
 
             if (arr[i] === k.down) return;

@@ -5,7 +5,8 @@ export const states = {
     FAILED: 3,
     LOADING: 4,
     RESULT: 5,
-    SPECTATING: 6
+    SPECTATING: 6,
+    HOME: 7
 }
 
 export class GameState {
@@ -14,5 +15,14 @@ export class GameState {
     }
     leave() {
 
+    }
+    enter() {
+
+    }
+    update() {
+
+    }
+    render() {
+        
     }
 }

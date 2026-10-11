@@ -10,7 +10,7 @@ export class Loading extends GameState {
         this.game.setLoadingCircle(true);
         this.game.settingsManager.setButtonVisibility(false);
 
-        this.game.UI.songSelectContainer.animate([
+        /* this.game.UI.songSelectContainer.animate([
             { transform: "translateX(0px)" },
             { transform: "translateX(690px)" }
         ],
@@ -31,7 +31,7 @@ export class Loading extends GameState {
                 duration: 500,
                 fill: "forwards"
             }
-        );
+        ); */
 
         this.game.songAudioHandler.changeVolume(
             this.game.songAudioHandler.audio.volume * 0.5,
@@ -39,7 +39,7 @@ export class Loading extends GameState {
         );
     }
 
-    handleInput() {
+    update() {
 
     }
 

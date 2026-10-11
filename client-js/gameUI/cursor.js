@@ -48,8 +48,8 @@ class Particle {
         this.active = false;
     }
 
-    render() {
-        this.sprite.render(this.game.ctx);
+    render(ctx) {
+        this.sprite.render(ctx);
     }
 }
 
@@ -129,7 +129,7 @@ export class Cursor {
     }
 
     render() {
-        this.particles.active.forEach((t) => { t.render() });
+        this.particles.active.forEach((t) => { t.render(this.game.ctx) });
         this.cursorSprite.render(this.game.ctx);
         this.cursorMiddleSprite.render(this.game.ctx);
     }

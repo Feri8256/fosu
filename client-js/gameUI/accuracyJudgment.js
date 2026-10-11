@@ -1,4 +1,3 @@
-import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
 import { Sprite } from "../graphics/sprite.js";
 import { Animation, EASING, Timeline } from "../animationEngine.js";
 

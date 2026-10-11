@@ -58,24 +58,45 @@ export class Playing extends GameState {
 
 
 
-    handleInput() {
+    update() {
         let ia = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyA, false);
         let ib = this.game.inputHandler.includesKey(this.game.CONFIG.hitKeyB, false);
         let ic = this.game.inputHandler.getMouse().down && this.game.CONFIG.mouseButtonsInGame;
-        this.game.inputValidator.updateInputs([ia, ib, ic]);
+        this.game.inputValidator.updateInputs(-1, [ia, ib, ic]);
 
 
-        this.game.beatmapPlayer.update(this.game.songClock);
 
         if (this.game.inputHandler.includesKey("Escape", true)) this.game.setState(states.PAUSED);
 
+        this.game.cursor.update();
+        this.game.beatmapPlayer.update(this.game.songClock);
+        this.game.countdown.update(this.game.songClock);
         this.game.inputOverlay.update();
+        this.game.accuracyDisplay.update();
+        this.game.comboDisplay.update();
+        this.game.scoreDisplay.update();
+        this.game.spinnerBonusDisplay.update();
+        this.game.hitJudgeMgr.update();
+        this.game.replayManager.update(this.game.songClock);
 
         if (this.game.inputHandler.includesKey("Space", true)
             && this.game.beatmapPlayer.isIntroSkipable()
         ) {
             this.game.beatmapPlayer.skipIntro();
         }
+    }
+
+    render() {
+        this.game.beatmapPlayer.render();
+        this.game.accuracyDisplay.render();
+        this.game.comboDisplay.render();
+        this.game.inputOverlay.render();
+        this.game.countdown.render();
+        this.game.scoreDisplay.render();
+        this.game.spinnerBonusDisplay.render();
+        this.game.hitJudgeMgr.render();
+        this.game.cursor.render();
+
     }
 
     leave() {

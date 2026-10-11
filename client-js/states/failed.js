@@ -10,7 +10,7 @@ export class Failed extends GameState {
 
     }
 
-    handleInput() {
+    update() {
 
     }
 }

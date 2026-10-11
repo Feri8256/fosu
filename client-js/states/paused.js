@@ -1,4 +1,4 @@
-import { GameState } from "./gameStates.js";
+import { GameState, states } from "./gameStates.js";
 
 export class Paused extends GameState {
     constructor(game) {
@@ -27,7 +27,10 @@ export class Paused extends GameState {
 
     }
 
-    handleInput() {
+    update() {
+        let m = this.game.inputHandler.getMouse();
+        this.game.cursor.setPosition(m.x, m.y);
+        
         if (this.game.inputHandler.includesKey("Escape", true)) {
             this.game.setState(states.PLAYING);
             this.game.UI.pauseOverlay.animate([
@@ -46,5 +49,17 @@ export class Paused extends GameState {
             }, 500);
         }
 
+    }
+
+    render() {
+        this.game.beatmapPlayer.render();
+        this.game.accuracyDisplay.render();
+        this.game.comboDisplay.render();
+        this.game.inputOverlay.render();
+        this.game.countdown.render();
+        this.game.scoreDisplay.render();
+        this.game.spinnerBonusDisplay.render();
+        this.game.hitJudgeMgr.render();
+        this.game.cursor.render();
     }
 }

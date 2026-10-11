@@ -52,7 +52,9 @@ export class SkinResourceManager {
                 "count2.png",
                 "count3.png",
                 "go.png",
-                "ready.png"
+                "ready.png",
+                "songselect-top.png",
+                "songselect-bottom.png"
             ],
             sounds: [
                 "combobreak.wav",

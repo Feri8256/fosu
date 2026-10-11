@@ -90,7 +90,10 @@ export class Result extends GameState {
         this.game.setState(state);
     }
 
-    handleInput() {
+    update() {
+        let m = this.game.inputHandler.getMouse();
+        this.game.cursor.setPosition(m.x, m.y);
+        
         if (this.game.inputHandler.includesKey("Escape", true)) {
             this.back();
         }
