@@ -3,8 +3,7 @@ import { GameState, states } from "./gameStates.js";
 
 export class SongSelecting extends GameState {
     constructor(game) {
-        super("MENU");
-        this.game = game;
+        super(game, "MENU");
 
         this.topOverlay = new Sprite(this.game.skinResourceManager.getSpriteImage("songselect-top"));
         this.bottomOverlay = new Sprite(this.game.skinResourceManager.getSpriteImage("songselect-bottom"));

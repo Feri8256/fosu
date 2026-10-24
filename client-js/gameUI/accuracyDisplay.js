@@ -1,6 +1,10 @@
 import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
 
 export class AccuracyDisplay {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
 

@@ -52,7 +52,7 @@ import { HitJudgementManager } from "./gameUI/hitJudgementManager.js";
 import { EventSystem } from "./eventSystem.js";
 import { io } from "/socket.io/client-dist/socket.io.esm.min.js";
 
-class Game {
+export class Game {
     constructor() {
         this.utils = utils;
         this.events = new EventSystem();
@@ -233,7 +233,7 @@ class Game {
         let sc = this.songAudioHandler.getCurrentTime();
         this.songDeltaTime = sc - this.songClock;
         this.songClock = sc;
-
+        
         this.currentState.update();
         this.songAudioHandler.update();
         this.backgroundManager.update();

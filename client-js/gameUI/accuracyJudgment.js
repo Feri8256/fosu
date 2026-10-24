@@ -4,7 +4,7 @@ import { Animation, EASING, Timeline } from "../animationEngine.js";
 export class AccuracyJudgment {
     /**
      * Visual feedback of the players hit accuracy
-     * @param {*} game 
+     * @param {import("../main.js").Game} game 
      * @param {Number} x x position value originating from the hit object
      * @param {Number} y y position value originating from the hit object
      * @param {Number} s scaling

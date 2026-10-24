@@ -1,6 +1,10 @@
 import { Sprite } from "../graphics/sprite.js";
 
 export class InputOverlay {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.background = new Sprite(this.game.skinResourceManager.getSpriteImage("inputoverlay-background"));

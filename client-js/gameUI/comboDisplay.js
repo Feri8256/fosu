@@ -2,6 +2,10 @@ import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
 import { Animation, EASING, Timeline } from "../animationEngine.js";
 
 export class ComboDisplay {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.currentCombo = 0;

@@ -1,6 +1,10 @@
 import { utils } from "../utils.js";
 
 export class InputValidator {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.inputStates = [

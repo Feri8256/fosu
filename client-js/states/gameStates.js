@@ -10,7 +10,13 @@ export const states = {
 }
 
 export class GameState {
-    constructor(stateName) {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     * @param {String} stateName 
+     */
+    constructor(game, stateName) {
+        this.game = game
         this.stateName = stateName;
     }
     leave() {

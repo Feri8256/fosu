@@ -54,6 +54,11 @@ class Particle {
 }
 
 export class Cursor {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     * @param {Boolean} isRotating 
+     */
     constructor(game, isRotating) {
         this.game = game;
         this.isRotatingEnabled = isRotating;

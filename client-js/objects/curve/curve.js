@@ -35,6 +35,14 @@ export class Curve {
             this.curve = new Linear(this.curvePoints);
         }
 
+        /* this.curvePoints.forEach((curvePoint) => {
+            //console.log(curvePoint);
+            if (!previousPoint) return;
+            curvePoint.equal(previousPoint) ? console.log("Gotem") : console.log("nah");
+            previousPoint = curvePoint;
+            
+        }); */
+
         this.canvasPath = new Path2D();
         for (const cp of this.curve.path) {
             this.canvasPath.lineTo(cp.x, cp.y);

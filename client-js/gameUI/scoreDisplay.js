@@ -2,6 +2,10 @@ import { SpriteFontRenderer } from "../graphics/fontRenderer.js";
 import { Animation, EASING } from "../animationEngine.js";
 
 export class ScoreDisplay {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.currentScore = 0;

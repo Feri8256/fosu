@@ -2,6 +2,10 @@ import { utils } from "../utils.js";
 import { Animation, Timeline, EASING } from "../animationEngine.js";
 
 export class ReplayManager {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.currentReplayId = "";

@@ -1,4 +1,9 @@
 export class AccuracyMeter {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     * @param {Number} od 
+     */
     constructor(game, od = 1) {
         this.game = game;
         this.od = od;

@@ -1,6 +1,17 @@
 import { Animation } from "../animationEngine.js";
 
 export class HitObject {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     * @param {import("../point.js").Point} position 
+     * @param {Number} time 
+     * @param {Number} scaling 
+     * @param {Number} circleSize 
+     * @param {*} hitSample 
+     * @param {*} hitSound 
+     * @param {Number} approachTime 
+     */
     constructor(game, position, time, scaling, circleSize, hitSample, hitSound, approachTime) {
         this.game = game;
         this.position = position,

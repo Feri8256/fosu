@@ -3,6 +3,10 @@
  * and keeps track of the settings
  */
 export class SettingsManager {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.lsKey = "fosuConfig";
         this.game = game;

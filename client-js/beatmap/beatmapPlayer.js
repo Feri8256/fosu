@@ -3,6 +3,8 @@ import { Slider } from "../objects/slider.js";
 import { Spinner } from "../objects/spinner.js";
 import { utils } from "../utils.js";
 
+import { Point } from "../point.js";
+
 const TYPE_PARAM = {
     CIRCLE: 0,
     SLIDER: 1,
@@ -10,14 +12,18 @@ const TYPE_PARAM = {
     SPINNER: 3
 }
 
-class Point {
+/* class Point {
     constructor(x, y) {
         this.x = x;
         this.y = y;
     }
-}
+} */
 
 export class BeatmapPlayer {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.playFieldWidth = 512;
@@ -231,10 +237,10 @@ export class BeatmapPlayer {
 
             if (!this.isSpectating) {
                 // we not spectating.. start capture the gameplay
-                this.game.replayManager.startCapture(this.game.CONFIG.playerName, this.game.songSelectManager.currentSelect.beatmapHash, String(Date.now()));
+                //this.game.replayManager.startCapture(this.game.CONFIG.playerName, this.game.songSelectManager.currentSelect.beatmapHash, String(Date.now()));
             } else {
                 // We spectating but who? The machine (mode 2) or human (mode 1)?
-                this.game.replayManager.setMode(this.game.autoplay.activated ? 2 : 1);
+                //this.game.replayManager.setMode(this.game.autoplay.activated ? 2 : 1);
             }
             this.game.setState(this.isSpectating ? this.game.STATE_ENUM.SPECTATING : this.game.STATE_ENUM.PLAYING);
         }, startDelay);
@@ -285,7 +291,7 @@ export class BeatmapPlayer {
 
             // When its too late to click and no hit registered on the hit object it counts as a miss
             if (!u.hitCheck && u.time < this.currentTime - 300) {
-               
+
                 this.game.events.emit("game:hit", u.position, 0, u.scaling);
 
                 // Register a not successful hit to the accuracy meter and combo meter
@@ -319,10 +325,17 @@ export class BeatmapPlayer {
     }
 
     render() {
+        let reversedCircles = [...this.hitCirclesToRender].reverse();
+
+        let reversedSliders = [...this.slidersToRender].reverse();
+
         // Rendering every type of hit object in order
         this.spinnersToRender.forEach((o) => { o.render() });
-        this.slidersToRender.forEach((s) => { s.render() });
-        this.hitCirclesToRender.forEach((o) => { o.render() });
+        reversedSliders.forEach((s) => { s.render() });
+        reversedCircles.forEach((o) => { o.render() });
+
+        reversedSliders.length = 0;
+        reversedCircles.length = 0;
 
         // Beatmap time progress bar on the bottom
         if (!this.playing) return;

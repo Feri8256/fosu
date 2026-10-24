@@ -2,6 +2,10 @@ import { Animation } from "../animationEngine.js";
 import { Sprite, SpriteImage } from "../graphics/sprite.js";
 
 export class BackgrondImageManager {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.fadeInDurationMs = 300;

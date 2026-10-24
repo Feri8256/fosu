@@ -19,6 +19,10 @@ const HIT_VALUE_POINTS = {
 }
 
 export class ScoreMeter {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.currentScore = 0;

@@ -2,8 +2,7 @@ import { GameState, states } from "./gameStates.js";
 
 export class Playing extends GameState {
     constructor(game) {
-        super("PLAYING");
-        this.game = game;
+        super(game, "PLAYING");
 
         this.game.inputValidator.onInputChange = (a) => {
             this.game.replayManager.addInputEvents(a, this.game.songAudioHandler.getCurrentTime());

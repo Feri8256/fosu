@@ -1,4 +1,8 @@
 export class SongSelectionBuilder {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.list = [];

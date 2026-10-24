@@ -2,8 +2,7 @@ import { GameState } from "./gameStates.js";
 
 export class Loading extends GameState {
     constructor(game) {
-        super("LOADING");
-        this.game = game;
+        super(game, "LOADING");
     }
 
     enter() {

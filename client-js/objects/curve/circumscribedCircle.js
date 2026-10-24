@@ -1,3 +1,5 @@
+import { Point } from "../../point.js";
+
 function counterClockwise(a, b, c) {
     var ret = (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
     if (ret > 0) {
@@ -8,13 +10,6 @@ function counterClockwise(a, b, c) {
     }
     return 0;
 };
-
-class Point {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
 
 export class CircumscribedCircle {
     /**
@@ -50,7 +45,7 @@ export class CircumscribedCircle {
             delta: t
         };
 
-        var nCurve = pixelLength / 5 | 0;
+        var nCurve = pixelLength / 10 | 0; // 5
         this.path = [];
         for (var i = 0; i <= nCurve; i++) {
             this.path[i] = this.pointAt(i / nCurve);

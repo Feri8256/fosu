@@ -4,7 +4,7 @@ import { Animation, EASING } from "../animationEngine.js";
 export class Countdown {
     /**
      * *"Are You ready?... 3-2-1-GO!"*
-     * @param {*} game 
+     * @param {import("../main.js").Game} game 
      * @param {Number} firstHitObjectTime put `-1` here for disable the countdown
      * @param {Number} beatLength beat length from uninherited timing point
      */

@@ -1,6 +1,10 @@
 import { AccuracyJudgment } from "./accuracyJudgment.js";
 
 export class HitJudgementManager {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.accJudgments = [];

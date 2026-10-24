@@ -1,6 +1,10 @@
 import { parseOsu } from "./osuParser.js";
 
 export class BeatmapLoader {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
 

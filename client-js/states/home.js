@@ -2,8 +2,7 @@ import { GameState, states } from "./gameStates.js";
 
 export class Home extends GameState {
     constructor(game) {
-        super("HOME");
-        this.game = game;
+        super(game, "HOME");
 
         this.stateChangeDelayMs = 500;
         this.stateChangeTimestamp = 0;

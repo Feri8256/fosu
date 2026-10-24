@@ -1,6 +1,10 @@
 import { Animation } from "../animationEngine.js";
 
 export class SongAudioHandler {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.audio = document.querySelector("audio");

@@ -1,4 +1,8 @@
 export class ReplayWatchStartHandler {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
 

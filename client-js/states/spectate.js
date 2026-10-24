@@ -2,8 +2,7 @@ import { GameState, states } from "./gameStates.js";
 
 export class Spectate extends GameState {
     constructor(game) {
-        super("SPECTATING");
-        this.game = game;
+        super(game, "SPECTATING");
 
 
     }

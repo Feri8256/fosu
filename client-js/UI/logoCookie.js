@@ -3,6 +3,10 @@ import { Animation, EASING } from "../animationEngine.js";
 import { utils } from "../utils.js";
 
 export class LogoCookie {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.clickDebounceMs = 2000;

@@ -87,7 +87,7 @@ export function parseOsu(str) {
         let eventTokens = eventLine.split(commaSeparator);
 
         if (eventTokens[0] === "0") out.Events.BackgroundImage = eventTokens[2].replaceAll(`"`, "");
-        if (eventTokens[0] === "2" || eventTokens[0] === "Break") out.Events.Breaks.push({ startTime: parseInt(eventTokens[1]), endTime: parseInt(eventTokens[2]) });
+        if (eventTokens[0] === "2" || eventTokens[0] === "Break") out.Events.Breaks.push({ startTime: Number(eventTokens[1]), endTime: Number(eventTokens[2]) });
     }
 
 
@@ -100,14 +100,14 @@ export function parseOsu(str) {
         if (timingPointLine === '') break;
         let timingPointTokens = timingPointLine.split(commaSeparator);
         let timingPoint = {
-            time: parseInt(timingPointTokens[0]),
-            beatLength: parseFloat(timingPointTokens[1]),
-            meter: parseInt(timingPointTokens[2] || 4),
-            sampleSet: parseInt(timingPointTokens[3] || 0),
-            sampleIndex: parseInt(timingPointTokens[4] || 0),
-            volume: parseInt(timingPointTokens[5] || 1),
-            uninherited: parseInt(timingPointTokens[6] || 1),
-            effects: parseInt(timingPointTokens[7])
+            time: Number(timingPointTokens[0]),
+            beatLength: Number(timingPointTokens[1]),
+            meter: Number(timingPointTokens[2] || 4),
+            sampleSet: Number(timingPointTokens[3] || 0),
+            sampleIndex: Number(timingPointTokens[4] || 0),
+            volume: Number(timingPointTokens[5] || 1),
+            uninherited: Number(timingPointTokens[6] || 1),
+            effects: Number(timingPointTokens[7])
         };
         out.TimingPoints.push(timingPoint);
     }
@@ -129,32 +129,43 @@ export function parseOsu(str) {
             let curveTypePoints = hitObjectTokens[5].split('|');
             // 2D array [[x,y]...]
             let curvePointsArray = [];
-            for (let j = 1; j < curveTypePoints.length; j++) {
-                let XY = curveTypePoints[j];
-                curvePointsArray.push(XY.split(':').map(n => parseInt(n)));
+            if (curveTypePoints.length > 0) {
+                for (let j = 1; j < curveTypePoints.length; j++) {
+                    let XYstr = curveTypePoints[j];
+                    if (!XYstr) XYstr = "0:0";
+
+                    let XYsplit = XYstr.split(':');
+                    if (XYsplit.length !== 2) XYsplit = ["0", "0"];
+
+                    let XYnum = XYsplit.map(n => isNaN(Number(n)) ? 0 : Number(n));
+
+                    curvePointsArray.push(XYnum);
+                }
+            } else {
+                curvePointsArray.push([0,0]);
             }
 
             hitObject = {
-                x: parseInt(hitObjectTokens[0]),
-                y: parseInt(hitObjectTokens[1]),
-                time: parseInt(hitObjectTokens[2]),
-                type: parseInt(hitObjectTokens[3]),
+                x: Number(hitObjectTokens[0]),
+                y: Number(hitObjectTokens[1]),
+                time: Number(hitObjectTokens[2]),
+                type: Number(hitObjectTokens[3]),
                 hitSound: Number(hitObjectTokens[4]),
                 objectParams: hitObjectTokens[5],
                 hitSample: createHitSample(hitObjectTokens[10]),
                 curveType: curveTypePoints[0],
                 curvePoints: curvePointsArray,
-                slides: parseInt(hitObjectTokens[6]),
-                length: parseInt(hitObjectTokens[7]),
+                slides: Number(hitObjectTokens[6]),
+                length: Number(hitObjectTokens[7]),
                 edgeSounds: hitObjectTokens[8]?.split("|").map(esnd => Number(esnd)),
                 edgeSets: hitObjectTokens[9]?.split("|").map(eset => createHitSample(eset))
             }
         } else {
             hitObject = {
-                x: parseInt(hitObjectTokens[0]),
-                y: parseInt(hitObjectTokens[1]),
-                time: parseInt(hitObjectTokens[2]),
-                type: parseInt(hitObjectTokens[3]),
+                x: Number(hitObjectTokens[0]),
+                y: Number(hitObjectTokens[1]),
+                time: Number(hitObjectTokens[2]),
+                type: Number(hitObjectTokens[3]),
                 hitSound: Number(hitObjectTokens[4]),
                 objectParams: hitObjectTokens[5],
                 hitSample: createHitSample(hitObjectTokens[6]),

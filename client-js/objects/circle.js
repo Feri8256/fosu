@@ -5,7 +5,7 @@ import { Animation, EASING } from "../animationEngine.js";
 export class Circle extends HitObject {
     /**
      * 
-     * @param {Game} game 
+     * @param {import("../main.js").Game} game 
      * @param {Point} position 
      * @param {Number} time 
      * @param {Number} scaling 

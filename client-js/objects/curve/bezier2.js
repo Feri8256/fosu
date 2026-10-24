@@ -1,9 +1,4 @@
-class Point {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
+import { Point } from "../../point.js";
 
 export class Bezier2 {
     /**
@@ -20,7 +15,7 @@ export class Bezier2 {
         this.points = points;
 
         this.path = [];
-        var nCurve = pixelLength / 5 | 0;
+        var nCurve = pixelLength / 10 | 0; // 5
         for (let i = 0; i <= nCurve; i++) {
             this.path.push(
                 this.pointAt(i / nCurve)

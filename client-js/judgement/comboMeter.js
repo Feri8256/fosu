@@ -1,4 +1,8 @@
 export class ComboMeter {
+    /**
+     * 
+     * @param {import("../main.js").Game} game 
+     */
     constructor(game) {
         this.game = game;
         this.currentCombo = 0;

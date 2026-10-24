@@ -2,8 +2,7 @@ import { GameState, states } from "./gameStates.js";
 
 export class Result extends GameState {
     constructor(game) {
-        super("RESULT");
-        this.game = game;
+        super(game, "RESULT");
     }
 
     enter() {
